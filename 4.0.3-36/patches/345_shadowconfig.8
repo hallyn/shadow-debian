@@ -1,0 +1,18 @@
+Goal: Correct file name and additionnal information in shadowconfig.8
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/shadowconfig.8
+===================================================================
+--- shadow-4.0.3.orig/man/shadowconfig.8	2005-05-12 12:12:08.909056587 +0200
++++ shadow-4.0.3/man/shadowconfig.8	2005-05-12 12:12:18.805577919 +0200
+@@ -20,5 +20,8 @@ Turning shadow passwords on when they ar
+ are already off, is harmless.
+ 
+ Read
+-.I /usr/share/doc/passwd/README.debian.gz
++.I /usr/share/doc/passwd/README.Debian
+ for a brief introduction to shadow passwords and related features.
++
++Note that turning shadow passwords off and on again will lose all password
++aging information.

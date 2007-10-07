@@ -1,0 +1,135 @@
+Goal: the username should be logged as UNKNOWN if LOG_UNKFAIL_ENAB is not set.
+
+Status wrt upstream: It should be applied upstream, or kept.
+
+Notes:
+ * This patch also adds the following minor changes (which are not easy to
+   extract from this patch):
+     + TOO MANY LOGIN... logged if PAM_MAXTRIES or failcount >= retries.
+      Upstream only test PAM_MAXTRIES.
+     + Print to stderr (in addition to syslog) in case of maximum number of
+       tries exceeded.
+     + Always prints the number of tries in the syslog entry.
+     + add special handling for PAM_ABORT
+ * This patch also adds the following non-minor change:
+     + add an entry to failog, as when USE_PAM is not defined. (#53164)
+ * The patch changed pam_end to PAM_END. This is certainly a mistake.
+   PAM_END is pam_close_seesion + pam_end. Here, the session is still not
+   open, we don't have to close it.
+ * a HAVE_PAM_FAIL_DELAY is missing
+
+
+Index: shadow-4.0.3/src/login.c
+===================================================================
+--- shadow-4.0.3.orig/src/login.c	2005-05-29 00:06:16.954189000 +0200
++++ shadow-4.0.3/src/login.c	2005-05-29 00:06:56.174189000 +0200
+@@ -775,49 +775,68 @@
+ 			 * MAX_LOGIN_TRIES?
+ 			 */
+ 
+-			retcode = pam_authenticate (pamh, 0);
+-			while ((failcount++ < retries) &&
+-			       ((retcode == PAM_AUTH_ERR) ||
+-				(retcode == PAM_USER_UNKNOWN) ||
+-				(retcode == PAM_CRED_INSUFFICIENT) ||
+-				(retcode == PAM_AUTHINFO_UNAVAIL))) {
+-				pam_get_item (pamh, PAM_USER,
+-					      (const void **) &pam_user);
+-				syslog (LOG_NOTICE,
+-					"FAILED LOGIN %d FROM %s FOR %s, %s",
+-					failcount, hostname, pam_user,
+-					pam_strerror (pamh, retcode));
+-#ifdef HAVE_PAM_FAIL_DELAY
+-				pam_fail_delay (pamh, 1000000 * delay);
+-#endif
+-				fprintf (stderr, "Login incorrect\n\n");
+-				pam_set_item (pamh, PAM_USER, NULL);
+-				retcode = pam_authenticate (pamh, 0);
+-			}
+-
+-			if (retcode != PAM_SUCCESS) {
+-				pam_get_item (pamh, PAM_USER,
+-					      (const void **) &pam_user);
+-
+-				if (retcode == PAM_MAXTRIES)
+-					syslog (LOG_NOTICE,
+-						"TOO MANY LOGIN TRIES (%d) FROM %s FOR %s, %s",
+-						failcount, hostname,
+-						pam_user,
+-						pam_strerror (pamh,
+-							      retcode));
+-				else
+-					syslog (LOG_NOTICE,
+-						"FAILED LOGIN SESSION FROM %s FOR %s, %s",
+-						hostname, pam_user,
+-						pam_strerror (pamh,
+-							      retcode));
+-
+-				fprintf (stderr, "\nLogin incorrect\n");
+-				pam_end (pamh, retcode);
+-				exit (0);
++			failcount = 0;
++			while (1) {
++			  const char *failent_user;
++			  failed = 0;
++			  
++			  failcount++;
++			  if (delay > 0)
++			    retcode = pam_fail_delay(pamh, 1000000*delay);
++			  
++			  retcode = pam_authenticate (pamh, 0);
++			  
++			  pam_get_item (pamh, PAM_USER,
++					(const void **) &pam_user);
++			  
++			  if (pam_user && pam_user[0]) {
++			    pwd = getpwnam(pam_user);
++			    if (pwd) {
++			      pwent = *pwd;
++			      failent_user = pwent.pw_name;
++			    } else {
++			      if (getdef_bool("LOG_UNKFAIL_ENAB") && pam_user)
++				failent_user = pam_user;
++			      else
++				failent_user = "UNKNOWN";
++			    }
++			  } else {
++			    pwd = NULL;
++			    failent_user = "UNKNOWN";
++			  }
++			  
++			  if (retcode == PAM_MAXTRIES || failcount >= retries) {
++			    syslog (LOG_NOTICE,
++				    _("TOO MANY LOGIN TRIES (%d)%s FOR `%s'"),
++				    failcount, fromhost, failent_user);
++			    fprintf(stderr,
++				    _("Maximum number of tries exceeded (%d)\n"),
++				    failcount);
++			    PAM_END;
++			    exit(0);
++			  } else if (retcode == PAM_ABORT) {
++			    /* Serious problems, quit now */
++			    fprintf(stderr,_("login: abort requested by PAM\n"));
++			    syslog(LOG_ERR,_("PAM_ABORT returned from pam_authenticate()"));
++			    PAM_END;
++			    exit(99);
++			  } else if (retcode != PAM_SUCCESS) {
++			    syslog(LOG_NOTICE,_("FAILED LOGIN (%d)%s FOR `%s', %s"),
++				   failcount, fromhost, failent_user,
++				   pam_strerror (pamh, retcode));
++			    failed = 1;
++			  }
++
++			  if (!failed)
++			    break;
++			  
++			  fprintf(stderr,"Login incorrect\n\n");
++			  
++			  /* Let's give it another go around */
++			  pam_set_item(pamh,PAM_USER,NULL);
+ 			}
+ 
++			/* We don't get here unless they were authenticated above */
+ 			retcode = pam_acct_mgmt (pamh, 0);
+ 
+ 			if (retcode == PAM_NEW_AUTHTOK_REQD) {

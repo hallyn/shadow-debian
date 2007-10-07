@@ -1,0 +1,18 @@
+Goal: fix typo
+Fixes:
+
+Status wrt upstream: should be reported
+
+Index: shadow-4.0.12/man/shadow.5.xml
+===================================================================
+--- shadow-4.0.12.orig/man/shadow.5.xml	2005-08-17 11:50:34.000000000 +0200
++++ shadow-4.0.12/man/shadow.5.xml	2005-08-17 11:50:58.000000000 +0200
+@@ -49,7 +49,7 @@
+     </itemizedlist>
+     
+     <para>The password field must be filled. The encrypted password consists
+-      of 13 to 24 characters from the 64 characters alphabet a thru z, A
++      of 13 to 24 characters from the 64 character alphabet a thru z, A
+       thru Z, 0 thru 9, \. and /. Optionally it can start with a "$"
+       character. This means the encrypted password was generated using
+       another (not DES) algorithm. For example if it starts with "$1$" it

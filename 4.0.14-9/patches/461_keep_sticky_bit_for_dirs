@@ -1,0 +1,24 @@
+Goal: Keep sticky bit on dirs when copied with copy_tree. This should allo
+      to keep them when copying the skeleton directory in useradd
+
+Fixes: #296729
+
+Status wrt upstream: Forwarded but not applied yet
+
+Index: shadow-4.0.13/libmisc/copydir.c
+===================================================================
+--- shadow-4.0.13.orig/libmisc/copydir.c	2005-10-27 15:02:29.379978864 +0200
++++ shadow-4.0.13/libmisc/copydir.c	2005-10-27 15:00:43.179123848 +0200
+@@ -225,10 +225,11 @@
+ #ifdef WITH_SELINUX
+ 			selinux_file_context (dst_name);
+ #endif
+-			mkdir (dst_name, sb.st_mode & 0777);
++			mkdir (dst_name, sb.st_mode);
+ 			chown (dst_name,
+ 			       uid == (uid_t) - 1 ? sb.st_uid : uid,
+ 			       gid == (gid_t) - 1 ? sb.st_gid : gid);
++			chmod (dst_name, sb.st_mode);
+ 
+ 			if (copy_tree (src_name, dst_name, uid, gid)) {
+ 				err++;

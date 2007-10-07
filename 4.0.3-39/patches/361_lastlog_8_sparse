@@ -1,0 +1,22 @@
+Goal: Document that lastlog is a sparse file, and don't need to be rotated.
+Fixes: 219321
+
+Status wrt upstream: Applied upstream (will be in 4.0.11).
+
+Index: shadow-4.0.3/man/lastlog.8
+===================================================================
+--- shadow-4.0.3.orig/man/lastlog.8	2005-06-23 12:47:42.782712000 +0200
++++ shadow-4.0.3/man/lastlog.8	2005-06-23 13:08:07.412712000 +0200
+@@ -61,6 +61,12 @@
+ Large gaps in uid numbers will cause the lastlog program to run longer with
+ no output to the screen (i.e. if mmdf=800 and last uid=170, program will
+ appear to hang as it processes uid 171-799).
++.SH NOTE
++The \fIlastlog\fR file is a database which contains info on the last login of
++each user.  You should not rotate it.  It is a sparse file, so its size on the
++disk is much smaller than the one shown by \fBls \-l\fR (which can indicate a
++really big file if you have an high UID).  You can display its real size with
++\fBls \-s\fR.
+ .SH AUTHORS
+ Julianne Frances Haugh (jockgrrl@ix.netcom.com)
+ .br

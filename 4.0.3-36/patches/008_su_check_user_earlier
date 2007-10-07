@@ -1,0 +1,53 @@
+
+Notes:
+  * This patch just move a block of code, but I don't see the rationnal
+    for moving it.
+  * Except this piece of code being moved earlier, there is the
+    following (small) differences:
+    + The UID is logged as a signed int (instead of unsigned int, but I don't
+      know why, maybe to fix a compilation warning?)
+    + An end of line is added to the syslog message
+      (anyway, it is optional)
+
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-05-30 00:18:20.757531000 +0200
++++ shadow-4.0.3/src/su.c	2005-05-30 00:18:28.867531000 +0200
+@@ -380,6 +380,18 @@
+ 		additional_args = argv + optind;
+ 
+ 	/*
++	 * Get the user's real name.  The current UID is used to determine
++	 * who has executed su.  That user ID must exist.
++	 */
++
++	pw = get_my_pwent();
++	if (!pw) {
++		SYSLOG((LOG_CRIT, "Unknown UID: %d\n", (int) my_uid));
++		su_failure(tty);
++	}
++	STRFCPY(oldname, pw->pw_name);
++
++	/*
+ 	 * If a new login is being set up, the old environment will be
+ 	 * ignored and a new one created later on.
+ 	 */
+@@ -403,18 +415,6 @@
+ 			addenv (*envp++, NULL);
+ 	}
+ 
+-	/*
+-	 * Get the user's real name. The current UID is used to determine
+-	 * who has executed su. That user ID must exist.
+-	 */
+-
+-	pw = get_my_pwent ();
+-	if (!pw) {
+-		SYSLOG ((LOG_CRIT, "Unknown UID: %u", my_uid));
+-		su_failure (tty);
+-	}
+-	STRFCPY (oldname, pw->pw_name);
+-
+ #ifndef USE_PAM
+ #ifdef SU_ACCESS
+ 	/*

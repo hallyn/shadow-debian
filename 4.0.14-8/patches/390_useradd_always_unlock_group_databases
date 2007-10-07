@@ -1,0 +1,38 @@
+Goal: A lock is always created on the group and gshadow databases, it
+      should always be removed (not only if do_grp_update).
+
+Fixes: #348250
+
+Status wrt upstream: will be in 4.0.15
+
+Index: shadow-4.0.14/src/useradd.c
+===================================================================
+--- shadow-4.0.14.orig/src/useradd.c	2006-02-07 13:11:46.000000000 +0100
++++ shadow-4.0.14/src/useradd.c	2006-02-07 13:13:15.000000000 +0100
+@@ -1273,7 +1273,6 @@
+ 				 _("%s: cannot rewrite group file\n"), Prog);
+ 			fail_exit (E_GRP_UPDATE);
+ 		}
+-		gr_unlock ();
+ #ifdef	SHADOWGRP
+ 		if (is_shadow_grp && !sgr_close ()) {
+ 			fprintf (stderr,
+@@ -1282,13 +1281,16 @@
+ 				 Prog);
+ 			fail_exit (E_GRP_UPDATE);
+ 		}
+-		if (is_shadow_grp)
+-			sgr_unlock ();
+ #endif
+ 	}
+ 	if (is_shadow_pwd)
+ 		spw_unlock ();
+ 	pw_unlock ();
++	gr_unlock ();
++#ifdef	SHADOWGRP
++	if (is_shadow_grp)
++		sgr_unlock ();
++#endif
+ }
+ 
+ /*

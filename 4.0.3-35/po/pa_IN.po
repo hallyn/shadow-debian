@@ -1,0 +1,262 @@
+# translation of shadow_debian_po.po to Panjabi
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
+#    Developers do not need to manually edit POT or PO files.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+# Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: shadow_debian_po\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-05-11 13:26+0200\n"
+"PO-Revision-Date: 2005-05-19 17:39+0530\n"
+"Last-Translator: Amanpreet Singh Alam[ਆਲਮ] <amanpreetalam@yahoo.com>\n"
+"Language-Team: Panjabi <pa@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9.1\n"
+
+#. Type: password
+#. Description
+#: ../passwd.templates:3
+msgid "Root password:"
+msgstr "ਪ੍ਰਬੰਧਕ ਗੁਪਤ-ਕੋਡ:"
+
+#. Type: password
+#. Description
+#: ../passwd.templates:3
+msgid ""
+"You need to set a password for 'root', the system administrative account. A "
+"malicious or unqualified user with root access can have disastrous results, "
+"so you should take care to choose a root password that is not easy to guess. "
+"It should not be a word found in the dictionary, or a word that could be "
+"easily associated with you, like your middle name. A good password will "
+"contain a mixture of letters, numbers and punctuation and will be changed at "
+"regular intervals. The root password is changed by running the 'passwd' "
+"program as root."
+msgstr ""
+"ਤੁਹਾਨੂੰ ਪ੍ਰਬੰਧਕ (root), ਇੱਕ ਸਿਸਟਮ ਪ੍ਰਬੰਧਕੀ ਖਾਤਾ ਹੈ, ਲਈ ਇੱਕ ਗੁਪਤ-ਕੋਡ ਦੇਣ ਦੀ ਲੋੜ ਹੈ। ਇੱਕ ਗਲਤ "
+"ਜਾਂ ਅਣਜਾਣ ਉਪਭੋਗੀ ਇਹਨਾਂ ਅਧਿਕਾਰਾਂ ਨਾਲ ਸਮੱਸਿਆਵਾਂ ਪੈਦਾ ਕਰ ਸਕਦਾ ਹੈ, ਇਸ ਕਰਕੇ ਤੁਹਾਨੂੰ ਪ੍ਰਬੰਧਕੀ "
+"(root) ਗੁਪਤ-ਕੋਡ ਦੀ ਚੋਣ ਕਰਨ ਸਮੇਂ ਇਹ ਧਿਆਨ ਰੱਖਣਾ ਚਾਹੀਦਾ ਹੈ ਕਿ ਇਹ ਆਸਾਨ ਨਾ ਹੋਵੇ, ਇਹ ਸ਼ਬਦ-ਕੋਸ਼ "
+"ਵਿੱਚੋਂ ਕੋਈ ਅੱਖਰ ਨਾ ਹੋਵੇ, ਜਾਂ ਤੁਹਾਡੇ ਨਾਲ ਸਬੰਧਤ ਕੋਈ ਸ਼ਬਦ ਨਾ ਹੋਵੇ, ਜਿਵੇਂ ਕਿ ਤੁਹਾਡਾ ਨਾਂ ਆਦਿ। ਇੱਕ ਚੰਗੇ "
+"ਗੁਪਤ-ਕੋਡ ਵਿੱਚ ਅੱਖਰ, ਅੰਕ, ਜਾਂ ਵਿਰਾਮ ਚਿੰਨ ਹੁੰਦੇ ਹਨ ਅਤੇ ਇਸ ਨੂੰ ਨਿਯਮਤ ਤੌਰ 'ਤੇ ਬਦਲਦੇ ਰਹਿਣਾ ਚਾਹੀਦਾ "
+"ਹੈ। ਪ੍ਰਬੰਧਕ (root) ਗੁਪਤ-ਕੋਡ ਨੂੰ 'passwd' ਪ੍ਰੋਗਰਾਮ ਨੂੰ ਪ੍ਰਬੰਧਕ ਦੋ ਤੌਰ 'ਤੇ ਚਲਾ ਕੇ ਬਦਲ ਸਕਦੇ ਹੋ।"
+
+#. Type: password
+#. Description
+#: ../passwd.templates:3
+msgid "Note that you will not be able to see the password as you type it."
+msgstr "ਯਾਦ ਰੱਖੋ ਕਿ ਤੁਸੀਂ ਲਿਖਣ ਸਮੇਂ ਆਪਣਾ ਗੁਪਤ-ਕੋਡ ਨਹੀਂ ਵੇਖ ਸਕਦੇ ਹੋ।"
+
+#. Type: password
+#. Description
+#: ../passwd.templates:17
+msgid ""
+"Please enter the same root password again to verify that you have typed it "
+"correctly."
+msgstr ""
+"ਕਿਰਪਾ ਕਰਕੇ ਪ੍ਰਬੰਧਕ (root) ਦੇ ਤੌਰ 'ਤੇ ਦਿੱਤਾ ਗੁਪਤ-ਕੋਡ ਮੁੜ ਲਿਖੋ ਤਾਂ ਕਿ ਇਹ ਯਕੀਨੀ ਬਣਾਇਆ ਜਾ ਸਕੇ "
+"ਕਿ ਇਹ ਠੀਕ ਹੈ।"
+
+#. Type: boolean
+#. Description
+#: ../passwd.templates:24
+msgid "Create a normal user account now?"
+msgstr "ਕੀ ਸਧਾਰਨ ਉਪਭੋਗੀ ਖਾਤਾ ਬਣਾਉਣਾ ਹੈ?"
+
+#. Type: boolean
+#. Description
+#: ../passwd.templates:24
+msgid ""
+"It's a bad idea to use the root account for normal day-to-day activities, "
+"such as the reading of electronic mail, because even a small mistake can "
+"result in disaster. You should create a normal user account to use for those "
+"day-to-day tasks."
+msgstr ""
+"ਪ੍ਰਬੰਧਕ (root) ਖਾਤੇ ਨੂੰ ਰੋਜ਼ਾਨਾ ਦੇ ਕੰਮਾਂ, ਜਿਵੇਂ ਕਿ ਈ-ਪੱਤਰ ਪੜਨੇ, ਲਈ ਵਰਤਣਾ ਇੱਕ ਗਲਤ ਹੈ, ਕਿਉਕਿ "
+"ਇੱਕ ਛੋਟੀ ਜਿਹੀ ਗਲਤੀ ਨਾਲ ਵੀ ਵੱਡੀ ਸਮੱਸਿਆ ਆ ਸਕਦੀ ਹੈ। ਤੁਹਾਨੂੰ ਇਸਤਰਾਂ ਦੀ ਵਰਤੋਂ ਲਈ ਇੱਕ ਸਧਾਰਨ "
+"ਖਾਤਾ ਬਣਾਉਣਾ ਚਾਹੀਦਾ ਹੈ।"
+
+#. Type: boolean
+#. Description
+#: ../passwd.templates:24
+msgid ""
+"Note that you may create it later (as well as any additional account) by "
+"typing 'adduser <username>' as root, where <username> is an user name, like "
+"'imurdock' or 'rms'."
+msgstr ""
+"ਯਾਦ ਰੱਖੋ ਕਿ ਤੁਸੀਂ ਇਸ ਨੂੰ ਬਾਅਦ ਵਿੱਚ ਵੀ ਪ੍ਰਬੰਧਕ (root) ਦੇ ਤੌਰ 'ਤੇ 'adduser <username>' ਲਿਖ "
+"ਕੇ ਬਣਾ ਸਕਦੇ ਹੋ, ਜਿੱਥੇ ਕਿ <username> ਇੱਕ ਉਪਭੋਗੀ ਨਾਂ ਹੋਵੇਗਾ, ਜਿਵੇਂ ਕਿ 'imurdock' ਜਾਂ 'rms' "
+"ਆਦਿ।"
+
+#. Type: string
+#. Description
+#: ../passwd.templates:36
+msgid "Enter a username for your account:"
+msgstr "ਆਪਣੇ ਖਾਤੇ ਲਈ ਉਪਭੋਗੀ ਨਾਂ ਦਿਓ:"
+
+#. Type: string
+#. Description
+#: ../passwd.templates:36
+msgid ""
+"Select a username for the new account. Your first name is a reasonable "
+"choice. The username should start with a lower-case letter, which can be "
+"followed by any combination of numbers and more lower-case letters."
+msgstr ""
+"ਨਵੇਂ ਖਾਤੇ ਲਈ ਉਪਭੋਗੀ ਨਾਂ ਦੀ ਚੋਣ ਕਰੋ। ਤੁਹਾਡਾ ਪਹਿਲਾਂ ਨਾਂ ਸਭ ਤੋਂ ਵਧੀਆ ਚੋਣ ਹੈ। ਉਪਭੋਗੀ ਨਾਂ ਛੋਟੇ ਅੱਖਰਾਂ "
+"ਨਾਲ ਹੀ ਸ਼ੁਰੂ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ, ਜਿਸ ਵਿੱਚ ਹੋਰ ਕੋਈ ਅੰਕ ਜਾਂ ਛੋਟੇ ਅੱਖਰ ਸ਼ਾਮਿਲ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ।"
+
+#. Type: note
+#. Description
+#: ../passwd.templates:43
+msgid "Invalid username entered."
+msgstr "ਗਲਤ ਉਪਭੋਗੀ ਨਾਂ ਦਿੱਤਾ ਹੈ।"
+
+#. Type: note
+#. Description
+#: ../passwd.templates:43
+msgid ""
+"The user name you entered is invalid. Note that usernames must start with a "
+"lower-case letter, which can be followed by any combination of numbers and "
+"more lower-case letters."
+msgstr ""
+"ਦਿੱਤਾ ਉਪਭੋਗੀ ਨਾਂ ਗਲਤ ਹੈ। ਯਾਦ ਰੱਖੋ ਕਿ ਉਪਭੋਗੀ ਨਾਂ ਛੋਟੇ ਅੱਖਰਾਂ ਨਾਲ ਹੀ ਸ਼ੁਰੂ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ, ਜਿਸ "
+"ਵਿੱਚ ਬਾਅਦ ਵਿੱਚ ਕੋਈ ਵੀ ਅੰਕ ਜਾਂ ਛੋਟੇ ਅੱਖਰ ਹੋ ਸਕਦੇ ਹਨ।"
+
+#. Type: string
+#. Description
+#: ../passwd.templates:50
+msgid "Enter a full name for the new user:"
+msgstr "ਨਵੇਂ ਉਪਭੋਗੀ ਲਈ ਪੂਰਾ ਨਾਂ ਦਿਓ:"
+
+#. Type: string
+#. Description
+#: ../passwd.templates:50
+msgid ""
+"A user account will be created for you to use instead of the root account "
+"for non-administrative activities."
+msgstr ""
+"ਤੁਹਾਡੇ ਲਈ ਨਾ-ਪ੍ਰਬੰਧਕੀ ਕਾਰਵਾਈ ਕਰਨ ਲਈ ਪ੍ਰਬੰਧਕੀ (root) ਖਾਤੇ ਤੋਂ ਬਿਨਾਂ ਇੱਕ ਹੋਰ ਉਪਭੋਗੀ ਖਾਤਾ "
+"ਤਿਆਰ ਕੀਤਾ ਗਿਆ ਹੈ।"
+
+#. Type: password
+#. Description
+#: ../passwd.templates:56
+msgid "Enter a password for the new user:"
+msgstr "ਨਵੇਂ ਉਪਭੋਗੀ ਲਈ ਗੁਪਤ-ਕੋਡ ਦਿਓ:"
+
+#. Type: password
+#. Description
+#: ../passwd.templates:56
+msgid ""
+"A good password will contain a mixture of letters, numbers and punctuation "
+"and will be changed at regular intervals."
+msgstr ""
+"ਇੱਕ ਚੰਗੇ ਗੁਪਤ-ਕੋਡ ਵਿੱਚ ਅੱਖਰ, ਅੰਕ ਅਤੇ ਵਿਰਾਮ ਚਿੰਨ੍ਹ ਹੁੰਦੇ ਹਨ ਅਤੇ ਇਸ ਨੂੰ ਨਿਯਮਤ ਸਮੇਂ ਉਪਰੰਤ ਬਦਲਦੇ "
+"ਰਹਿਣਾ ਚਾਹੀਦਾ ਹੈ।"
+
+#. Type: password
+#. Description
+#: ../passwd.templates:62
+msgid "Re-enter password to verify:"
+msgstr "ਪੁਸ਼ਟੀ ਕਰਨ ਲਈ ਗੁਪਤ-ਕੋਡ ਮੁੜ ਦਿਓ:"
+
+#. Type: password
+#. Description
+#: ../passwd.templates:62
+msgid ""
+"Please enter the same user password again to verify you have typed it "
+"correctly."
+msgstr ""
+"ਕਿਰਪਾ ਕਰਕੇ ਗੁਪਤ-ਕੋਡ ਮੁੜ ਲਿਖੋ ਤਾਂ ਕਿ ਇਹ ਯਕੀਨੀ ਬਣਾਇਆ ਜਾ ਸਕੇ ਕਿ ਤੁਸੀਂ ਇਸ ਨੂੰ ਠੀਕ ਲਿਖਿਆ ਹੈ।"
+
+#. Type: note
+#. Description
+#: ../passwd.templates:68
+msgid "Password input error."
+msgstr "ਗੁਪਤ-ਕੋਡ ਇੰਪੁੱਟ ਗਲਤੀ ਹੈ।"
+
+#. Type: note
+#. Description
+#: ../passwd.templates:68
+msgid "The two passwords you entered were not the same. Please try again."
+msgstr "ਦੋ ਗੁਪਤ-ਕੋਡ, ਜੋ ਤੁਸੀਂ ਦਿੱਤੇ ਹਨ, ਇੱਕੋ ਜਿਹੇ ਨਹੀਂ ਹਨ। ਕਿਰਪਾ ਕਰਕੇ ਮੁੜ ਕੋਸ਼ਿਸ ਕਰੋ।"
+
+#. Type: note
+#. Description
+#: ../passwd.templates:73
+msgid "Empty password was entered."
+msgstr "ਖਾਲੀ ਗੁਪਤ-ਕੋਡ ਦਿੱਤਾ ਗਿਆ ਹੈ।"
+
+#. Type: note
+#. Description
+#: ../passwd.templates:73
+msgid ""
+"You seem to have entered nothing for the password. That is not secure! "
+"Please try again."
+msgstr "ਤੁਸੀਂ ਗੁਪਤ-ਕੋਡ ਲਈ ਕੁਝ ਨਹੀਂ ਦਿੱਤਾ ਹੈ। ਇਹ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਹੈ! ਕਿਰਪਾ ਕਰਕੇ ਮੁੜ ਕੋਸ਼ਿਸ ਕਰੋ।"
+
+#. Type: boolean
+#. Description
+#: ../passwd.templates:80
+msgid "Enable shadow passwords?"
+msgstr "ਕੀ ਛਾਂ ਗੁਪਤ-ਕੋਡ ਯੋਗ ਕਰਨਾ ਹੈ?"
+
+#. Type: boolean
+#. Description
+#: ../passwd.templates:80
+msgid ""
+"Shadow passwords make your system more secure because nobody is able to view "
+"even encrypted passwords. Passwords are stored in a separate file that can "
+"only be read by special programs. The use of shadow passwords is strongly "
+"recommended. However, if you're going to use NIS you could run into trouble."
+msgstr ""
+"ਛਾਂ ਗੁਪਤ-ਕੋਡ ਨਾਲ ਤੁਹਾਡਾ ਸਿਸਟਮ ਹੋਰ ਵੀ ਸੁਰੱਖਿਅਤ ਹੋ ਜਾਦਾ ਹੈ, ਕਿਉਕਿ ਕੋਈ ਵੀ ਇਕ੍ਰਿਪਟਡ ਗੁਪਤ-ਕੋਡ "
+"ਨੂੰ ਵੇਖ ਨਹੀਂ ਸਕਦਾ ਹੈ। ਗੁਪਤ-ਕੋਡਾਂ ਨੂੰ ਵੱਖਰੀ ਫਾਇਲ ਵਿੱਚ ਸੰਭਾਲਿਆ ਜਾਦਾ ਹੈ, ਜੋ ਕਿ ਖਾਸ ਕਾਰਜਾਂ ਵਿੱਚ "
+"ਹੀ ਖੋਲਿਆ ਜਾ ਸਕਦਾ ਹੈ। ਛਾਂ ਗੁਪਤ-ਕੋਡਾਂ ਦੀ ਵਰਤੋਂ ਦੀ ਜ਼ੋਰਦਾਰ ਸਿਫਾਰਸ਼ ਕੀਤੀ ਜਾਦੀ ਹੈ। ਪਰ, ਜੇਕਰ "
+"ਤੁਸੀਂ NIS ਦੀ ਵਰਤੋਂ ਕਰ ਰਹੇ ਹੋ, ਤਾਂ ਤੁਹਾਨੂੰ ਸਮੱਸਿਆ ਆ ਸਕਦੀ ਹੈ।"
+
+#~ msgid "Enable md5 passwords?"
+#~ msgstr "ਕੀ md5 ਗੁਪਤ-ਕੋਡ ਯੋਗ ਕਰਨਾ ਹੈ?"
+
+#~ msgid ""
+#~ "Md5 passwords are more secure and allow for passwords longer than 8 "
+#~ "characters to be used. However, they can cause compatibility problems if "
+#~ "you are using NIS or sharing password files with older systems."
+#~ msgstr ""
+#~ "Md5 ਗੁਪਤ-ਕੋਡ ਸੁਰੱਖਿਅਤ ਹੁੰਦੇ ਹਨ ਅਤੇ 8 ਅੱਖਰਾਂ ਤੋਂ ਵੱਧ ਅੱਖਰ ਰੱਖਣ ਲਈ ਸਹਾਇਕ ਹਨ। ਪਰ, ਇਨਾਂ ਨਾਲ "
+#~ "ਅਨੁਕੂਲਤਾ ਦੀ ਸਮੱਸਿਆ ਹੈ, ਜੇਕਰ ਤੁਸੀਂ ਪੁਰਾਣੇ ਸਿਸਟਮਾਂ ਨਾਲ ਗੁਪਤ-ਕੋਡ ਸਾਂਝੇ ਕਰ ਰਹੇ ਹੋ ਜਾਂ NIS ਦੀ "
+#~ "ਵਰਤੋਂ ਕਰ ਰਹੇ ਹੋ ਤਾਂ ਸਮੱਸਿਆ ਆ ਸਕਦੀ ਹੈ।"

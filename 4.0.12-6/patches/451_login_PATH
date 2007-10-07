@@ -1,0 +1,26 @@
+Goal: set PATH according to ENV_SUPATH and ENV_PATH (for login), as for
+      su.
+Fixes: #330803
+
+Status wrt upstream:
+
+Index: shadow-4.0.12/libmisc/setupenv.c
+===================================================================
+--- shadow-4.0.12.orig/libmisc/setupenv.c	2005-09-29 23:22:38.000000000 +0200
++++ shadow-4.0.12/libmisc/setupenv.c	2005-09-29 23:25:25.000000000 +0200
+@@ -243,7 +243,6 @@
+ 	addenv ("USER", info->pw_name);
+ 	addenv ("LOGNAME", info->pw_name);
+ 
+-#ifndef USE_PAM
+ 	/*
+ 	 * Create the PATH environmental variable and export it.
+ 	 */
+@@ -259,6 +258,7 @@
+ 		/* only value specified without "PATH=" */
+ 		addenv ("PATH", cp);
+ 	}
++#ifndef USE_PAM
+ 
+ 	/*
+ 	 * Create the MAIL environmental variable and export it.  login.defs

@@ -1,0 +1,77 @@
+Goal: Several rewrites for better English and clarity
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/passwd.1
+===================================================================
+--- shadow-4.0.3.orig/man/passwd.1	2005-05-12 12:12:08.888059724 +0200
++++ shadow-4.0.3/man/passwd.1	2005-05-12 12:12:18.803578217 +0200
+@@ -45,9 +45,9 @@ The administrator of a group may change 
+ \fBpasswd\fR also changes account information, such as the full name
+ of the user, user's login shell, or password expiry date and interval.
+ .PP
+-The \fB-s\fR option makes passwd call chsh to change the user's shell. The
++The \fB-s\fR option makes \fBpasswd\fR call \fBchsh\fR to change the user's shell.  The
+ \fB-f\fR option makes passwd call chfn to change the user's gecos
+-information. These two options are only meant for compatiblity, since the
++information.  These two options are only meant for compatibility, since the
+ other programs can be called directly.
+ .SS Password Changes
+ The user is first prompted for his/her old password, if one is present.
+@@ -117,9 +117,9 @@
+ days, the user may no longer sign on to the account.
+ .PP
+ If you wish to immediately expire an account's password, you can use the
+-\fB-e\fR option. This in effect can force a user to change his/her password at
+-the user's next login. You can also use the \fB-d\fR option to delete a user's
+-password (make it empty). Use caution with this option since it can make an
++\fB-e\fR option.  This in effect can force a user to change his/her password at
++the user's next login.  You can also use the \fB-d\fR option to delete a user's
++password (make it empty).  Use caution with this option since it can make an
+ account not require a password at all to login, leaving your system open to
+ intruders.
+ .SS Account maintenance
+@@ -130,13 +130,19 @@ value which matches no possible encrypte
+ The \fB-u\fR option re-enables an account by changing the password
+ back to its previous value.
+ .PP
+-The account status may be given with the \fB-S\fR option.
+-The status information consists of 6 parts.
+-The first part indicates if the user account is locked (L), has no
++The account status may be viewed with the \fB-S\fR option.
++The status information consists of 7 fields.
++The first field is the user's login name.
++The second field indicates if the user account is locked (L), has no
+ password (NP), or has a usable password (P).
+-The second part gives the date of the last password change.
+-The next four parts are the minimum age, maximum age, warning period,
++The third field gives the date of the last password change.
++The next four fields are the minimum age, maximum age, warning period,
+ and inactivity period for the password.
++These ages are expressed in days.
++See
++.B Password expiry information
++above for a discussion
++of these fields.
+ .SS Hints for user passwords
+ The security of a password depends upon the strength of the
+ encryption algorithm and the size of the key space.
+@@ -187,11 +193,15 @@ feels comfortable with.
+ Users may not be able to change their password on a system if NIS
+ is enabled and they are not logged into the NIS server.
+ .SH FILES
+-/etc/passwd \- user account information
+-.br
+-/etc/shadow \- encrypted user passwords
++.TP
++.I /etc/passwd 
++User account information
++.TP
++.I /etc/shadow 
++Encrypted user passwords
+ .SH "SEE ALSO"
+ .BR group (5),
+ .BR passwd (5)
++.BR shadow (5)
+ .SH AUTHOR
+ Julianne Frances Haugh <jockgrrl@ix.netcom.com>

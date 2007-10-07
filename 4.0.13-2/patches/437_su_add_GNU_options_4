@@ -1,0 +1,140 @@
+Goal:
+      * remove compilation warnings (Basename)
+      * no more use shell() for executing a shell whithout argument.
+        This may have some implications on the environment: shell used to use
+        execle with newenvp as the new environment.
+        I think it is preferable to have the ssame behavior when there are
+        or isn't any argument.
+        if !change_environment (and the user shell is not restricted), we
+        need to add all the environmental variables to newenvp (with addenv)
+        and to copy newenvp to environ.
+      * if fakelogin, some env variables are set. This must not be done if
+        --preserve-environment wasspecified (for users whose shell is not
+        restricted)
+Index: shadow-4.0.13/src/su.c
+===================================================================
+--- shadow-4.0.13.orig/src/su.c	2005-10-04 08:07:17.407784032 +0200
++++ shadow-4.0.13/src/su.c	2005-10-04 08:07:18.106641636 +0200
+@@ -207,14 +207,14 @@
+ 
+ 		shell_basename = getdef_str ("SU_NAME");
+ 		if (!shell_basename)
+-			shell_basename = Basename (shellstr);
++			shell_basename = Basename ((char *)shellstr);
+ 
+ 		arg0 = xmalloc (strlen (shell_basename) + 2);
+ 		arg0[0] = '-';
+ 		strcpy (arg0 + 1, shell_basename);
+ 		args[0] = arg0;
+ 	} else
+-		args[0] = Basename (shellstr);
++		args[0] = Basename ((char *)shellstr);
+ 	argno = 1;
+ 
+ 	if (command) {
+@@ -231,20 +231,14 @@
+ 	args[argno] = NULL;
+ 
+ #ifndef USE_PAM
+-	if (argno > 1)
+-		(void) execv (shellstr, args);
+-	else
+-		shell (shellstr, args[0]);
++	(void) execv (shellstr, args);
+ 	/* NOT REACHED */
+ #else
+ 	child = fork ();
+ 	if (child == 0) {	/* child shell */
+ 		pam_end (pamh, PAM_SUCCESS);
+ 
+-		if (argno == 1)
+-			shell (shellstr, (char *) args[0]);
+-		else
+-			(void) execv (shellstr, (char **) args);
++		(void) execv (shellstr, (char **) args);
+ 		{
+ 			int exit_status = (errno == ENOENT ? 127 : 126);
+ 
+@@ -460,41 +454,6 @@
+ 		additional_args = argv + optind;
+ 
+ 	/*
+-	 * If a new login is being set up, the old environment will be
+-	 * ignored and a new one created later on.
+-	 */
+-	if (fakelogin) {
+-		/*
+-		 * The terminal type will be left alone if it is present in
+-		 * the environment already.
+-		 */
+-		if ((cp = getenv ("TERM")))
+-			addenv ("TERM", cp);
+-#ifndef USE_PAM
+-		if ((cp = getdef_str ("ENV_TZ")))
+-			addenv (*cp == '/' ? tz (cp) : cp, NULL);
+-
+-		/*
+-		 * The clock frequency will be reset to the login value if required
+-		 */
+-		if ((cp = getdef_str ("ENV_HZ")))
+-			addenv (cp, NULL);	/* set the default $HZ, if one */
+-
+-		/*
+-		 * Also leave DISPLAY and XAUTHORITY if present, else
+-		 * pam_xauth will not work.
+-		 */
+-		if ((cp = getenv ("DISPLAY")))
+-			addenv ("DISPLAY", cp);
+-		if ((cp = getenv ("XAUTHORITY")))
+-			addenv ("XAUTHORITY", cp);
+-#endif				/* !USE_PAM */
+-	} else {
+-		while (*envp)
+-			addenv (*envp++, NULL);
+-	}
+-
+-	/*
+ 	 * Get the user's real name. The current UID is used to determine
+ 	 * who has executed su. That user ID must exist.
+ 	 */
+@@ -559,6 +518,40 @@
+ #endif				/* !USE_PAM */
+ 	pwent = *pw;
+ 
++	/*
++	 * If a new login is being set up, the old environment will be
++	 * ignored and a new one created later on.
++	 */
++
++	if (fakelogin && (change_environment || restricted_shell(pwent.pw_shell))) {
++		/*
++		 * The terminal type will be left alone if it is present in
++		 * the environment already.
++		 */
++		if ((cp = getenv ("TERM")))
++			addenv ("TERM", cp);
++#ifndef USE_PAM
++		if ((cp = getdef_str ("ENV_TZ")))
++			addenv (*cp == '/' ? tz (cp) : cp, NULL);
++		/*
++		 * The clock frequency will be reset to the login value if required
++		 */
++		if ((cp = getdef_str ("ENV_HZ")))
++			addenv (cp, NULL);	/* set the default $HZ, if one */
++		/*
++		 * Also leave DISPLAY and XAUTHORITY if present, else
++		 * pam_xauth will not work.
++		 */
++		if ((cp = getenv ("DISPLAY")))
++			addenv ("DISPLAY", cp);
++		if ((cp = getenv ("XAUTHORITY")))
++			addenv ("XAUTHORITY", cp);
++#endif				/* !USE_PAM */
++	} else {
++		while (*envp)
++			addenv (*envp++, NULL);
++	}
++
+ #ifndef USE_PAM
+ 	/*
+ 	 * BSD systems only allow "wheel" to SU to root. USG systems don't,

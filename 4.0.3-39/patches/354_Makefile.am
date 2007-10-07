@@ -1,0 +1,14 @@
+Goal: Remove the "debian" directoryfrom the Makefile.am
+
+Status wrt upstream: Applied 
+
+Index: shadow-4.0.3/Makefile.am
+===================================================================
+--- shadow-4.0.3.orig/Makefile.am
++++ shadow-4.0.3/Makefile.am
+@@ -5,4 +5,4 @@
+ AUTOMAKE_OPTIONS = 1.5 dist-bzip2 foreign
+ 
+ SUBDIRS = intl po man libmisc lib src \
+-	contrib debian doc etc
++	contrib doc etc

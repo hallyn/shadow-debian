@@ -1,0 +1,104 @@
+Goal: The PAM session needs to be closed as root, thus before change_uid().
+
+Status wrt upstream: It should certainly be applied upstream.
+
+Notes: The changelog reports:
+         * src/login.c: moved usage of setup_uid_gid() when PAM is enabled or
+           pam_groups.so's groups get clobbered
+           (Ben Collins 19 Sep 1999)
+
+       The behaviour of the parent is modified (for example signal handlers).
+       I don't know if this may be a problem.
+
+       The following bugs are also related to this issue:
+         http://bugs.debian.org/53570
+         http://bugs.debian.org/195048
+         http://bugs.debian.org/211884
+
+Index: shadow-4.0.3/src/login.c
+===================================================================
+--- shadow-4.0.3.orig/src/login.c	2005-05-28 19:11:32.274189000 +0200
++++ shadow-4.0.3/src/login.c	2005-05-28 19:11:33.674189000 +0200
+@@ -1273,6 +1273,40 @@
+ 	login_fbtab (tty, pwent.pw_uid, pwent.pw_gid);
+ #endif
+ 
++#ifdef USE_PAM
++	/*
++	 * We must fork before setuid() because we need to call
++	 * pam_close_session() as root.
++	 *
++	 * Note: not true in other (non-Linux) PAM implementations, where
++	 * the parent process of login (init, telnetd, ...) is responsible
++	 * for calling pam_close_session(). This avoids an extra process for
++	 * each login. Maybe we should do this on Linux too? We let the
++	 * admin configure whether they need to keep login around to close
++	 * sessions.
++	 */
++	if (getdef_bool ("CLOSE_SESSIONS")) {
++		signal (SIGINT, SIG_IGN);
++		child = fork ();
++		if (child < 0) {
++			/* error in fork() */
++			fprintf (stderr,
++				 "login: failure forking: %s",
++				 strerror (errno));
++			PAM_END;
++			exit (0);
++		} else if (child) {
++			/*
++			 * parent - wait for child to finish, then cleanup
++			 * session
++			 */
++			wait (NULL);
++			PAM_END;
++			exit (0);
++		}
++		/* child */
++	}
++#endif
+ 	/* We call set_groups() above because this clobbers pam_groups.so */
+ #ifndef USE_PAM
+ 	if (setup_uid_gid (&pwent, is_console))
+@@ -1374,41 +1408,6 @@
+ 	signal (SIGTERM, SIG_DFL);	/* default terminate signal */
+ 	signal (SIGALRM, SIG_DFL);	/* default alarm signal */
+ 	signal (SIGHUP, SIG_DFL);	/* added this.  --marekm */
+-
+-#ifdef USE_PAM
+-	/*
+-	 * We must fork before setuid() because we need to call
+-	 * pam_close_session() as root.
+-	 *
+-	 * Note: not true in other (non-Linux) PAM implementations, where
+-	 * the parent process of login (init, telnetd, ...) is responsible
+-	 * for calling pam_close_session(). This avoids an extra process for
+-	 * each login. Maybe we should do this on Linux too? We let the
+-	 * admin configure whether they need to keep login around to close
+-	 * sessions.
+-	 */
+-	if (getdef_bool ("CLOSE_SESSIONS")) {
+-		signal (SIGINT, SIG_IGN);
+-		child = fork ();
+-		if (child < 0) {
+-			/* error in fork() */
+-			fprintf (stderr,
+-				 "login: failure forking: %s",
+-				 strerror (errno));
+-			PAM_END;
+-			exit (0);
+-		} else if (child) {
+-			/*
+-			 * parent - wait for child to finish, then cleanup
+-			 * session
+-			 */
+-			wait (NULL);
+-			PAM_END;
+-			exit (0);
+-		}
+-		/* child */
+-	}
+-#endif
+ 	signal (SIGINT, SIG_DFL);	/* default interrupt signal */
+ 
+ 	endpwent ();	/* stop access to password file */

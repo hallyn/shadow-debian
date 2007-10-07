@@ -1,0 +1,28 @@
+Goal: Verify return values
+
+Status wrt upstream: not reported yet
+
+Index: shadow-4.0.14/libmisc/copydir.c
+===================================================================
+--- shadow-4.0.14.orig/libmisc/copydir.c	2006-01-11 21:31:39.000000000 +0100
++++ shadow-4.0.14/libmisc/copydir.c	2006-01-11 21:58:44.000000000 +0100
+@@ -225,13 +225,12 @@
+ #ifdef WITH_SELINUX
+ 			selinux_file_context (dst_name);
+ #endif
+-			mkdir (dst_name, sb.st_mode);
+-			chown (dst_name,
+-			       uid == (uid_t) - 1 ? sb.st_uid : uid,
+-			       gid == (gid_t) - 1 ? sb.st_gid : gid);
+-			chmod (dst_name, sb.st_mode);
+-
+-			if (copy_tree (src_name, dst_name, uid, gid)) {
++			if (mkdir (dst_name, sb.st_mode)
++			    || chown (dst_name,
++			              uid == (uid_t) - 1 ? sb.st_uid : uid,
++			              gid == (gid_t) - 1 ? sb.st_gid : gid)
++			    || chmod (dst_name, sb.st_mode)
++			    || copy_tree (src_name, dst_name, uid, gid)) {
+ 				err++;
+ 				break;
+ 			}

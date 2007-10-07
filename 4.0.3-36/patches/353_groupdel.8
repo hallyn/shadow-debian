@@ -1,0 +1,25 @@
+Goal: Add exit codes of groupdel to its man page
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/groupdel.8
+===================================================================
+--- shadow-4.0.3.orig/man/groupdel.8	2005-05-12 12:12:08.931053300 +0200
++++ shadow-4.0.3/man/groupdel.8	2005-05-12 12:12:18.807577620 +0200
+@@ -44,6 +44,16 @@ You must remove the user before you remo
+ /etc/group \- group information
+ .br
+ /etc/gshadow \- secure group information
++.SH EXIT VALUES
++0       \- success
++.br
++2       \- bad command syntax
++.br
++6       \- specified group doesn't exist
++.br
++8       \- can't remove user's primary group
++.br
++10      \- can't update group file
+ .SH SEE ALSO
+ .BR chfn (1),
+ .BR chsh (1),

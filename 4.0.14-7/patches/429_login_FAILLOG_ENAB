@@ -1,0 +1,95 @@
+Goal: Re-enable logging and displaying failures on login when login is
+      compiled with PAM and when FAILLOG_ENAB is set to yes. And create the
+      faillog file if it does not exist on postinst (as on Woody).
+Depends: 008_login_more_LOG_UNKFAIL_ENAB
+Fixes: #192849
+
+Note: It could be removed if pam_tally could report the number of failures
+      preceding a successful login.
+
+Index: shadow-4.0.14/src/login.c
+===================================================================
+--- shadow-4.0.14.orig/src/login.c	2006-01-03 08:25:02.262481714 +0100
++++ shadow-4.0.14/src/login.c	2006-01-03 08:25:02.607411684 +0100
+@@ -129,11 +129,11 @@
+ static void setup_tty (void);
+ static void check_flags (int, char *const *);
+ 
++static struct faillog faillog;
++
+ #ifndef USE_PAM
+ extern int login_access (const char *, const char *);
+ 
+-static struct faillog faillog;
+-
+ static void bad_time_notify (void);
+ static void check_nologin (void);
+ #endif
+@@ -663,6 +663,8 @@
+ 			    SYSLOG ((LOG_NOTICE,
+ 				    "TOO MANY LOGIN TRIES (%d)%s FOR `%s'",
+ 				    failcount, fromhost, failent_user));
++			    if (pwd && getdef_bool("FAILLOG_ENAB"))
++			      failure (pwent.pw_uid, tty, &faillog);
+ 			    fprintf(stderr,
+ 				    _("Maximum number of tries exceeded (%d)\n"),
+ 				    failcount);
+@@ -680,6 +682,13 @@
+ 				   pam_strerror (pamh, retcode)));
+ 			    failed = 1;
+ 			  }
++			  if (pwd && getdef_bool("FAILLOG_ENAB") &&
++			      ! failcheck (pwent.pw_uid, &faillog, failed)) {
++			    SYSLOG((LOG_CRIT,
++			           "exceeded failure limit for `%s' %s",
++			           failent_user, fromhost));
++			    failed = 1;
++			  }
+ 
+ 			  if (!failed)
+ 			    break;
+@@ -711,6 +720,8 @@
+ #endif				/* WITH_AUDIT */
+ 
+ 			  fprintf(stderr,"\nLogin incorrect\n");
++			  if (pwd && getdef_bool("FAILLOG_ENAB"))
++			    failure (pwent.pw_uid, tty, &faillog);
+ 			  if (getdef_str("FTMP_FILE") != NULL) {
+ #if HAVE_UTMPX_H
+ 			    failent = utxent;
+@@ -1071,6 +1082,7 @@
+ 		 */
+ #ifndef USE_PAM
+ 		motd ();	/* print the message of the day */
++#endif
+ 		if (getdef_bool ("FAILLOG_ENAB")
+ 		    && faillog.fail_cnt != 0) {
+ 			failprint (&faillog);
+@@ -1084,6 +1096,7 @@
+ 					 username, (int) faillog.fail_cnt));
+ 			}
+ 		}
++#ifndef USE_PAM
+ 		if (getdef_bool ("LASTLOG_ENAB")
+ 		    && lastlog.ll_time != 0) {
+ 			time_t ll_time = lastlog.ll_time;
+Index: shadow-4.0.14/lib/getdef.c
+===================================================================
+--- shadow-4.0.14.orig/lib/getdef.c	2006-01-03 08:25:02.263481511 +0100
++++ shadow-4.0.14/lib/getdef.c	2006-01-03 08:25:02.608411481 +0100
+@@ -56,6 +56,7 @@
+ 	{"ENV_SUPATH", NULL},
+ 	{"ERASECHAR", NULL},
+ 	{"FAIL_DELAY", NULL},
++	{"FAILLOG_ENAB", NULL},
+ 	{"FAKE_SHELL", NULL},
+ 	{"FTMP_FILE", NULL},
+ 	{"GETPASS_ASTERISKS", NULL},
+@@ -90,7 +91,6 @@
+ 	{"ENV_HZ", NULL},
+ 	{"ENV_TZ", NULL},
+ 	{"ENVIRON_FILE", NULL},
+-	{"FAILLOG_ENAB", NULL},
+ 	{"ISSUE_FILE", NULL},
+ 	{"LASTLOG_ENAB", NULL},
+ 	{"LOGIN_STRING", NULL},

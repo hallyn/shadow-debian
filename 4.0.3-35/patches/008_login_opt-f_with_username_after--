@@ -1,0 +1,48 @@
+Goal: Made login's -f option also able to use the username after -- if none
+      was passed as it's optarg
+Fixes: #53702
+
+Status wrt upstream: I'm not sure, but it is probably not in upstream.
+                     It could certainly be submitted to upstream.
+
+Index: shadow-4.0.3/src/login.c
+===================================================================
+--- shadow-4.0.3.orig/src/login.c	2005-05-23 01:17:08.437167000 +0200
++++ shadow-4.0.3/src/login.c	2005-05-23 01:19:05.347167000 +0200
+@@ -473,7 +473,7 @@
+ 
+ 	check_flags (argc, argv);
+ 
+-	while ((flag = getopt (argc, argv, "d:f:h:pr:")) != EOF) {
++	while ((flag = getopt (argc, argv, "d:f::h:pr:")) != EOF) {
+ 		switch (flag) {
+ 		case 'p':
+ 			pflg++;
+@@ -482,11 +482,16 @@
+ 			/*
+ 			 * username must be a separate token
+ 			 * (-f root, *not* -froot).  --marekm
++ 			 *
++ 			 * if -f has an arg, use that, else use the
++ 			 * normal user name passed after all options
++ 			 * --benc
+ 			 */
+-			if (optarg != argv[optind - 1])
++			if (optarg != NULL && optarg != argv[optind - 1])
+ 				usage ();
+ 			fflg++;
+-			STRFCPY (username, optarg);
++			if (optarg)
++			  STRFCPY (username, optarg);
+ 			break;
+ #ifdef	RLOGIN
+ 		case 'r':
+@@ -640,7 +645,7 @@
+ 		init_env ();
+ 
+ 		if (optind < argc) {	/* get the user name */
+-			if (rflg || fflg)
++			if (rflg || (fflg && username[0]))
+ 				usage ();
+ 
+ #ifdef SVR4

@@ -1,0 +1,69 @@
+Goal: Re-enable logging and displaying failures on login when login is
+      compiled with PAM and when FAILLOG_ENAB is set to yes. And create the
+      faillog file if it does not exist on postinst (as on Woody).
+Depends: 008_login_more_LOG_UNKFAIL_ENAB
+Fixes: #192849
+
+Note: It could be removed if pam_tally could report the number of failures
+      preceding a successful login.
+
+Index: shadow-4.0.3/src/login.c
+===================================================================
+--- shadow-4.0.3.orig/src/login.c
++++ shadow-4.0.3/src/login.c
+@@ -160,9 +160,7 @@
+ #define	RETRIES	3
+ #endif
+ 
+-#ifndef USE_PAM
+ static struct faillog faillog;
+-#endif
+ 
+ /* local function prototypes */
+ static void usage (void);
+@@ -809,6 +807,8 @@
+ 			    syslog (LOG_NOTICE,
+ 				    _("TOO MANY LOGIN TRIES (%d)%s FOR `%s'"),
+ 				    failcount, fromhost, failent_user);
++			    if (pwd && getdef_bool("FAILLOG_ENAB"))
++			      failure (pwent.pw_uid, tty, &faillog);
+ 			    fprintf(stderr,
+ 				    _("Maximum number of tries exceeded (%d)\n"),
+ 				    failcount);
+@@ -826,11 +826,20 @@
+ 				   pam_strerror (pamh, retcode));
+ 			    failed = 1;
+ 			  }
++			  if (pwd && getdef_bool("FAILLOG_ENAB") &&
++			      ! failcheck (pwent.pw_uid, &faillog, failed)) {
++			    SYSLOG((LOG_CRIT,
++			           "exceeded failure limit for `%s' %s",
++			           failent_user, fromhost));
++			    failed = 1;
++			  }
+ 
+ 			  if (!failed)
+ 			    break;
+ 			  
+ 			  fprintf(stderr,"Login incorrect\n\n");
++			  if (pwd && getdef_bool("FAILLOG_ENAB"))
++			    failure (pwent.pw_uid, tty, &faillog);
+ 			  if (getdef_str("FTMP_FILE") != NULL) {
+ #if HAVE_UTMPX_H
+ 			    failent = utxent;
+@@ -1300,6 +1309,7 @@
+ 		 */
+ #ifndef USE_PAM
+ 		motd ();	/* print the message of the day */
++#endif
+ 		if (getdef_bool ("FAILLOG_ENAB")
+ 		    && faillog.fail_cnt != 0) {
+ 			failprint (&faillog);
+@@ -1314,6 +1324,7 @@
+ 					 (int) faillog.fail_cnt));
+ 			}
+ 		}
++#ifndef USE_PAM
+ 		if (getdef_bool ("LASTLOG_ENAB")
+ 		    && lastlog.ll_time != 0) {
+ #ifdef HAVE_STRFTIME

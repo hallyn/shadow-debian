@@ -1,0 +1,658 @@
+#! /bin/sh -e
+## 005_manpages.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+--- shadow-4.0.3.ori/man/chage.1	2002-03-13 18:52:15.000000000 +0100
++++ shadow-4.0.3_31/man/chage.1	2005-01-07 18:18:05.000000000 +0100
+@@ -57,7 +57,7 @@
+ When \fImaxdays\fR plus \fIlastday\fR is less than the current day,
+ the user will be required to change her password before being
+ able to use her account.
+-This occurance can be planned for in advance by use of the \fB-W\fR option,
++This occurrence can be planned for in advance by use of the \fB-W\fR option,
+ which provides the user with advance warning.
+ .PP
+ With the \fB-d\fR option, the value of \fIlastday\fR is the number of days
+--- shadow-4.0.3.ori/man/chfn.1	2002-03-13 18:52:15.000000000 +0100
++++ shadow-4.0.3_31/man/chfn.1	2005-01-07 18:18:05.000000000 +0100
+@@ -37,18 +37,20 @@
+ [\fIuser\fR]
+ .SH DESCRIPTION
+ \fBchfn\fR changes user fullname, office number, office extension, and home
+-phone number information for a user's account. 
+-This information is typically printed by \fBfinger\fR(1) and similiar
++phone number information for a user's account.
++This information is typically printed by \fBfinger\fR(1) and similar
+ programs.
+ A normal user may only change the fields for her own account,
+-the super user may change the fields for any account.
+-Also, only the super user may use the \fB-o\fR option to change the
++subject to the restrictions in /etc/login.defs.  (The default configuration
++is to prevent users from changing their fullname.)
++The super user may change any field for any account.
++Additionally, only the super user may use the \fB-o\fR option to change the
+ undefined portions of the GECOS field.
+ .PP
+ The only restriction placed on the contents of the fields is that no
+ control characters may be present, nor any of comma, colon, or equal sign.
+-The \fIother\fR field does not have this restriction, and is used to
+-store accounting information used by other applications.
++.\" The \fIother\fR field does not have this restriction, and is used to
++.\" store accounting information used by other applications.
+ .PP
+ If none of the options are selected, \fBchfn\fR operates in an interactive
+ fashion, prompting the user with the current values for all of the fields.
+@@ -58,6 +60,8 @@
+ Without options, chfn prompts for the current user account.
+ .SH FILES
+ /etc/passwd \- user account information
++.br
++/etc/login.defs \- runtime configuragion
+ .SH SEE ALSO
+ .BR passwd (5)
+ .SH AUTHOR
+--- shadow-4.0.3.ori/man/chpasswd.8	2002-03-08 05:39:11.000000000 +0100
++++ shadow-4.0.3_31/man/chpasswd.8	2005-01-07 18:18:05.000000000 +0100
+@@ -1,5 +1,6 @@
+ .\"$Id: 005_manpages.dpatch,v 1.6 2005/03/17 19:32:03 bubulle Exp $
+ .\" Copyright 1991, Julianne Frances Haugh
++.\" Copyright 2004, Christian Perrier
+ .\" All rights reserved.
+ .\"
+ .\" Redistribution and use in source and binary forms, with or without
+@@ -29,12 +30,12 @@
+ .SH NAME
+ \fBchpasswd\fR - update password file in batch
+ .SH SYNOPSIS
+-\fBchpasswd\fR [\fB-e\fR]
++\fBchpasswd\fR [\fB--encrypted\fR] [\fB--md5\fR]
+ .SH DESCRIPTION
+ \fBchpasswd\fR reads a file of user name and password pairs
+ from standard input and uses this information
+-to update a group of existing users. Without the -e switch, the
+-passwords are expected to be cleartext. With the -e switch, the
++to update a group of existing users. Without the --encrypted switch, the
++passwords are expected to be cleartext. With the --encrypted switch, the
+ passwords are expected to be in encrypted form.
+ Each line is of the format
+ .sp 1
+@@ -46,6 +47,9 @@
+ .PP
+ This command is intended to be used in a large system environment where
+ many accounts are created at a single time.
++.PP
++The --md5 switch allows using MD5 encryption instead of the default DES
++encryption when the supplied passwords are not already in encrypted form.
+ .SH CAVEATS
+ .\" The \fBmkpasswd\fR command must be executed afterwards to update the
+ .\" DBM password files.
+--- shadow-4.0.3.ori/man/lastlog.8	2001-01-27 03:55:52.000000000 +0100
++++ shadow-4.0.3_31/man/lastlog.8	2005-01-07 18:18:05.000000000 +0100
+@@ -36,19 +36,21 @@
+ .SH DESCRIPTION
+ .PP
+ \fBlastlog\fR formats and prints the contents of the last login log
+-\fI/var/log/lastlog\fR file . The \fBlogin-name\fR, \fBport\fR, and \fBlast
++\fI/var/log/lastlog\fR file. The \fBlogin-name\fR, \fBport\fR, and \fBlast
+ login time\fR will be printed. The default (no flags) causes lastlog entries
+-to be printed, sorted by the numerical UID.
++to be printed, sorted by their order in /etc/passwd.
+ .TP
+-\fB-u\fR, \fB--user\fR \fIlogin-name\fR will cause the lastlog record for
++\fB-u\fR, \fB--user\fR \fIlogin-name\fR
++will cause the lastlog record for
+ \fIlogin-name\fR only to be printed
+ .TP
+-\fB-t\fR, \fB--time\fR \fIdays\fR will cause only the lastlogins more recent
+-\than fIdays\fR to be printed
+-.TP
+-\fB-h\fR, \fB--help\fR print a one-line help message and exit.
+-.BR
++\fB-t\fR, \fB--time\fR \fIdays\fR
++will cause only the lastlogins more recent
++than fIdays\fR to be printed
+ .TP
++\fB-h\fR, \fB--help\fR
++print a one-line help message and exit.
++.PP
+ The \fB-t\fR flag overrides the use of \fB-u\fR.
+ .PP
+ If the user has never logged in the message \fB"**Never logged in**"\fR will
+@@ -61,5 +63,5 @@
+ appear to hang as it processes uid 171-799).
+ .SH AUTHORS
+ Julianne Frances Haugh (jockgrrl@ix.netcom.com)
+-.BR
++.br
+ Phillip Street
+--- shadow-4.0.3.ori/man/limits.5	2001-01-25 11:43:50.000000000 +0100
++++ shadow-4.0.3_31/man/limits.5	2005-01-07 18:18:05.000000000 +0100
+@@ -1,11 +1,11 @@
+ .\"$Id: limits.5,v 1.5 2001/01/25 10:43:50 kloczek Exp $
+-.TH LIMITS 5
++.TH LIMITS.CONF 5
+ .SH NAME
+-limits \- Resource limits definition
++limits.conf \- Resource limits definition
+ .SH DESCRIPTION
+ The
+-.I limits
+-file (/etc/limits by default or LIMITS_FILE defined config.h)
++.I limits.conf
++file (/etc/security/limits.conf)
+ describes the resource limits you wish to impose.
+ It should be owned by root and readable by root account only.
+ .PP
+@@ -68,7 +68,7 @@
+ not global, nor are they permanent.  Perhaps global limits will come, but
+ for now this will have to do ;)
+ .SH FILES
+-/etc/limits
++/etc/security/limits.conf
+ .SH SEE ALSO
+ .BR login (1),
+ .BR setpriority (2),
+--- shadow-4.0.3.ori/man/login.1	2002-03-13 18:52:15.000000000 +0100
++++ shadow-4.0.3_31/man/login.1	2005-01-07 18:18:05.000000000 +0100
+@@ -95,9 +95,9 @@
+ Please see the appropriate manual section for more information on
+ this function.
+ .PP
+-A subsystem login is indicated by the presense of a "*" as the first
++A subsystem login is indicated by the presence of a "*" as the first
+ character of the login shell. The given home directory will be used as
+-the root of a new filesystem which the user is actually logged into.
++the root of a new file system which the user is actually logged into.
+ .SH OPTIONS
+ .TP
+ .B -p
+@@ -119,11 +119,20 @@
+ may be in use at any particular site.
+ .PP
+ The location of files is subject to differences in system configuration.
++.PP
++The \fBlogin\fR program is NOT responsible for removing users from the utmp file.
++It is the responsibility of
++.BR getty (8)
++and
++.BR init (8)
++to clean up apparent ownership of a terminal session.  If you use \fBlogin\fR
++from the shell prompt without \fBexec\fR, the user you use will
++continue to appear to be logged in even after you log out of the "subsession".
+ .SH FILES
+ .br
+-/etc/utmp \- list of current login sessions
++/var/run/utmp \- list of current login sessions
+ .br
+-/etc/wtmp \- list of previous login sessions
++/var/log/wtmp \- list of previous login sessions
+ .br
+ /etc/passwd \- user account information
+ .br
+--- shadow-4.0.3.ori/man/newgrp.1	2002-03-13 18:52:15.000000000 +0100
++++ shadow-4.0.3_31/man/newgrp.1	2005-01-07 18:18:05.000000000 +0100
+@@ -48,7 +48,7 @@
+ password. The user will be denied access if the group password is empty and
+ the user is not listed as a member.
+ .PP
+-The \fBsg\fR command works similiar to \fBnewgrp\fR but accepts a command.
++The \fBsg\fR command works similar to \fBnewgrp\fR but accepts a command.
+ The command will be executed with the Bourne shell.  With most shells you
+ may run \fBsg\fR from, you need to enclose multi-word commands in quotes.
+ Another difference between \fBnewgrp\fR and \fBsg\fR is that some shells
+--- shadow-4.0.3.ori/man/newusers.8	2002-03-08 05:39:11.000000000 +0100
++++ shadow-4.0.3_31/man/newusers.8	2005-01-07 18:18:05.000000000 +0100
+@@ -31,7 +31,7 @@
+ .SH SYNOPSIS
+ \fBnewusers\fR [\fInew_users\fR]
+ .SH DESCRIPTION
+-\fBnewusers\fR reads a file of user name and cleartext password pairs
++\fBnewusers\fR reads a file of user name and clear-text password pairs
+ and uses this information to update a group of existing users or to
+ create new users.
+ Each line is in the same format as the standard password file (see
+--- shadow-4.0.3.ori/man/passwd.1	2002-03-13 18:52:15.000000000 +0100
++++ shadow-4.0.3_31/man/passwd.1	2005-01-07 18:18:05.000000000 +0100
+@@ -45,9 +45,9 @@
+ \fBpasswd\fR also changes account information, such as the full name
+ of the user, user's login shell, or password expiry date and interval.
+ .PP
+-The \fB-s\fR option makes passwd call chsh to change the user's shell. The
++The \fB-s\fR option makes \fBpasswd\fR call \fBchsh\fR to change the user's shell.  The
+ \fB-f\fR option makes passwd call chfn to change the user's gecos
+-information. These two options are only meant for compatiblity, since the
++information.  These two options are only meant for compatiblity, since the
+ other programs can be called directly.
+ .SS Password Changes
+ The user is first prompted for his/her old password, if one is present.
+@@ -117,9 +117,9 @@
+ days, the user may no longer sign on to the account.
+ .PP
+ If you wish to immediately expire an account's password, you can use the
+-\fB-e\fR option. This in effect can force a user to change his/her password at
+-the user's next login. You can also use the \fB-d\fR option to delete a user's
+-password (make it empty). Use caution with this option since it can make an
++\fB-e\fR option.  This in effect can force a user to change his/her password at
++the user's next login.  You can also use the \fB-d\fR option to delete a user's
++password (make it empty).  Use caution with this option since it can make an
+ account not require a password at all to login, leaving your system open to
+ intruders.
+ .SS Account maintenance
+@@ -130,13 +130,19 @@
+ The \fB-u\fR option re-enables an account by changing the password
+ back to its previous value.
+ .PP
+-The account status may be given with the \fB-S\fR option.
+-The status information consists of 6 parts.
+-The first part indicates if the user account is locked (L), has no
++The account status may be viewed with the \fB-S\fR option.
++The status information consists of 7 fields.
++The first field is the user's login name.
++The second field indicates if the user account is locked (L), has no
+ password (NP), or has a usable password (P).
+-The second part gives the date of the last password change.
+-The next four parts are the minimum age, maximum age, warning period,
++The third field gives the date of the last password change.
++The next four fields are the minimum age, maximum age, warning period,
+ and inactivity period for the password.
++These ages are expressed in days.
++See
++.B Password expiry information
++above for a discussion
++of these fields.
+ .SS Hints for user passwords
+ The security of a password depends upon the strength of the
+ encryption algorithm and the size of the key space.
+@@ -187,11 +193,15 @@
+ Users may not be able to change their password on a system if NIS
+ is enabled and they are not logged into the NIS server.
+ .SH FILES
+-/etc/passwd \- user account information
+-.br
+-/etc/shadow \- encrypted user passwords
++.TP
++.I /etc/passwd 
++User account information
++.TP
++.I /etc/shadow 
++Encrypted user passwords
+ .SH "SEE ALSO"
+ .BR group (5),
+ .BR passwd (5)
++.BR shadow (5)
+ .SH AUTHOR
+ Julianne Frances Haugh <jockgrrl@ix.netcom.com>
+--- shadow-4.0.3.ori/man/passwd.5	2002-03-08 05:39:11.000000000 +0100
++++ shadow-4.0.3_31/man/passwd.5	2005-01-07 18:18:05.000000000 +0100
+@@ -51,24 +51,24 @@
+ have been enabled.
+ If shadow passwords are being used, the encrypted password will
+ be found in \fI/etc/shadow\fR.
+-The encryped password consists of 13 characters from the
++The encrypted password consists of 13 characters from the
+ 64 character alphabet
+ a thru z, A thru Z, 0 thru 9, \. and /.
+ Refer to \fBcrypt\fR(3) for details on how this string is
+ interpreted.
+-.PP
+-An optional password age string may follow the encrypted
+-password, separated by a comma, from the same alphabet
+-as the password itself.
+-The first character gives the number of weeks during which the
+-password is valid.
+-The second character gives the number of weeks which must pass
+-before the user is permitted to change the password.
+-The last two characters give the week since Jan 1970 when the
+-password was last changed.
+-When the number of weeks during which the password is valid
+-have passed, the user will be required to provide a new
+-password.
++.\" .PP
++.\" An optional password age string may follow the encrypted
++.\" password, separated by a comma, from the same alphabet
++.\" as the password itself.
++.\" The first character gives the number of weeks during which the
++.\" password is valid.
++.\" The second character gives the number of weeks which must pass
++.\" before the user is permitted to change the password.
++.\" The last two characters give the week since Jan 1970 when the
++.\" password was last changed.
++.\" When the number of weeks during which the password is valid
++.\" have passed, the user will be required to provide a new
++.\" password.
+ .PP
+ The comment field is used by various system utilities, such as
+ \fBfinger\fR(1).
+--- shadow-4.0.3.ori/man/pw_auth.3	2002-03-08 05:39:11.000000000 +0100
++++ shadow-4.0.3_31/man/pw_auth.3	2005-01-07 18:18:05.000000000 +0100
+@@ -94,7 +94,7 @@
+ by the username.
+ .IP \fBPW_TELNET\fR 1i
+ Authenticate a user who is connecting to the system using the 
+-fBtelnet\fR command.
++\fBtelnet\fR command.
+ The authentication program will be invoked with a \fB-t\fR option, followed
+ by the username.
+ .IP \fBPW_RLOGIN\fR 1i
+@@ -105,7 +105,7 @@
+ .IP \fBPW_FTP\fR 1i
+ Authenticate a user who is connecting to the system using the \fBftp\fR
+ command.
+-The authentication program will be invoked with a \fR-f\fR option, followed
++The authentication program will be invoked with a \fB-f\fR option, followed
+ by the username.
+ The standard file descriptors are not available for communicating with the
+ user.
+--- shadow-4.0.3.ori/man/pwck.8	2002-03-08 05:39:12.000000000 +0100
++++ shadow-4.0.3_31/man/pwck.8	2005-01-07 18:18:05.000000000 +0100
+@@ -25,7 +25,7 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.TH PWCK 1
++.TH PWCK 8
+ .SH NAME
+ pwck \- verify integrity of password files
+ .SH SYNOPSIS
+@@ -35,7 +35,7 @@
+ All entries in the \fI/etc/passwd\fR and \fI/etc/shadow\fR are checked to
+ see that the entry has the proper format and valid data in each field.
+ The user is prompted to delete entries that are improperly formatted or
+-which have other incorrectable errors.
++which have other uncorrectable errors.
+ .P
+ Checks are made to verify that each entry has
+ .sp
+--- shadow-4.0.3.ori/man/pwconv.8	2002-03-08 05:39:12.000000000 +0100
++++ shadow-4.0.3_31/man/pwconv.8	2005-01-07 18:18:05.000000000 +0100
+@@ -27,7 +27,7 @@
+ Each program acquires the necessary locks before conversion.
+ 
+ .BR pwconv " and " grpconv
+-are similiar.  First, entries in the shadowed file which don't exist
++are similar.  First, entries in the shadowed file which don't exist
+ in the main file are removed.  Then, shadowed entries which don't have
+ `x' as the password in the main file are updated.  Any missing
+ shadowed entries are added.  Finally, passwords in the main file are
+--- shadow-4.0.3.ori/man/shadow.5	2002-03-08 05:39:12.000000000 +0100
++++ shadow-4.0.3_31/man/shadow.5	2005-01-07 18:18:05.000000000 +0100
+@@ -58,6 +58,9 @@
+ a thru z, A thru Z, 0 thru 9, \. and /.
+ Refer to \fBcrypt\fR(3) for details on how this string is
+ interpreted.
++If the password field contains some string that is not valid result
++of \fBcrypt\fR(3), for instance ! or *, the user will not be able to use
++a unix password to log in, subject to \fBpam\fR(7).
+ .PP
+ The date of the last password change is given as the number
+ of days since Jan 1, 1970.
+--- shadow-4.0.3.ori/man/shadowconfig.8	2001-08-24 01:10:48.000000000 +0200
++++ shadow-4.0.3_31/man/shadowconfig.8	2005-01-07 18:18:05.000000000 +0100
+@@ -20,5 +20,8 @@
+ are already off, is harmless.
+ 
+ Read
+-.I /usr/share/doc/passwd/README.debian.gz
++.I /usr/share/doc/passwd/README.Debian
+ for a brief introduction to shadow passwords and related features.
++
++Note that turning shadow passwords off and on again will lose all password
++aging information.
+--- shadow-4.0.3.ori/man/su.1	2002-03-13 18:52:15.000000000 +0100
++++ shadow-4.0.3_31/man/su.1	2005-01-07 18:18:05.000000000 +0100
+@@ -1,4 +1,3 @@
+-.\"$Id: su.1,v 1.11 2002/03/09 19:22:30 ankry Exp $
+ .\" Copyright 1989 - 1990, Julianne Frances Haugh
+ .\" All rights reserved.
+ .\"
+@@ -25,37 +24,78 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
++.\"
++.\"	$Id: su.1,v 1.6 2000/08/26 18:27:17 marekm Exp $
++.\"
+ .TH SU 1
+ .SH NAME
+-su \- change user ID or become super-user
++su \- Change user ID or become super-user
+ .SH SYNOPSIS
+-\fBsu\fR [\fB-\fR] [\fIusername\fR [\fIargs\fR]]
++\fBsu\fP [\fBOPTS\fR] [\fB-\fP] [\fBusername\fP [\fBARGS\fP]]
+ .SH DESCRIPTION
+-\fBsu\fR is used to become another user during a login session. Invoked
+-without a username, \fBsu\fR defaults to becoming the super user. The
+-optional argument \fB\-\fR may be used to provide an environment similiar to
+-what the user would expect had the user logged in directly.
+-.PP
+-Additional arguments may be provided after the username, in which case they
+-are supplied to the user\'s login shell. In particular, an argument of
+-\fB-c\fR will cause the next argument to be treated as a command by most
+-command interpreters. The command will be executed by the shell specified in
+-\fI/etc/passwd\fR for the target user.
+-.PP
+-The user will be prompted for a password, if appropriate. Invalid passwords
+-will produce an error message. All attempts, both valid and invalid, are
+-logged to detect abuses of the system.
+-.PP
+-The current environment is passed to the new shell.  The value of \fB$PATH\fR
+-is reset to \fB/bin:/usr/bin\fR for normal users, or
+-\fB/sbin:/bin:/usr/sbin:/usr/bin\fR for the super user.  This may be changed
+-with the \fBENV_PATH\fR and \fBENV_SUPATH\fR definitions in
+-\fI/etc/login.defs\fR.
++.B su
++is used to become another user during a login session.
++Invoked without a username, \fBsu\fR defaults to becoming
++the super user.
++The optional argument \fB\-\fR may be used to provide an
++environment similiar to what the user would expect had
++the user logged in directly.
++.PP
++The user will be prompted for a password, if appropriate.  Invalid
++passwords will produce an error message.  All attempts, both valid and
++invalid, are logged to detect abuses of the system.
++.PP
++An optional command can be executed. This is done by the shell specified
++in \fI/etc/passwd\fR for the target user unless the \fB-s\fR or \fB-m\fR
++options are used.  Any arguments supplied after the \fBusername\fR will be
++passed to the invoked shell (shell must support the -c command line
++option in order for a command to be passed to it).
++.PP
++Unless the \fB-m\fR or \fB-p\fR options are used, the current environment is
++passed to the new shell with alterations.  The value of \fB$PATH\fR is
++reset to \fB/bin:/usr/bin\fR for normal users, or
++\fB/sbin:/bin:/usr/sbin:/usr/bin\fR for the super user.  This may be
++changed with the \fBENV_PATH\fR and \fBENV_SUPATH\fR definitions in
++\fI/etc/login.defs\fR. 
++\fB$IFS\fP, if is set, is reset to contain space, tab, and newline.
++\fB$USER\fP is set to the name of the target user, 
++\fB$HOME\fP is set to the home directory of the target user, and
++\fB$SHELL\fP is set to the shell of the target user.
++When using the \fB-m\fR or \fB-p\fR options, the
++user's environment is not changed.
+ .PP
+ A subsystem login is indicated by the presense of a "*" as the first
+ character of the login shell. The given home directory will be used as
+ the root of a new filesystem which the user is actually logged into.
++.SH OPTIONS
++.TP
++\fB-\fR
++make this a login shell
++.TP
++\fB\-c\fR, \fB\-\-commmand\fR=\fI<command>\fR
++pass \fIcommand\fR to the invoked shell using its \fB-c\fR option
++.TP
++\fB\-m\fR, \fB\-p\fR, \fB\-\-preserve\-environment\fR
++do not reset environment variables, and keep the same shell
++.TP
++\fB\-s\fR, \fB\-\-shell\fR=\fI<shell>\fR
++use \fIshell\fR instead of the default in /etc/passwd
++.PP
++.SH NOTES
++The \fB-m\fR, \fB-p\fR and \fB-s\fR options are restricted by the target
++user's shell being listed in \fB/etc/shells\fR. If it's not listed, then
++it's assumed to be a restricted account, a normal su is performed, and
++those options are ignored silently.
++.PP
++A subsystem login is indicated by the presense of a "*" as the first
++character of the login shell. The given home directory will be used as
++the root of a new filesystem which the user is actually logged into.
++.PP
++Much of the behavior of this command can be altered via its pam
++configuration \- see
++.BR pam (7)
+ .SH CAVEATS
++.PP
+ This version of \fBsu\fR has many compilation options, only some of which
+ may be in use at any particular site.
+ .SH FILES
+@@ -63,11 +103,14 @@
+ .br
+ /etc/shadow \- encrypted passwords and age information
+ .br
++/etc/shells \- valid user shells
++.br
+ $HOME/.profile \- initialization script for default shell
+ .SH SEE ALSO
+ .BR login (1),
+ .BR sh (1),
+ .BR login.defs (5),
+-.BR suauth (5)
++.BR shells (5), 
++.BR pam (7)
+ .SH AUTHOR
+-Julianne Frances Haugh <jockgrrl@ix.netcom.com>
++Julianne Frances Haugh (jfh@austin.ibm.com)
+--- shadow-4.0.3.ori/man/suauth.5	2001-01-25 11:43:51.000000000 +0100
++++ shadow-4.0.3_31/man/suauth.5	2005-01-07 18:18:05.000000000 +0100
+@@ -32,7 +32,7 @@
+ delimited by "," or the words
+ .B ALL EXCEPT
+ followed by a list
+-of usernames delimted by ","
++of usernames delimited by ","
+ .PP
+ from-id is formatted the same as to-id except the extra word
+ .B GROUP
+@@ -61,7 +61,7 @@
+ For the su command to be successful, the user must enter
+ his or her own password. They are told this.
+ .PP
+-Note there are three separate fields delimted by a colon. No
++Note there are three separate fields delimited by a colon. No
+ whitespace must surround this colon. Also note that the file
+ is examined sequentially line by line, and the first applicable
+ rule is used without examining the file further. This makes it
+--- shadow-4.0.3.ori/man/useradd.8	2002-03-08 05:39:12.000000000 +0100
++++ shadow-4.0.3_31/man/useradd.8	2005-01-07 18:18:05.000000000 +0100
+@@ -32,7 +32,7 @@
+ .TP 8
+ \fBuseradd\fR [\fB-c\fR \fIcomment\fR] [\fB-d\fR \fIhome_dir\fR]
+ .br
+-[\fB-e\fR \fIexpire_date\fR] [\fB-f\fR \fIinactive_time\fR]
++[\fB-e\fR \fIexpire_date\fR] [\fB-f\fR \fIinactive_days\fR]
+ .br
+ [\fB-g\fR \fIinitial_group\fR] [\fB-G\fR \fIgroup\fR[,...]]
+ .br
+@@ -95,6 +95,7 @@
+ option.
+ The default is to not create the directory and to not copy any
+ files.
++This option may not function correctly if the username has a / in it.
+ .IP "\fB-o\fR"
+ Allow create user with duplicate (non-unique) UID.
+ .IP "\fB-p \fIpasswd\fR"
+@@ -119,7 +120,7 @@
+ .IP "\fB-b \fIdefault_home\fR"
+ The initial path prefix for a new user's home directory.
+ The user's name will be affixed to the end of \fIdefault_home\fR
+-to create the new directory name if the \fB-d\fI option is not
++to create the new directory name if the \fB-d\fR option is not
+ used when creating a new account.
+ .IP "\fB-e \fIdefault_expire_date\fR"
+ The date on which the user account is disabled.
+--- shadow-4.0.3.ori/man/userdel.8	2002-03-08 05:39:12.000000000 +0100
++++ shadow-4.0.3_31/man/userdel.8	2005-01-07 18:18:05.000000000 +0100
+@@ -48,6 +48,20 @@
+ /etc/shadow \- secure user account information
+ .br
+ /etc/group \- group information
++.SH EXIT VALUES
++0       \- success
++.br
++1       \- can't update password file
++.br
++2       \- bad command syntax
++.br
++6       \- specified user doesn't exist
++.br
++8       \- user currently logged in
++.br
++10      \- can't update group file
++.br
++12      \- can't remove home directory
+ .SH CAVEATS
+ \fBuserdel\fR will not allow you to remove an account if the user
+ is currently logged in.
+--- shadow-4.0.3.ori/man/usermod.8	2002-03-08 05:39:12.000000000 +0100
++++ shadow-4.0.3_31/man/usermod.8	2005-01-07 18:18:05.000000000 +0100
+@@ -32,7 +32,7 @@
+ .TP 8
+ \fBusermod\fR [\fB-c\fR \fIcomment\fR] [\fB-d\fR \fIhome_dir\fR [\fB-m\fR]]
+ .br
+-[\fB-e\fR \fIexpire_date\fR] [\fB-f\fR \fIinactive_time\fR]
++[\fB-e\fR \fIexpire_date\fR] [\fB-f\fR \fIinactive_days\fR]
+ .br
+ [\fB-g\fR \fIinitial_group\fR] [\fB-G\fR \fIgroup\fR [,...]]
+ .br
+--- shadow-4.0.3.ori/man/groupdel.8	2002-03-09 15:37:43.000000000 +0100
++++ shadow-4.0.3-31sarge1/man/groupdel.8	2005-01-11 11:37:02.000000000 +0100
+@@ -44,6 +44,16 @@
+ /etc/group \- group information
+ .br
+ /etc/gshadow \- secure group information
++.SH EXIT VALUES
++0       \- success
++.br
++2       \- bad command syntax
++.br
++6       \- specified group doesn't exist
++.br
++8       \- can't remove user's primary group
++.br
++10      \- can't update group file
+ .SH SEE ALSO
+ .BR chfn (1),
+ .BR chsh (1),
+--- shadow-4.0.3.ori/man/grpck.8	2002-03-08 05:39:11.000000000 +0100
++++ shadow-4.0.3-31sarge1/man/grpck.8	2005-01-11 11:37:02.000000000 +0100
+@@ -25,7 +25,7 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.TH GRPCK 1
++.TH GRPCK 8
+ .SH NAME
+ grpck \- verify integrity of group files
+ .SH SYNOPSIS

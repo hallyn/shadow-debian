@@ -1,0 +1,66 @@
+#! /bin/sh -e
+## 004_configure.in.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+--- shadow-4.0.3.orig/configure.in
++++ shadow-4.0.3/configure.in
+@@ -138,7 +138,7 @@
+ fi
+ 
+ AC_MSG_CHECKING(location of shared mail directory)
+-for maildir in /var/spool/mail /var/mail /usr/spool/mail /usr/mail NONE; do
++for maildir in /var/mail /var/spool/mail /usr/spool/mail /usr/mail NONE; do
+ 	if test "$maildir" = "NONE"; then
+ 		AC_MSG_RESULT(None)
+ 	elif test -d $maildir; then
+@@ -265,9 +265,10 @@
+ 	AC_CHECK_LIB(pam, pam_start,
+ 		[AC_DEFINE(USE_PAM)
+ 		LIBPAM="-lpam"
+-		AC_CHECK_LIB(pam_misc, main,
++		AC_CHECK_LIB(pam_misc, misc_conv,
+ 			[LIBPAM="$LIBPAM -lpam_misc"],
+-			AC_MSG_ERROR(libpam_misc is missing)
++			AC_MSG_ERROR(libpam_misc is missing),
++			-lpam
+ 		)]
+ 		[AC_MSG_CHECKING(use login access checking if PAM not used)
+ 		AC_DEFINE(LOGIN_ACCESS)
+@@ -282,7 +283,7 @@
+ 	AC_MSG_RESULT(yes)
+ fi
+ 
+-ALL_LINGUAS="cs de el fr ja ko pl sv uk"
++ALL_LINGUAS="bs ca cs da de el es eu fi fr he id it ja ko nb nn nl pl pt_BR pt ro ru sk sq sv tl tr uk zh_CN zh_TW"
+ AM_GNU_GETTEXT
+ 
+ AC_OUTPUT([
+@@ -305,7 +306,6 @@
+ 	lib/Makefile
+ 	src/Makefile
+ 	contrib/Makefile
+-	debian/Makefile
+ 	etc/Makefile
+ 	etc/pam.d/Makefile
+ 	shadow.spec])

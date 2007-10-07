@@ -1,0 +1,19 @@
+Goal: Adjusted password check to fix authentication bypass (Martin Schulze)
+Fixes: CAN-2004-1001
+
+Status wrt upstream: already applied upstream.
+
+Index: shadow-4.0.3/libmisc/pwdcheck.c
+===================================================================
+--- shadow-4.0.3.orig/libmisc/pwdcheck.c	2000-10-15 19:07:26.000000000 +0200
++++ shadow-4.0.3/libmisc/pwdcheck.c	2005-05-23 23:34:09.467134000 +0200
+@@ -40,7 +40,8 @@
+ 	retcode = pam_acct_mgmt(pamh, 0);
+ 	if (retcode == PAM_NEW_AUTHTOK_REQD) {
+ 		retcode = pam_chauthtok(pamh, PAM_CHANGE_EXPIRED_AUTHTOK);
+-	} else if (retcode)
++	}
++	if (retcode)
+ 		goto bailout;
+ 
+ 	if (pam_setcred(pamh, 0))

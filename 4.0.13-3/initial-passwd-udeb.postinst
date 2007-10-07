@@ -1,0 +1,68 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+db_get debian-installer/locale
+if [ "$RET" ]; then
+	TARGETLANG="$RET"
+else
+	TARGETLANG=C
+fi
+
+db_get debconf/priority
+TARGETPRIO="$RET"
+
+target_debconf () {
+	env -u DEBIAN_HAS_FRONTEND -u DEBIAN_FRONTEND \
+		-u DEBCONF_REDIR -u DEBCONF_OLD_FD_BASE \
+		DEBCONF_READFD=0 DEBCONF_WRITEFD=3 \
+		DEBIAN_PRIORITY="$TARGETPRIO" \
+		LANG="$TARGETLANG" DEBCONF_RECONFIGURE=1 \
+		chroot /target debconf -o base-config "$@"
+}
+
+tmpfile="$(mktemp /target/tmp/initial-passwd-udeb.XXXXXX)"
+trap "rm -f '$tmpfile'" EXIT HUP INT QUIT TERM
+echo '. /usr/share/debconf/confmodule' >>"$tmpfile"
+
+need_copy=
+
+# Copy information from cdebconf to debconf. This is a horrible hack around
+# the lack of a debconf-copydb that works with cdebconf's rfc822db.
+for q in passwd/root-password passwd/root-password-again passwd/make-user \
+		passwd/username passwd/username-bad passwd/user-fullname \
+		passwd/user-password passwd/user-password-again \
+		passwd/password-mismatch passwd/password-empty passwd/shadow \
+		passwd/md5 passwd/root-password-empty \
+		passwd/root-password-crypted passwd/user-password-crypted; do
+	db_get "$q" || continue
+	value="$(printf %s "$RET" | sed "s/'/'\\\\''/g")"
+	db_fget "$q" seen
+	seen="$(printf %s "$RET" | sed "s/'/'\\\\''/g")"
+	cat >>"$tmpfile" <<EOF
+db_register '$q' '$q'
+db_set '$q' '$value'
+db_fset '$q' seen '$seen'
+EOF
+	need_copy=1
+done
+
+if [ "$need_copy" ]; then
+	chmod +x "$tmpfile"
+	target_debconf "${tmpfile#/target}"
+fi
+
+# Ideally, dpkg-reconfigure wouldn't create a new frontend every time. In
+# the meantime, we reimplement a couple of bits of it. Note that
+# DEBCONF_RECONFIGURE=1 is set in target_debconf above.
+
+version="$(LANG="$TARGETLANG" chroot /target dpkg --status passwd | \
+	   grep ^Version: | sed 's/^Version: //')"
+CODE=0
+target_debconf -f passthrough \
+	/var/lib/dpkg/info/passwd.config reconfigure "$version" || CODE="$?"
+if [ "$CODE" = 30 ]; then
+	exit 10
+else
+	exit $CODE
+fi

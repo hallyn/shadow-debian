@@ -1,0 +1,53 @@
+Goal: Add a "quiet" mode to vipw and have it display on stdout
+
+Fixes: #190252
+
+Status wrt upstream: Forwarded but not applied yet
+
+Index: shadow-4.0.13/src/vipw.c
+===================================================================
+--- shadow-4.0.13.orig/src/vipw.c	2005-10-27 14:28:08.238320024 +0200
++++ shadow-4.0.13/src/vipw.c	2005-10-27 14:36:15.101305600 +0200
+@@ -45,6 +45,7 @@
+ static const char *progname, *filename, *fileeditname;
+ static int filelocked = 0, createedit = 0;
+ static int (*unlock) (void);
++static int quiet = 0;
+ 
+ /* local function prototypes */
+ static int create_backup_file (FILE *, const char *, struct stat *);
+@@ -104,7 +105,8 @@
+ 		fprintf (stderr, "%s: %s", progname, msg);
+ 	if (syserr)
+ 		fprintf (stderr, ": %s", strerror (err));
+-	fprintf (stderr, _("\n%s: %s is unchanged\n"), progname, filename);
++	if (!quiet)
++	        fprintf (stdout, _("\n%s: %s is unchanged\n"), progname, filename);
+ 	exit (ret);
+ }
+ 
+@@ -218,13 +220,15 @@
+ 	progname = ((c = strrchr (*argv, '/')) ? c + 1 : *argv);
+ 	do_vipw = (strcmp (progname, "vigr") != 0);
+ 
+-	while ((flag = getopt (argc, argv, "ghps")) != EOF) {
++	while ((flag = getopt (argc, argv, "ghpqs")) != EOF) {
+ 		switch (flag) {
+ 		case 'g':
+ 			do_vipw = 0;
+ 			break;
+ 		case 'h':
+ 			e = 0;
++		case 'q':
++			quiet = 1;
+ 		case 'p':
+ 			do_vipw = 1;
+ 			break;
+@@ -235,6 +239,7 @@
+ 			printf (_("Usage:\n\
+ `vipw' edits /etc/passwd        `vipw -s' edits /etc/shadow\n\
+ `vigr' edits /etc/group         `vigr -s' edits /etc/gshadow\n\
++`{vipw|vigr} -q' quiet mode\n\
+ "));
+ 			exit (e);
+ 		}

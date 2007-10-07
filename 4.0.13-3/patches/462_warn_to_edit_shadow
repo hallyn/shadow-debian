@@ -1,0 +1,41 @@
+Goal: Warn about possible need to edit shadow files when editing the 
+      master files with vipw
+
+Fixes: #62821
+
+Status wrt upstream: Forwarded but not applied yet
+
+Index: shadow-4.0.13/src/vipw.c
+===================================================================
+--- shadow-4.0.13.orig/src/vipw.c	2005-10-27 15:30:16.567527832 +0200
++++ shadow-4.0.13/src/vipw.c	2005-10-27 15:36:24.261629832 +0200
+@@ -248,15 +248,27 @@
+ 	if (do_vipw) {
+ 		if (editshadow)
+ 			vipwedit (SHADOW_FILE, spw_lock, spw_unlock);
+-		else
++		else {
+ 			vipwedit (PASSWD_FILE, pw_lock, pw_unlock);
++			printf (_("You have modified the password file.\n\
++You may need to modify the shadow file for consistency.\n\
++Please use the command `vipw -s' to do so.\n\
++"));
++		}
+ 	} else {
+ #ifdef SHADOWGRP
+ 		if (editshadow)
+ 			vipwedit (SGROUP_FILE, sgr_lock, sgr_unlock);
+-		else
++		else {
+ #endif
+ 			vipwedit (GROUP_FILE, gr_lock, gr_unlock);
++#ifdef SHADOWGRP
++			printf (_("You have modified the group file.\n\
++You may need to modify the shadow group file for consistency.\n\
++Please use the command `vigr -s' to do so.\n	\
++"));
++#endif
++		}
+ 	}
+ 
+ 	nscd_flush_cache ("passwd");

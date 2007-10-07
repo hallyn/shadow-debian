@@ -1,0 +1,26 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 403_sg_symlink_162339_163652.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: This patch was probably a part of the fix for #162339 and #163652.
+## DP: It was needed because newgrp was installed in /bin, but the sg
+## DP: symlink pointed to /usr/bin/newgrp.
+## DP:
+## DP: The symlink is now done in debian/rules, and sg and newgrp are
+## DP: installed in /usr/bin.
+## DP: This patch can probably be removed now.
+## DP: (We just have to test if sg is linked to newgrp)
+
+@DPATCH@
+Index: shadow-4.0.12/src/Makefile.am
+===================================================================
+--- shadow-4.0.12.orig/src/Makefile.am	2005-08-17 11:51:00.000000000 +0200
++++ shadow-4.0.12/src/Makefile.am	2005-08-17 11:51:01.000000000 +0200
+@@ -77,7 +77,6 @@
+ 
+ install-am: all-am
+ 	$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+-	ln -sf newgrp	$(DESTDIR)$(ubindir)/sg
+ 	ln -sf vipw	$(DESTDIR)$(usbindir)/vigr
+ 	for i in $(suidbins); do \
+ 		chmod -f 4755 $(DESTDIR)$(bindir)/$$i; \

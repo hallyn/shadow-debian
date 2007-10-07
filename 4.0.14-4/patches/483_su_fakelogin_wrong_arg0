@@ -1,0 +1,17 @@
+Goal: shell's name must be -su when a su fakes a login
+
+Status wrt upstream: not reported yet
+
+Index: shadow-4.0.14/src/su.c
+===================================================================
+--- shadow-4.0.14.orig/src/su.c	2006-01-12 14:35:45.000000000 +0100
++++ shadow-4.0.14/src/su.c	2006-01-12 14:41:10.000000000 +0100
+@@ -902,7 +902,7 @@
+ 		 * Use the shell and create an argv
+ 		 * with the rest of the command line included.
+ 		 */
+-		argv[-1] = shellstr;
++		argv[-1] = cp;
+ #ifndef USE_PAM
+ 		(void) execv (shellstr, &argv[-1]);
+ #else

@@ -1,0 +1,46 @@
+Goal: Better explain the respective roles of login, init and getty with regards
+      to the utmp file
+      Give correct location of some files
+
+Status wrt upstream: Forwarded but not completely applied yet 
+		     (the files locations patches are already applied)
+
+Index: shadow-4.0.3/man/login.1
+===================================================================
+--- shadow-4.0.3.orig/man/login.1	2005-05-12 12:12:08.887059874 +0200
++++ shadow-4.0.3/man/login.1	2005-05-12 12:12:18.802578367 +0200
+@@ -95,9 +95,9 @@ executed.
+ Please see the appropriate manual section for more information on
+ this function.
+ .PP
+-A subsystem login is indicated by the presense of a "*" as the first
++A subsystem login is indicated by the presence of a "*" as the first
+ character of the login shell. The given home directory will be used as
+-the root of a new filesystem which the user is actually logged into.
++the root of a new file system which the user is actually logged into.
+ .SH OPTIONS
+ .TP
+ .B -p
+@@ -119,11 +119,20 @@ This version of \fBlogin\fR has many com
+ may be in use at any particular site.
+ .PP
+ The location of files is subject to differences in system configuration.
++.PP
++The \fBlogin\fR program is NOT responsible for removing users from the utmp file.
++It is the responsibility of
++.BR getty (8)
++and
++.BR init (8)
++to clean up apparent ownership of a terminal session.  If you use \fBlogin\fR
++from the shell prompt without \fBexec\fR, the user you use will
++continue to appear to be logged in even after you log out of the "subsession".
+ .SH FILES
+ .br
+-/etc/utmp \- list of current login sessions
++/var/run/utmp \- list of current login sessions
+ .br
+-/etc/wtmp \- list of previous login sessions
++/var/log/wtmp \- list of previous login sessions
+ .br
+ /etc/passwd \- user account information
+ .br

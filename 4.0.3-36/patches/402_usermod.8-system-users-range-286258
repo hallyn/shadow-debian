@@ -1,0 +1,17 @@
+Goal: Give the correct range for system users : 0-999 instead of 0-99
+
+Status wrt upstream: Not applied because too Debian-specific
+
+Index: shadow-4.0.3/man/usermod.8
+===================================================================
+--- shadow-4.0.3.orig/man/usermod.8	2005-06-20 23:31:40.000000000 +0200
++++ shadow-4.0.3/man/usermod.8	2005-06-20 23:31:56.000000000 +0200
+@@ -91,7 +91,7 @@
+ The numerical value of the user's ID.
+ This value must be unique, unless the \fI-o\fR option is used.
+ The value must be non-negative.
+-Values between 0 and 99 are typically reserved for system accounts.
++Values between 0 and 999 are typically reserved for system accounts.
+ Any files which the user owns and which are located in the directory
+ tree rooted at the user's home directory will have the file user ID
+ changed automatically.

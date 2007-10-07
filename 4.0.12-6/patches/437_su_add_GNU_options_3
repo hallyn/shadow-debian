@@ -1,0 +1,128 @@
+Goal:
+     * add -c ability to run_shell.
+     * only change environment if the user did not requested to preserve
+       the environment, or if the user has a restricted shell.
+Index: shadow-4.0.12/src/su.c
+===================================================================
+--- shadow-4.0.12.orig/src/su.c	2005-08-29 21:49:10.000000000 +0200
++++ shadow-4.0.12/src/su.c	2005-08-29 21:49:11.000000000 +0200
+@@ -185,7 +185,10 @@
+  * have been applied.  Some work was needed to get it integrated into
+  * su.c from shadow.
+  */
+-static void run_shell (const char *shellstr, char **additional_args, int fakelogin)
++static void run_shell (const char *shellstr,
++                       const char *command,
++                       char **additional_args,
++                       int fakelogin)
+ {
+ 	const char **args;
+ 	int child;
+@@ -194,8 +197,10 @@
+ 	int ret;
+ 	int argno = 0;
+ 
++	/* There is at most 4 arguments (arg0, '-c', <command>, NULL) + the
++	 * number of arguments in the additional_args array. */
+ 	args = (const char **)xmalloc(sizeof (char *)
+-	                              * (2 + elements (additional_args)));
++	                              * (4 + elements (additional_args)));
+ 
+ 	if (fakelogin) {
+ 		char *arg0;
+@@ -213,11 +218,17 @@
+ 		args[0] = Basename (shellstr);
+ 	argno = 1;
+ 
++	if (command) {
++		args[argno++] = "-c";
++		args[argno++] = command;
++	}
++
+ 	if (additional_args) {
+ 		for (; *additional_args; ++additional_args) {
+ 			args[argno++] = *additional_args;
+ 		}
+ 	}
++
+ 	args[argno] = NULL;
+ 
+ #ifndef USE_PAM
+@@ -716,7 +727,9 @@
+ 		addenv ("PATH", cp);
+ 	}
+ 
+-	environ = newenvp;	/* make new environment active */
++	if (change_environment || restricted_shell(pwent.pw_shell)) {
++		environ = newenvp;	/* make new environment active */
++	}
+ 
+ 	if (getenv ("IFS"))	/* don't export user IFS ... */
+ 		addenv ("IFS= \t\n", NULL);	/* ... instead, set a safe IFS */
+@@ -766,18 +779,20 @@
+ 		exit (1);
+ 	}
+ 
+-	/* we need to setup the environment *after* pam_open_session(),
+-	 * else the UID is changed before stuff like pam_xauth could
+-	 * run, and we cannot access /etc/shadow and co
+-	 */
+-	environ = newenvp;	/* make new environment active */
+-
+-	/* update environment with all pam set variables */
+-	envcp = pam_getenvlist (pamh);
+-	if (envcp) {
+-		while (*envcp) {
+-			addenv (*envcp, NULL);
+-			envcp++;
++	if (change_environment || restricted_shell(pwent.pw_shell)) {
++		/* we need to setup the environment *after* pam_open_session(),
++		 * else the UID is changed before stuff like pam_xauth could
++		 * run, and we cannot access /etc/shadow and co
++		 */
++		environ = newenvp;	/* make new environment active */
++
++		/* update environment with all pam set variables */
++		envcp = pam_getenvlist (pamh);
++		if (envcp) {
++			while (*envcp) {
++				addenv (*envcp, NULL);
++				envcp++;
++			}
+ 		}
+ 	}
+ 
+@@ -795,15 +810,17 @@
+ 		exit (1);
+ #endif				/* !USE_PAM */
+ 
+-	if (fakelogin)
+-		setup_env (&pwent);
++	if (change_environment || restricted_shell (pwent.pw_shell)) {
++		if (fakelogin )
++			setup_env (&pwent);
+ #if 1				/* Suggested by Joey Hess. XXX - is this right?  */
+-	else {
+-		addenv ("HOME", pwent.pw_dir);
+-		addenv ("USER", pwent.pw_name);
+-		addenv ("SHELL", shell);
+-	}
++		else {
++			addenv ("HOME", pwent.pw_dir);
++			addenv ("USER", pwent.pw_name);
++			addenv ("SHELL", shell);
++		}
+ #endif
++	}
+ 
+ 	/*
+ 	 * This is a workaround for Linux libc bug/feature (?) - the
+@@ -814,7 +831,7 @@
+ 	 */
+ 	closelog ();
+ 
+-	run_shell (shell, additional_args, fakelogin);
++	run_shell (shell, command, additional_args, fakelogin);
+ 	/* NOT REACHED */
+ 	exit (1);
+ }

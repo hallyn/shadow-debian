@@ -1,0 +1,31 @@
+Goal: document the -q option:
+      -q can be used with -r
+      -q just mask warnings, but if an action is necessary, it asks for
+      the proper action.
+Fixes: 309408
+
+Status wrt upstream: It should be forwarded to upstream.
+
+Index: shadow-4.0.12/man/pwck.8.xml
+===================================================================
+--- shadow-4.0.12.orig/man/pwck.8.xml	2005-08-17 11:49:14.000000000 +0200
++++ shadow-4.0.12/man/pwck.8.xml	2005-08-17 11:51:12.000000000 +0200
+@@ -28,6 +28,7 @@
+     </cmdsynopsis>
+     <cmdsynopsis>
+       <command>pwck</command>
++      <arg choice='opt'>-q </arg>
+       <arg choice='opt'>-r </arg>
+       <arg choice='opt'>
+         <arg choice='plain'>
+@@ -101,8 +102,8 @@
+         </term>
+         <listitem>
+           <para>
+-	    Report errors only. Using this option will not require an action
+-	    from the user.
++            Report errors only. The warnings which do not require any
++            action from the user won't be displayed.
+           </para>
+         </listitem>
+       </varlistentry>

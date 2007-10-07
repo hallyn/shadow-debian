@@ -1,0 +1,95 @@
+Goal:	When su process sits between parent and child shells, it should
+	propagate STOPs from child to parent and CONTs from parent to child,
+	otherwise e.g. bash's "suspend" command won't work.
+
+Status wrt upstream: Fixed in upstream the same way, with slightly different
+	code inside run_shell() and signal handlig, since 4.0.5
+
+Notes:	Affects only operation with CLOSE_SESSIONS=yes. When it's set to "no",
+	newgrp doesn't fork and create child process, it just calls exec(),
+	so there won't be "newgrp" process between parent and child shells.
+
+	SIGCHLD is handled implicitly by waitpid() when WUNTRACED flag is
+	specified.
+	
+	SIGCONT is handled implicitly too, because it just resumes execution
+	right after the point the code has been stopped -- in our case it's
+	the next command after "raise(SIGSTOP)", which has been processed
+	_synchronously_.
+	
+	Thus there's no need to set signal handlers for either SIGCHLD or
+	SIGCONT, and code is much cleaner with this.
+	
+	Because waitpid() is now placed inside a loop, here are some comments
+	about when the loop is broken:
+	1. (wpid != pid && errno != EINTR) -- when waitpid() returns any error
+	   except "interrupted by signal", i.e. wrong pid, wrong options etc.
+	2. WIFEXITED
+	3. WIFSIGNALED
+	4. WCOREDUMP
+	This _differs_ with Tomasz's in EINTR handling -- Tomasz's su will
+	_exit_ on EINTR. This code won't. I suspect that it's not possible
+	to be inerrupted _that way_ with e.g. SIGCHLD, but who knows...
+
+	Closes: 314727
+	(suspend command from su shell fails to return to parent shell)
+
+	Upstream blocks all signals except INTR and ALRM, our code doesn't.
+	This led to problem with zsh as child shell. Zsh does not create
+	separate pgrp for itself and when suspends, it sends TSTP to parent
+	"su" process too. su had TSTP unblocked and default handler set
+	for it. I changed su.c to block TSTP (also TTIN, TTOU, QUIT and HUP,
+	-- the same as in newgrp.c)
+
+	Closes: 317747
+	(su -m / suspend / fg broken with zsh)
+
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-07-11 16:12:38.000000000 +0300
++++ shadow-4.0.3/src/su.c	2005-07-11 16:18:01.000000000 +0300
+@@ -739,9 +739,14 @@
+ 	   around to close sessions */
+ 	if (getdef_bool("CLOSE_SESSIONS")) {
+ 		pid_t pid;
+-		int status;
++		int status, wpid;
+ 
+-		signal(SIGINT, SIG_IGN);
++		signal (SIGINT, SIG_IGN);
++		signal (SIGQUIT, SIG_IGN);
++		signal (SIGHUP, SIG_IGN);
++		signal (SIGTSTP, SIG_IGN);
++		signal (SIGTTIN, SIG_IGN);
++		signal (SIGTTOU, SIG_IGN);
+ 		pid = fork();
+ 
+ 		switch(pid) {
+@@ -753,10 +758,25 @@
+ 			pam_end(pamh, PAM_ABORT);
+ 			exit(1);
+ 		case 0: /* child */
+-			signal(SIGINT, SIG_DFL);
++			signal (SIGINT, SIG_DFL);
++			signal (SIGQUIT, SIG_DFL);
++			signal (SIGHUP, SIG_DFL);
++			signal (SIGTSTP, SIG_DFL);
++			signal (SIGTTIN, SIG_DFL);
++			signal (SIGTTOU, SIG_DFL);
+ 			break;
+ 		default: /* parent */
+-			waitpid(pid, &status, 0);
++			do {
++				errno = 0;
++				wpid = waitpid(pid, &status, WUNTRACED);
++				if (wpid == pid && WIFSTOPPED(status)) {
++					/* stop when child stops */
++					raise(SIGSTOP);
++					/* wake child when resumed */
++					kill(pid, SIGCONT);
++				}
++			} while (wpid == pid && WIFSTOPPED(status)
++					|| wpid != pid && errno == EINTR);
+ 			/* now we are done using PAM */
+ 			pam_setcred(pamh, PAM_DELETE_CRED);
+ 			ret = pam_close_session(pamh, 0);

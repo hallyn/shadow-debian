@@ -1,0 +1,22 @@
+Goal: document how to initiate a trusted path on linux.
+Fixes: #305600 by documenting that the answer is in the kernel.
+
+Status wrt upstream: unknown
+
+Index: shadow-4.0.3/man/login.1
+===================================================================
+--- shadow-4.0.3.orig/man/login.1	2005-05-13 22:37:38.939127155 +0200
++++ shadow-4.0.3/man/login.1	2005-05-13 22:47:54.019226226 +0200
+@@ -122,6 +122,12 @@ The location of files is subject to diff
+ .PP
+ The \fBlogin\fR program is NOT responsible for removing users from the utmp file.
+ It is the responsibility of
++.PP
++As any program, \fBlogin\fR appearance could be faked. If non-trusted users have a
++physical access to the machine, an attacker could use this to obtain the
++password of the next person sitting in front of the machine. Under Linux,
++the SAK mecanism can be used by users to initiate of a trusted path and
++prevent this kind of attack. 
+ .BR getty (8)
+ and
+ .BR init (8)

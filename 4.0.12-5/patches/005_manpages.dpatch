@@ -1,0 +1,15 @@
+Note: * The small useradd.8.xml change seems to be the only one
+        not applied upstream
+
+Index: shadow-4.0.12/man/useradd.8.xml
+===================================================================
+--- shadow-4.0.12.orig/man/useradd.8.xml	2005-08-17 11:49:22.000000000 +0200
++++ shadow-4.0.12/man/useradd.8.xml	2005-08-17 11:50:33.000000000 +0200
+@@ -169,6 +169,7 @@
+             <option>-k</option> option is only valid in conjunction with the
+             <option>-m</option> option. The default is to not create the
+             directory and to not copy any files.
++            This option may not function correctly if the username has a / in it.
+           </para>
+         </listitem>
+       </varlistentry>

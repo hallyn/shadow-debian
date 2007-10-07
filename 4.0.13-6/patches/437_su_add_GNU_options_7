@@ -1,0 +1,66 @@
+Note: * Document the changes from the other 437_ patches
+
+Index: shadow-4.0.13/man/su.1.xml
+===================================================================
+--- shadow-4.0.13.orig/man/su.1.xml	2005-10-04 08:06:33.161799494 +0200
++++ shadow-4.0.13/man/su.1.xml	2005-10-04 08:07:20.207213632 +0200
+@@ -15,6 +15,7 @@
+   <refsynopsisdiv id='synopsis'>
+     <cmdsynopsis>
+       <command>su</command>
++      <arg choice='opt'>OPTS </arg>
+       <arg choice='opt'>- </arg>
+       <arg choice='opt'>
+ 	<arg choice='plain'>
+@@ -37,24 +38,24 @@
+       expect had the user logged in directly.
+     </para>
+ 
+-    <para>
+-      Additional arguments may be provided after the username, in which case
+-      they are supplied to the user&acute;s login shell. In particular, an
+-      argument of <option>-c</option> will cause the next argument to be
+-      treated as a command by most command interpreters. The command will be
+-      executed by the shell specified in <filename>/etc/passwd</filename>
+-      for the target user.
+-    </para>
+-
+     <para>The user will be prompted for a password, if appropriate. Invalid
+       passwords will produce an error message. All attempts, both valid and
+       invalid, are logged to detect abuses of the system.
+     </para>
+ 
++    <para>An optional command can be executed. This is done by the shell
++      specified in <filename>/etc/passwd</filename> for the target user
++      unless the <option>-s</option> or <option>-m</option>
++      options are used.  Any arguments supplied after the <emphasis remap='I'>
++      username</emphasis> will be passed to the invoked shell (shell must
++      support the <option>-c</option> command line option in order for a
++      command to be passed to it).
++    </para>
++
+     <para>
+-      The current environment is passed to the new shell. The value of
+-      <emphasis>$PATH</emphasis> is reset to
+-      <filename>/bin:/usr/bin</filename> for normal users, or
++      Unless the <option>-m</option> or <option>-p</option> options are used,
++      the current environment is passed to the new shell with alterations.
++      The value of <emphasis remap='B'>$PATH</emphasis> is reset to
+       <filename>/sbin:/bin:/usr/sbin:/usr/bin</filename> for the super user. 
+       This may be changed with the <emphasis>ENV_PATH</emphasis> and
+       <emphasis>ENV_SUPATH</emphasis> definitions in
+@@ -91,6 +92,14 @@
+ 	  <para>secure user account information</para>
+ 	</listitem>
+       </varlistentry>
++      <varlistentry>
++        <term><filename>/etc/shells</filename></term>
++        <listitem>valid user shells</listitem>
++      </varlistentry>
++      <varlistentry>
++        <term><filename>$HOME/.profile</filename></term>
++        <listitem>initialization script for default shell</listitem>
++      </varlistentry>
+     </variablelist>
+   </refsect1>
+ 

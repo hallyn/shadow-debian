@@ -1,0 +1,22 @@
+Goal: document how to initiate a trusted path on linux.
+Fixes: #305600 by documenting that the answer is in the kernel.
+
+Status wrt upstream: Not applied
+
+Index: shadow-4.0.3/man/login.1
+===================================================================
+--- shadow-4.0.3.orig/man/login.1	2005-06-09 19:36:10.000000000 +0200
++++ shadow-4.0.3/man/login.1	2005-06-09 22:51:42.000000000 +0200
+@@ -128,6 +128,12 @@
+ to clean up apparent ownership of a terminal session.  If you use \fBlogin\fR
+ from the shell prompt without \fBexec\fR, the user you use will
+ continue to appear to be logged in even after you log out of the "subsession".
++.PP
++As any program, \fBlogin\fR appearance could be faked. If non-trusted users have a
++physical access to the machine, an attacker could use this to obtain the
++password of the next person sitting in front of the machine. Under Linux,
++the SAK mecanism can be used by users to initiate of a trusted path and
++prevent this kind of attack. 
+ .SH FILES
+ .br
+ /var/run/utmp \- list of current login sessions

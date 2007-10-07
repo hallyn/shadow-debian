@@ -1,0 +1,38 @@
+Goal: document "-O" option in useradd
+Fixes: 304934
+
+Status wrt upstream: not applied. Documented in TFS only.
+	Also, Tomasz tends to adopt Solaris' "-K" option instead.
+
+Index: shadow-4.0.3/man/useradd.8
+===================================================================
+--- shadow-4.0.3.orig/man/useradd.8	2005-07-06 04:11:10.000000000 +0300
++++ shadow-4.0.3/man/useradd.8	2005-07-06 04:22:30.000000000 +0300
+@@ -36,9 +36,9 @@
+ .br
+ [\fB-g\fR \fIinitial_group\fR] [\fB-G\fR \fIgroup\fR[,...]]
+ .br
+-[\fB-m\fR [\fB-k\fR \fIskeleton_dir\fR]] [\fB-o\fR] [\fB-p\fR \fIpasswd\fR]
++[\fB-m\fR [\fB-k\fR \fIskeleton_dir\fR]] [\fB-o\fR] [\fB-O \fIPARAMETER\fR=\fIvalue\fR]
+ .br
+-[\fB-s\fR \fIshell\fR] [\fB-u\fR \fIuid\fR] \fIlogin\fR
++[\fB-p\fR \fIpasswd\fR] [\fB-s\fR \fIshell\fR] [\fB-u\fR \fIuid\fR] \fIlogin\fR
+ .TP 8
+ \fBuseradd\fR \fB-D\fR [\fB-g\fI default_group\fR] [\fB-b\fI default_home\fR]
+ .br
+@@ -98,6 +98,15 @@
+ This option may not function correctly if the username has a / in it.
+ .IP "\fB-o\fR"
+ Allow create user with duplicate (non-unique) UID.
++.IP "\fB-O \fIPARAMETER\fR=\fIvalue\fR"
++Overrides /etc/login.defs defaults (UID_MIN, UID_MAX, UMASK, PASS_MAX_DAYS and
++others). For example, \fB-O PASS_MAX_DAYS=-1\fR can be used when creating
++system account to turn off password ageing, even though
++system account has no password at all.
++.IP
++Multiple \fB-O\fR options can be specified, e.g.:
++\fB-O UID_MIN=100 -O UID_MAX=499\fR. Note: \fB-O UID_MIN=10,UID_MAX=499\fR
++doesn't work yet.
+ .IP "\fB-p \fIpasswd\fR"
+ The encrypted password, as returned by \fBcrypt\fR(3).
+ The default is to disable the account.

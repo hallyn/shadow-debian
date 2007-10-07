@@ -1,0 +1,77 @@
+Goal: add pam session ability to su (patch from Topi Miettinen)
+Fixes: #57526, #55873, #57532
+
+Note: When CLOSE_SESSIONS is not set, pam_end is not called.
+
+Status wrt upstream: Current upstream handles session management in run_shell
+                     However:
+                     * the session is closed after changing the uid.
+                       (i.e. not as root, as it should be)
+                       In order to close the session as root, the session
+                       management should be removed from run_shell.
+                     * CLOSE_SESSIONS is not taken into account
+
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-05-29 16:46:20.851112000 +0200
++++ shadow-4.0.3/src/su.c	2005-05-29 16:51:38.131112000 +0200
+@@ -703,17 +703,56 @@
+ 		pam_end (pamh, ret);
+ 		exit (1);
+ 	}
++	ret = pam_open_session(pamh, 0);
++	if (ret != PAM_SUCCESS) {
++		SYSLOG((LOG_ERR, "pam_open_session: %s\n", pam_strerror(pamh, ret)));
++		fprintf(stderr, "%s: %s\n", Prog, pam_strerror(pamh, ret));
++		pam_setcred(pamh, PAM_DELETE_CRED);
++		pam_end(pamh, ret);
++		exit(1);
++	}
++	/* We must fork before setuid() because we need to call
++	 * pam_close_session() as root.
++	 */
++
++	/* We let the admin configure whether they need to keep login
++	   around to close sessions */
++	if (getdef_bool("CLOSE_SESSIONS")) {
++		pid_t pid;
++		int status;
++
++		signal(SIGINT, SIG_IGN);
++		pid = fork();
++
++		switch(pid) {
++		case -1:
++			SYSLOG((LOG_ERR, "su: fork failure: %m"));
++			perror("su: fork failure");
++			pam_setcred(pamh, PAM_DELETE_CRED);
++			pam_close_session(pamh, 0);
++			pam_end(pamh, PAM_ABORT);
++			exit(1);
++		case 0: /* child */
++			signal(SIGINT, SIG_DFL);
++			break;
++		default: /* parent */
++			waitpid(pid, &status, 0);
++			/* now we are done using PAM */
++			pam_setcred(pamh, PAM_DELETE_CRED);
++			ret = pam_close_session(pamh, 0);
++			pam_end(pamh, ret);
++			exit(WEXITSTATUS(status));
++		}
++	}
+ 
+ 	/* become the new user */
+ 	if (change_uid (&pwent)) {
++		pam_close_session(pamh, 0);
+ 		pam_setcred (pamh, PAM_DELETE_CRED);
+ 		pam_end (pamh, PAM_ABORT);
+ 		exit (1);
+ 	}
+ 
+-	/* now we are done using PAM */
+-	pam_end (pamh, PAM_SUCCESS);
+-
+ #else				/* !USE_PAM */
+ 	if (!amroot)		/* no limits if su from root */
+ 		setup_limits (&pwent);

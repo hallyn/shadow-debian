@@ -1,0 +1,94 @@
+Status wrt upstream: will be in 4.0.15 (committed at 2006-01-07)
+
+Index: shadow-4.0.14/src/su.c
+===================================================================
+--- shadow-4.0.14.orig/src/su.c	2006-01-04 22:34:17.000000000 +0100
++++ shadow-4.0.14/src/su.c	2006-01-04 22:34:46.000000000 +0100
+@@ -274,6 +274,7 @@
+ 	fprintf (stderr, _("Usage: su [options] [login]\n"
+ 			   "\n"
+ 			   "Options:\n"
++			   "  -c, --command COMMAND	pass COMMAND to the invoked shell using its -c option\n"
+ 			   "  -h, --help			display this help message and exit\n"
+ 			   "  -, -l, --login		make the shell a login shell\n"
+ 			   "  -m, -p,\n"
+@@ -304,7 +305,7 @@
+ 	uid_t my_uid;
+ 	struct passwd *pw = 0;
+ 	char **envp = environ;
+-	char *shellstr = 0;
++	char *command = 0, *shellstr = 0;
+ 	char *tmp_name;
+ 
+ #ifdef USE_PAM
+@@ -347,6 +348,7 @@
+ 		int option_index = 0;
+ 		int c;
+ 		static struct option long_options[] = {
++			{"command", required_argument, NULL, 'c'},
+ 			{"help", no_argument, NULL, 'h'},
+ 			{"login", no_argument, NULL, 'l'},
+ 			{"preserve-environment", no_argument, NULL, 'p'},
+@@ -355,7 +357,7 @@
+ 		};
+ 
+ 		while ((c =
+-			getopt_long (argc, argv, "-hlmps:", long_options,
++			getopt_long (argc, argv, "-c:hlmps:", long_options,
+ 				     &option_index)) != -1) {
+ 			switch (c) {
+ 			case 1:
+@@ -368,6 +370,9 @@
+ 				optind--;
+ 				goto end_su_options;
+ 				break;	/* NOT REACHED */
++			case 'c':
++ 				command = optarg;
++ 				break;
+ 			case 'h':
+ 				usage ();
+ 				break;
+@@ -449,6 +454,8 @@
+ 	}
+ 
+ 	doshell = argc == optind;	/* any arguments remaining? */
++	if (command)
++		doshell = 0;
+ 
+ 	/*
+ 	 * Get the user's real name. The current UID is used to determine
+@@ -868,6 +875,11 @@
+ 	if (!doshell) {
+ 		/* Position argv to the remaining arguments */
+ 		argv += optind;
++		if (command) {
++			argv -= 2;
++			argv[0] = "-c";
++			argv[1] = command;
++		}
+ 		/*
+ 		 * Use the shell and create an argv
+ 		 * with the rest of the command line included.
+Index: shadow-4.0.14/man/su.1.xml
+===================================================================
+--- shadow-4.0.14.orig/man/su.1.xml	2006-01-04 22:34:24.000000000 +0100
++++ shadow-4.0.14/man/su.1.xml	2006-01-04 22:35:38.000000000 +0100
+@@ -82,6 +82,18 @@
+     <variablelist remap='IP'>
+       <varlistentry>
+ 	<term>
++	  <option>-c</option>, <option>--command</option>
++	  <replaceable>SHELL</replaceable>
++	</term>
++	<listitem>
++	  <para>
++	    Specify a command that will be invoked by the shell using its
++	    <option>-c</option>.
++	  </para>
++	</listitem>
++      </varlistentry>
++      <varlistentry>
++	<term>
+ 	  <option>-</option>, <option>-l</option>, <option>--login</option>
+ 	</term>
+ 	<listitem>

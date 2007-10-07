@@ -1,0 +1,64 @@
+#! /bin/sh -e
+## 406_good_name.dpatch by xrgtn
+##
+## All lines beginning with `## DP:' are a description of the patch.
+##
+## DP: Relaxed usernames/groupnames checking patch.
+## DP: Allows any non-empty user/grounames that don't contain ':' and '\n'
+## DP: characters and don't start with '-'. This patch is more restrictive
+## DP: than original Karl's version. closes: #264879
+## DP: 
+## DP: Comments from Karl Ramm (shadow 1:4.0.3-9, 20 Aug 2003 02:06:50 -0400):
+## DP: 
+## DP: I can't come up with a good justification as to why characters other
+## DP: than ':'s and '\0's should be disallowed in group and usernames (other
+## DP: than '-' as the leading character).  Thus, the maintenance tools don't
+## DP: anymore.  closes: #79682, #166798, #171179
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+diff -urNad shadow-4.0.3/libmisc/chkname.c /tmp/dpep.aDA3oY/shadow-4.0.3/libmisc/chkname.c
+--- shadow-4.0.3/libmisc/chkname.c	2002-01-10 15:04:34.000000000 +0200
++++ /tmp/dpep.aDA3oY/shadow-4.0.3/libmisc/chkname.c	2005-05-08 16:41:10.000000000 +0300
+@@ -21,6 +21,7 @@
+ static int
+ good_name(const char *name)
+ {
++#if 0
+ 	/*
+ 	 * User/group names must match [a-z_][a-z0-9_-]*
+ 	 */
+@@ -34,6 +35,16 @@
+ 		    (*name == '$' && *(name+1) == NULL)))
+ 			return 0;
+ 	}
++#endif
++	/*
++	 * Allow more relaxed user/group names in Debian -- ^[^-:\n][^:\n]*$
++	 */
++	if (!*name || *name == '-')
++		return 0;
++	do
++		if (*name == ':' || *name == '\n')
++			return 0;
++	while (*++name);
+ 
+ 	return 1;
+ }

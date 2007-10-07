@@ -1,0 +1,245 @@
+Goal: differentiate the different failure causes by the exit value
+      This will permit to adduser to detect if chage failed because the
+      system doesn't have shadowed passwords.
+Fixes: #317012
+
+Status wrt upstream: upstream only differentiate E_SUCCESS and E_NOPERM,
+                     other values could be used (E_USAGE, E_NOTFOUND or
+                     E_PW_UPDATE - like in groupdel/userdel)
+                     I chose to only have E_SUCCESS/E_NOPERM, for future
+                     backward compatibility.
+
+Note:  upstream still has an exit (1)
+
+Index: shadow-4.0.3/man/chage.1
+===================================================================
+--- shadow-4.0.3.orig/man/chage.1	2005-07-10 08:47:02.411174826 +0200
++++ shadow-4.0.3/man/chage.1	2005-07-10 08:47:03.760862158 +0200
+@@ -101,6 +101,12 @@
+ /etc/passwd \- user account information
+ .br
+ /etc/shadow \- shadow user account information
++.SH EXIT VALUES
++0       \- success
++.br
++1       \- permission denied
++.br
++3       \- no shadow password file
+ .SH SEE ALSO
+ .BR passwd (5),
+ .BR shadow (5)
+Index: shadow-4.0.3/src/chage.c
+===================================================================
+--- shadow-4.0.3.orig/src/chage.c	2005-07-10 08:47:03.627892961 +0200
++++ shadow-4.0.3/src/chage.c	2005-07-10 08:48:55.314019796 +0200
+@@ -86,6 +86,13 @@
+ 
+ #define	EPOCH		"1969-12-31"
+ 
++/*
++ * exit status values
++ */
++#define E_SUCCESS	0
++#define E_NOPERM	1	/* permission denied */
++#define E_NOT_SHADOWED 	3	/* no shadow password file */
++
+ /* local function prototypes */
+ static void usage (void);
+ static void date_to_str (char *, size_t, time_t);
+@@ -124,7 +131,7 @@
+ 		 ("Usage: %s [-l] [-m min_days] [-M max_days] [-d last_day] user\n"),
+ 		 Prog);
+ #endif
+-	exit (1);
++	exit (E_NOPERM);
+ }
+ 
+ static void date_to_str (char *buf, size_t maxsize, time_t date)
+@@ -484,7 +491,7 @@
+ 	if (!amroot && !lflg) {
+ 		fprintf (stderr, _("%s: permission denied\n"), Prog);
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ #ifdef USE_PAM
+ 	retval = PAM_SUCCESS;
+@@ -515,7 +522,7 @@
+ 	if (retval != PAM_SUCCESS) {
+ 		fprintf (stderr, _("%s: PAM authentication failed\n"),
+ 			 Prog);
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 
+ 	OPENLOG ("chage");
+@@ -538,7 +545,7 @@
+ 			 Prog);
+ 		SYSLOG ((LOG_ERR, "failed locking %s", PASSWD_FILE));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 	pwrw = locks;
+ #else
+@@ -550,20 +557,28 @@
+ 		cleanup (1);
+ 		SYSLOG ((LOG_ERR, "failed opening %s", PASSWD_FILE));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 	if (!(pw = pw_locate (argv[optind]))) {
+ 		fprintf (stderr, _("%s: unknown user: %s\n"), Prog,
+ 			 argv[optind]);
+ 		cleanup (1);
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 
+ 	pwent = *pw;
+ 	STRFCPY (name, pwent.pw_name);
+ 
+ #ifdef	SHADOWPWD
++	if (!spw_file_present()) {
++		fprintf (stderr,
++			 _("%s: the shadow password file is not present\n"),
++			 Prog);
++		SYSLOG ((LOG_ERR, "can't find the shadow password file"));
++		closelog ();
++		exit (E_NOT_SHADOWED);
++	}
+ 	/*
+ 	 * For shadow password files we have to lock the file and read in
+ 	 * the entries as was done for the password file. The user entries
+@@ -576,7 +591,7 @@
+ 		cleanup (1);
+ 		SYSLOG ((LOG_ERR, "failed locking %s", SHADOW_FILE));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 	if (!spw_open (locks ? O_RDWR : O_RDONLY)) {
+ 		fprintf (stderr,
+@@ -584,13 +599,13 @@
+ 		cleanup (2);
+ 		SYSLOG ((LOG_ERR, "failed opening %s", SHADOW_FILE));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 
+ 	if (lflg && (setgid (getgid ()) || setuid (ruid))) {
+ 		fprintf (stderr, _("%s: failed to drop privileges (%s)\n"),
+ 			 Prog, strerror (errno));
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 
+ 	sp = spw_locate (argv[optind]);
+@@ -656,12 +671,12 @@
+ 			fprintf (stderr, _("%s: permission denied\n"),
+ 				 Prog);
+ 			closelog ();
+-			exit (1);
++			exit (E_NOPERM);
+ 		}
+ 		list_fields ();
+ 		cleanup (2);
+ 		closelog ();
+-		exit (0);
++		exit (E_SUCCESS);
+ 	}
+ 
+ 	/*
+@@ -682,7 +697,7 @@
+ 				 Prog);
+ 			cleanup (2);
+ 			closelog ();
+-			exit (1);
++			exit (E_NOPERM);
+ 		}
+ 	}
+ #ifdef	SHADOWPWD
+@@ -712,7 +727,7 @@
+ 			SYSLOG ((LOG_ERR, "failed updating %s",
+ 				 PASSWD_FILE));
+ 			closelog ();
+-			exit (1);
++			exit (E_NOPERM);
+ 		}
+ #ifdef NDBM
+ 		(void) pw_dbm_update (&pwent);
+@@ -743,7 +758,7 @@
+ 		cleanup (2);
+ 		SYSLOG ((LOG_ERR, "failed updating %s", SHADOW_FILE));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ #else				/* !SHADOWPWD */
+ 
+@@ -777,7 +792,7 @@
+ 		cleanup (2);
+ 		SYSLOG ((LOG_ERR, "failed updating %s", PASSWD_FILE));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ #endif				/* SHADOWPWD */
+ 
+@@ -794,7 +809,7 @@
+ 		cleanup (2);
+ 		SYSLOG ((LOG_ERR, "error updating DBM passwd entry"));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 	endspent ();
+ 
+@@ -810,7 +825,7 @@
+ 		cleanup (2);
+ 		SYSLOG ((LOG_ERR, "error updating DBM passwd entry"));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 	endpwent ();
+ #endif				/* SHADOWPWD */
+@@ -829,7 +844,7 @@
+ 		cleanup (2);
+ 		SYSLOG ((LOG_ERR, "failed rewriting %s", SHADOW_FILE));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ #endif				/* SHADOWPWD */
+ 
+@@ -844,7 +859,7 @@
+ 		cleanup (2);
+ 		SYSLOG ((LOG_ERR, "failed rewriting %s", PASSWD_FILE));
+ 		closelog ();
+-		exit (1);
++		exit (E_NOPERM);
+ 	}
+ 	cleanup (2);
+ 	SYSLOG ((LOG_INFO, "changed password expiry for %s", name));
+@@ -860,7 +875,7 @@
+ 		if (retval != PAM_SUCCESS) {
+ 			fprintf (stderr, _("%s: PAM chauthtok failed\n"),
+ 				 Prog);
+-			exit (1);
++			exit (E_NOPERM);
+ 		}
+ 	}
+ 
+@@ -869,7 +884,7 @@
+ #endif				/* USE_PAM */
+ 
+ 	closelog ();
+-	exit (0);
++	exit (E_SUCCESS);
+  /*NOTREACHED*/}
+ 
+ /*

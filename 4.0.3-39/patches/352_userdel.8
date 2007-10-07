@@ -1,0 +1,29 @@
+Goal: Add exit codes of userdel to its man page
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/userdel.8
+===================================================================
+--- shadow-4.0.3.orig/man/userdel.8	2005-05-12 12:12:08.909056587 +0200
++++ shadow-4.0.3/man/userdel.8	2005-05-12 12:12:18.807577620 +0200
+@@ -48,6 +48,20 @@ and deleted manually.
+ /etc/shadow \- secure user account information
+ .br
+ /etc/group \- group information
++.SH EXIT VALUES
++0       \- success
++.br
++1       \- can't update password file
++.br
++2       \- bad command syntax
++.br
++6       \- specified user doesn't exist
++.br
++8       \- user currently logged in
++.br
++10      \- can't update group file
++.br
++12      \- can't remove home directory
+ .SH CAVEATS
+ \fBuserdel\fR will not allow you to remove an account if the user
+ is currently logged in.

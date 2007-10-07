@@ -1,0 +1,50 @@
+#! /bin/sh -e
+## 203_pl-manpages.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Polish man pages corrections/additions
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+diff -Nru shadow-4.0.3/man/pl/grpck.8 shadow-4.0.3_30.4/man/pl/grpck.8
+--- shadow-4.0.3/man/pl/grpck.8	2002-03-09 15:37:44.000000000 +0100
++++ shadow-4.0.3_30.4/man/pl/grpck.8	2004-11-02 22:17:35.000000000 +0100
+@@ -26,7 +26,7 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.TH GRPCK 1
++.TH GRPCK 8
+ .SH NAZWA
+ grpck \- weryfikacja spójno¶ci plików grup
+ .SH SK£ADNIA
+diff -Nru shadow-4.0.3/man/pl/pwck.8 shadow-4.0.3_30.4/man/pl/pwck.8
+--- shadow-4.0.3/man/pl/pwck.8	2001-08-14 23:11:19.000000000 +0200
++++ shadow-4.0.3_30.4/man/pl/pwck.8	2004-11-02 22:17:35.000000000 +0100
+@@ -26,7 +26,7 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.TH PWCK 1
++.TH PWCK 8
+ .SH NAZWA
+ pwck - weryfikacja spójno¶ci plików hase³
+ .SH OPIS

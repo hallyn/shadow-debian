@@ -1,0 +1,53 @@
+Goal: Fix chage display for expiry fields set to 0.
+Fixes: #78961
+
+Status wrt upstream: It should be forwarded to upstream.
+
+Note: On Debian, PAM deals unconsistently with these fields when they are
+      set to 0. See #308229.
+
+Index: shadow-4.0.3/src/chage.c
+===================================================================
+--- shadow-4.0.3.orig/src/chage.c	2005-06-27 00:38:26.000000000 +0200
++++ shadow-4.0.3/src/chage.c	2005-06-27 01:17:01.138559000 +0200
+@@ -260,8 +260,10 @@
+ 	 */
+ 
+ 	printf (_("Last Change:\t\t"));
+-	if (lastday <= 0) {
++	if (lastday < 0) {
+ 		printf (_("Never\n"));
++	} else if (lastday == 0) {
++		printf (_("Password must be changed\n"));
+ 	} else {
+ 		changed = lastday * SCALE;
+ 		print_date (changed);
+@@ -274,7 +276,7 @@
+ 
+ 	printf (_("Password Expires:\t"));
+ 	if (lastday <= 0 || maxdays >= 10000 * (DAY / SCALE)
+-	    || maxdays <= 0) {
++	    || maxdays < 0) {
+ 		printf (_("Never\n"));
+ 	} else {
+ 		expires = changed + maxdays * SCALE;
+@@ -290,8 +292,8 @@
+ 	 */
+ 
+ 	printf (_("Password Inactive:\t"));
+-	if (lastday <= 0 || inactdays <= 0 ||
+-	    maxdays >= 10000 * (DAY / SCALE) || maxdays <= 0) {
++	if (lastday <= 0 || inactdays < 0 ||
++	    maxdays >= 10000 * (DAY / SCALE) || maxdays < 0) {
+ 		printf (_("Never\n"));
+ 	} else {
+ 		expires = changed + (maxdays + inactdays) * SCALE;
+@@ -304,7 +306,7 @@
+ 	 */
+ 
+ 	printf (_("Account Expires:\t"));
+-	if (expdays <= 0) {
++	if (expdays < 0) {
+ 		printf (_("Never\n"));
+ 	} else {
+ 		expires = expdays * SCALE;

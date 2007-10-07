@@ -1,0 +1,80 @@
+#! /bin/sh -e
+## 009_etc.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Various patches in etc for the Debian package (before switch to dpatch)
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+diff -Nru shadow-4.0.3/etc/login.defs shadow-4.0.3_30.4/etc/login.defs
+--- shadow-4.0.3/etc/login.defs	1997-05-02 01:14:35.000000000 +0200
++++ shadow-4.0.3_30.4/etc/login.defs	2004-11-02 22:17:40.000000000 +0100
+@@ -121,7 +121,7 @@
+ #   MAILDIR is for Qmail
+ #
+ #MAILDIR	Maildir
+-MAIL_DIR	/usr/spool/mail
++MAIL_DIR	/var/mail
+ #MAIL_FILE	.mail
+ 
+ #
+diff -Nru shadow-4.0.3/etc/login.defs.hurd shadow-4.0.3_30.4/etc/login.defs.hurd
+--- shadow-4.0.3/etc/login.defs.hurd	2000-08-26 20:27:10.000000000 +0200
++++ shadow-4.0.3_30.4/etc/login.defs.hurd	2004-11-02 22:17:40.000000000 +0100
+@@ -24,7 +24,7 @@
+ #   QMAIL_DIR is for Qmail
+ #
+ #QMAIL_DIR	Maildir
+-MAIL_DIR	/var/spool/mail
++MAIL_DIR	/var/mail
+ #MAIL_FILE	.mail
+ 
+ #
+@@ -85,7 +85,7 @@
+ # phone, home phone).  If not defined, no changes are allowed.
+ # For backward compatibility, "yes" = "rwh" and "no" = "frwh".
+ #
+-CHFN_RESTRICT		rwh
++CHFN_RESTRICT		frwh
+ 
+ #
+ # Password prompt (%s will be replaced by user name).
+diff -Nru shadow-4.0.3/etc/login.defs.linux shadow-4.0.3_30.4/etc/login.defs.linux
+--- shadow-4.0.3/etc/login.defs.linux	2000-08-26 20:27:10.000000000 +0200
++++ shadow-4.0.3_30.4/etc/login.defs.linux	2004-11-02 22:17:40.000000000 +0100
+@@ -131,7 +131,7 @@
+ #   QMAIL_DIR is for Qmail
+ #
+ #QMAIL_DIR	Maildir
+-MAIL_DIR	/var/spool/mail
++MAIL_DIR	/var/mail
+ #MAIL_FILE	.mail
+ 
+ #
+@@ -282,7 +282,7 @@
+ # phone, home phone).  If not defined, no changes are allowed.
+ # For backward compatibility, "yes" = "rwh" and "no" = "frwh".
+ # 
+-CHFN_RESTRICT		rwh
++CHFN_RESTRICT		frwh
+ 
+ #
+ # Password prompt (%s will be replaced by user name).

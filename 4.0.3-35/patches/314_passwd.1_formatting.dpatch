@@ -1,0 +1,49 @@
+#! /bin/sh -e
+## 314_passwd.1_formatting.dpatch by Simon Brandmair <sbrandmair@gmx.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Minor formatting fixes of passwd(1) man page
+## DP: Debian bug #304447
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+Index: shadow-4.0.3/man/passwd.1
+===================================================================
+--- shadow-4.0.3.orig/man/passwd.1	2005-05-12 21:47:23.341530773 +0200
++++ shadow-4.0.3/man/passwd.1	2005-05-12 21:57:05.873492957 +0200
+@@ -46,7 +46,7 @@ The administrator of a group may change 
+ of the user, user's login shell, or password expiry date and interval.
+ .PP
+ The \fB-s\fR option makes \fBpasswd\fR call \fBchsh\fR to change the user's shell.  The
+-\fB-f\fR option makes passwd call chfn to change the user's gecos
++\fB-f\fR option makes \fBpasswd\fR call \fBchfn\fR to change the user's gecos
+ information.  These two options are only meant for compatiblity, since the
+ other programs can be called directly.
+ .SS Password Changes
+@@ -201,7 +201,7 @@ User account information
+ Encrypted user passwords
+ .SH "SEE ALSO"
+ .BR group (5),
+-.BR passwd (5)
++.BR passwd (5),
+ .BR shadow (5)
+ .SH AUTHOR
+ Julianne Frances Haugh <jockgrrl@ix.netcom.com>

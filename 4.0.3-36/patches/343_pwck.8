@@ -1,0 +1,26 @@
+Goal: Typos in pwck.8
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/pwck.8
+===================================================================
+--- shadow-4.0.3.orig/man/pwck.8	2005-05-12 12:12:08.909056587 +0200
++++ shadow-4.0.3/man/pwck.8	2005-05-12 12:12:18.804578068 +0200
+@@ -25,7 +25,7 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.TH PWCK 1
++.TH PWCK 8
+ .SH NAME
+ pwck \- verify integrity of password files
+ .SH SYNOPSIS
+@@ -35,7 +35,7 @@ pwck \- verify integrity of password fil
+ All entries in the \fI/etc/passwd\fR and \fI/etc/shadow\fR are checked to
+ see that the entry has the proper format and valid data in each field.
+ The user is prompted to delete entries that are improperly formatted or
+-which have other incorrectable errors.
++which have other uncorrectable errors.
+ .P
+ Checks are made to verify that each entry has
+ .sp

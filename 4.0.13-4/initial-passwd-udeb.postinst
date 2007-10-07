@@ -1,0 +1,39 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+db_get debian-installer/locale
+if [ "$RET" ]; then
+	TARGETLANG="$RET"
+else
+	TARGETLANG=C
+fi
+
+db_get debconf/priority
+TARGETPRIO="$RET"
+
+target_debconf () {
+	env -u DEBIAN_HAS_FRONTEND -u DEBIAN_FRONTEND \
+		-u DEBCONF_REDIR -u DEBCONF_OLD_FD_BASE \
+		DEBCONF_READFD=0 DEBCONF_WRITEFD=3 \
+		DEBIAN_PRIORITY="$TARGETPRIO" \
+		LANG="$TARGETLANG" DEBCONF_RECONFIGURE=1 \
+		chroot /target debconf -o base-config "$@"
+}
+
+debconf-copydb -p ^passwd/ configdb target_configdb
+
+# Ideally, dpkg-reconfigure wouldn't create a new frontend every time. In
+# the meantime, we reimplement a couple of bits of it. Note that
+# DEBCONF_RECONFIGURE=1 is set in target_debconf above.
+
+version="$(LANG="$TARGETLANG" chroot /target dpkg --status passwd | \
+	   grep ^Version: | sed 's/^Version: //')"
+CODE=0
+target_debconf -f passthrough \
+	/var/lib/dpkg/info/passwd.config reconfigure "$version" || CODE="$?"
+if [ "$CODE" = 30 ]; then
+	exit 10
+else
+	exit $CODE
+fi

@@ -1,0 +1,48 @@
+#! /bin/sh -e
+## 202_ja-manpages.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Japanese man pages corrections/additions
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+diff -Nru shadow-4.0.3/man/ja/grpck.8 shadow-4.0.3_30.4/man/ja/grpck.8
+--- shadow-4.0.3/man/ja/grpck.8	2002-03-09 15:37:43.000000000 +0100
++++ shadow-4.0.3_30.4/man/ja/grpck.8	2004-11-02 22:17:34.000000000 +0100
+@@ -32,7 +32,7 @@
+ .\" Translated Fri Feb 14 23:06:00 JST 1997
+ .\"         by Kazuyoshi Furutaka <furutaka@Flux.tokai.jaeri.go.jp>
+ .\"
+-.TH GRPCK 1
++.TH GRPCK 8
+ .SH 名前
+ grpck \- グループファイルの完全性を検証する
+ .SH 書式
+diff -Nru shadow-4.0.3/man/ja/shadowconfig.8 shadow-4.0.3_30.4/man/ja/shadowconfig.8
+--- shadow-4.0.3/man/ja/shadowconfig.8	2002-03-07 07:52:11.000000000 +0100
++++ shadow-4.0.3_30.4/man/ja/shadowconfig.8	2004-11-02 22:17:34.000000000 +0100
+@@ -21,5 +21,5 @@
+ shadow パスワードの設定がすでにオンの場合にオンに設定したり、
+ すでにオフの場合にオフに設定しても、何の影響もない。
+ 
+-.I /usr/doc/passwd/README.debian.gz
++.I /usr/share/doc/passwd/README.debian.gz
+ には shadow パスワードとそれに関する特徴の簡単な紹介が書かれている。

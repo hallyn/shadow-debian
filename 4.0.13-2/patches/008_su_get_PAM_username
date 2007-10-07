@@ -1,0 +1,34 @@
+Goal: ???
+
+Notes:
+ * It still needs more investigation.
+   I don't know what this patch is used for. IMO, the user name is
+   already known before calling pam_get_item(pamh, PAM_USER, ...)
+
+Index: shadow-4.0.13/src/su.c
+===================================================================
+--- shadow-4.0.13.orig/src/su.c	2005-10-04 08:07:20.901072255 +0200
++++ shadow-4.0.13/src/su.c	2005-10-04 08:07:21.600929655 +0200
+@@ -350,6 +350,7 @@
+ 	char **envp = environ;
+ 	char *command = 0, *shell = 0, **additional_args = 0;
+ 	int optc;
++	char *tmp_name;
+ 
+ #ifdef USE_PAM
+ 	int ret;
+@@ -656,6 +657,14 @@
+ 			su_failure (tty);
+ 		}
+ 	}
++	ret = pam_get_item(pamh, PAM_USER, (const void **) &tmp_name);
++	if (ret != PAM_SUCCESS) {
++		SYSLOG((LOG_ERR, "pam_get_item: internal PAM error\n"));
++		fprintf(stderr, "%s: Internal PAM error retrieving username\n", Prog);
++		pam_end(pamh, ret);
++		su_failure(tty);
++	}
++	strncpy(name, tmp_name, sizeof(name) - 1);
+ #else				/* !USE_PAM */
+ 	/*
+ 	 * Set up a signal handler in case the user types QUIT.

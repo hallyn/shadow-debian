@@ -1,0 +1,43 @@
+Index: shadow-4.0.14/src/Makefile.am
+===================================================================
+--- shadow-4.0.14.orig/src/Makefile.am	2006-01-03 08:25:03.943140495 +0100
++++ shadow-4.0.14/src/Makefile.am	2006-01-03 08:25:04.764973640 +0100
+@@ -52,29 +52,29 @@
+ 		 $(top_builddir)/lib/libshadow.la
+ AM_CPPFLAGS    = -DLOCALEDIR=\"$(datadir)/locale\"
+ 
+-chage_LDADD    = $(LDADD) $(LIBPAM) $(LIBAUDIT)
++chage_LDADD    = $(LDADD) $(LIBAUDIT)
+ chfn_LDADD     = $(LDADD) $(LIBPAM)
+ chsh_LDADD     = $(LDADD) $(LIBPAM)
+-chpasswd_LDADD = $(LDADD) $(LIBPAM)
++chpasswd_LDADD = $(LDADD)
+ gpasswd_LDADD  = $(LDADD) $(LIBAUDIT)
+-groupadd_LDADD = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+-groupdel_LDADD = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+-groupmod_LDADD = $(LDADD) $(LIBPAM) $(LIBAUDIT)
++groupadd_LDADD = $(LDADD) $(LIBAUDIT)
++groupdel_LDADD = $(LDADD) $(LIBAUDIT)
++groupmod_LDADD = $(LDADD) $(LIBAUDIT)
+ login_SOURCES  = \
+ 	login.c \
+ 	login_nopam.c
+ login_LDADD    = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+ newgrp_LDADD   = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+-newusers_LDADD = $(LDADD) $(LIBPAM)
++newusers_LDADD = $(LDADD)
+ nologin_LDADD  =
+ passwd_LDADD   = $(LDADD) $(LIBPAM) $(LIBCRACK) $(LIBAUDIT)
+ su_SOURCES     = \
+ 	su.c \
+ 	suauth.c
+ su_LDADD       = $(LDADD) $(LIBPAM)
+-useradd_LDADD  = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+-userdel_LDADD  = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+-usermod_LDADD  = $(LDADD) $(LIBPAM) $(LIBAUDIT)
++useradd_LDADD  = $(LDADD) $(LIBAUDIT)
++userdel_LDADD  = $(LDADD) $(LIBAUDIT)
++usermod_LDADD  = $(LDADD) $(LIBAUDIT)
+ 
+ install-am: all-am
+ 	$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am

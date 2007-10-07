@@ -1,0 +1,20 @@
+Goal: Be more verbose and indicate that the password was not changed when
+      pam_chauthtok fails (in addition to the PAM error, which may not be
+      comprehensible for the users)
+
+Fixes: #352137
+
+Status wrt upstream: not forwarded yet
+
+Index: shadow-4.0.18.1/libmisc/pam_pass.c
+===================================================================
+--- shadow-4.0.18.1.orig/libmisc/pam_pass.c	2006-08-25 11:56:01.178045454 +0200
++++ shadow-4.0.18.1/libmisc/pam_pass.c	2006-08-25 11:57:20.106686996 +0200
+@@ -38,6 +38,7 @@
+ 	ret = pam_chauthtok (pamh, flags);
+ 	if (ret != PAM_SUCCESS) {
+ 		fprintf (stderr, _("passwd: %s\n"), pam_strerror (pamh, ret));
++		fprintf (stderr, _("passwd: password unchanged\n"));
+ 		pam_end (pamh, ret);
+ 		exit (10);	/* XXX */
+ 	}

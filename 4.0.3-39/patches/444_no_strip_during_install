@@ -1,0 +1,13 @@
+Index: shadow-4.0.3/configure.in
+===================================================================
+--- shadow-4.0.3.orig/configure.in	2005-07-12 20:59:29.000000000 +0300
++++ shadow-4.0.3/configure.in	2005-07-12 21:01:46.000000000 +0300
+@@ -7,7 +7,7 @@
+ test "$prefix" = "NONE" && prefix="/usr"
+ test "$prefix" = "/usr" && exec_prefix=""
+ test "$CFLAGS" = "" && CFLAGS="-O2 -Wall"
+-test "$LDFLAGS" = "" && LDFLAGS="-s"
++dnl test "$LDFLAGS" = "" && LDFLAGS="-s"
+ 
+ AM_DISABLE_SHARED
+ AM_ENABLE_STATIC

@@ -1,0 +1,377 @@
+Goal: Add long options to usermod
+
+Fixes: #260149
+
+Status wrt upstream: Fixed in 4.0.14
+
+Index: shadow-4.0.13.old/src/usermod.c
+===================================================================
+--- shadow-4.0.13.old.orig/src/usermod.c	2005-10-27 22:38:04.679596845 +0200
++++ shadow-4.0.13.old/src/usermod.c	2005-10-31 08:56:42.910962461 +0100
+@@ -35,6 +35,7 @@
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#include <getopt.h>
+ #include <grp.h>
+ #include <lastlog.h>
+ #include <pwd.h>
+@@ -272,16 +273,28 @@
+  */
+ static void usage (void)
+ {
+-	fprintf (stderr,
+-		 _
+-		 ("Usage: %s\t[-u uid [-o]] [-g group] [[-G group,...] [-a]] \n"),
+-		 Prog);
+-	fprintf (stderr,
+-		 _
+-		 ("\t\t[-d home [-m]] [-s shell] [-c comment] [-l new_name]\n"));
+-	fprintf (stderr, "\t\t");
+-	fprintf (stderr, _("[-f inactive] [-e expire] "));
+-	fprintf (stderr, _("[-p passwd] [-L|-U] name\n"));
++	fprintf (stderr, _("Usage: usermod [options] LOGIN\n"
++			   "\n"
++			   "Options:\n"
++			   "  -c, --comment COMMENT		new value of the GECOS field\n"
++			   "  -d, --home-dir HOME_DIR	new login directory for the new user account\n"
++			   "		-m, --move	Use -m option to move data to \n"
++			   "				the new directory\n"
++			   "  -e, --expiredate EXPIRE_DATE	set account expiration date to EXPIRE_DATE\n"
++			   "  -f, --inactive INACTIVE	set password inactive after expiration\n"
++			   "				to INACTIVE\n"
++			   "  -g, --gid GROUP		force use GROUP as new initial login group\n"
++			   "  -G, --groups GROUPS		list of supplementary groups\n"
++			   "		-a, --append	Use -a option to append the user\n"
++			   "				to the supplemental groups\n"
++			   "  -h, --help			display this help message and exit\n"
++			   "  -l, --new-login LOGIN		new value of the login name\n"
++			   "  -L, --lock			lock the user account\n"
++			   "  -o, --non-unique		allow using duplicate (non-unique) UID\n"
++			   "  -p, --password PASSWORD	use encrypted password for the new password\n"
++			   "  -s, --shell SHELL		new login shell for the user account\n"
++			   "  -u, --uid UID			new UID for the user account\n"
++			   "  -U, --unlock			unlock the user account\n"));
+ 	exit (E_USAGE);
+ }
+ 
+@@ -885,159 +898,186 @@
+ #endif
+ 	}
+ 
+-	while ((arg = getopt (argc, argv, "ac:d:e:f:g:G:l:Lmop:s:u:U")) != EOF) {
+-		switch (arg) {
+-		case 'a':
+-			aflg++;
+-			break;
+-		case 'c':
+-			if (!VALID (optarg)) {
+-				fprintf (stderr,
+-					 _("%s: invalid field `%s'\n"),
+-					 Prog, optarg);
+-				exit (E_BAD_ARG);
+-			}
++	{
++		/*
++		 * Parse the command line options.
++		 */
++		int c;
++		static struct option long_options[] = {
++			{"append", required_argument, NULL, 'a'},
++			{"comment", required_argument, NULL, 'c'},
++			{"home-dir", required_argument, NULL, 'd'},
++			{"expiredate", required_argument, NULL, 'e'},
++			{"inactive", required_argument, NULL, 'f'},
++			{"gid", required_argument, NULL, 'g'},
++			{"groups", required_argument, NULL, 'G'},
++			{"help", no_argument, NULL, 'h'},
++			{"new-login", required_argument, NULL, 'l'},
++			{"lock", no_argument, NULL, 'L'},
++			{"move", no_argument, NULL, 'm'},
++			{"non-unique", no_argument, NULL, 'o'},
++			{"password", required_argument, NULL, 'p'},
++			{"shell", required_argument, NULL, 's'},
++			{"uid", required_argument, NULL, 'u'},
++			{"unlock", no_argument, NULL, 'U'},
++			{NULL, 0, NULL, '\0'}
++		};
++		while ((c =
++			getopt_long (argc, argv, "ac:d:e:f:g:G:l:Lmop:s:u:U",
++				     long_options, NULL)) != -1) {
++			switch (c) {
++				case 'a':
++					aflg++;
++					break;
++				case 'c':
++					if (!VALID (optarg)) {
++						fprintf (stderr,
++							 _("%s: invalid field `%s'\n"),
++							 Prog, optarg);
++						exit (E_BAD_ARG);
++					}
+ #ifdef WITH_AUDIT
+-			user_newcomment = optarg;
++					user_newcomment = optarg;
+ #else
+-			user_comment = optarg;
++					user_comment = optarg;
+ #endif
+-			cflg++;
+-			break;
+-		case 'd':
+-			if (!VALID (optarg)) {
+-				fprintf (stderr,
+-					 _("%s: invalid field `%s'\n"),
+-					 Prog, optarg);
+-				exit (E_BAD_ARG);
+-			}
+-			dflg++;
+-			user_newhome = optarg;
+-			break;
+-		case 'e':
+-			if (*optarg) {
++					cflg++;
++					break;
++				case 'd':
++					if (!VALID (optarg)) {
++						fprintf (stderr,
++							 _("%s: invalid field `%s'\n"),
++							 Prog, optarg);
++						exit (E_BAD_ARG);
++					}
++					dflg++;
++					user_newhome = optarg;
++					break;
++				case 'e':
++					if (*optarg) {
+ #ifdef WITH_AUDIT
+-				user_newexpire = strtoday (optarg);
+-				if (user_newexpire == -1) {
++						user_newexpire = strtoday (optarg);
++						if (user_newexpire == -1) {
+ #else
+-				user_expire = strtoday (optarg);
++						user_expire = strtoday (optarg);
+ 				if (user_expire == -1) {
+ #endif
+-					fprintf (stderr,
+-						 _
+-						 ("%s: invalid date `%s'\n"),
+-						 Prog, optarg);
+-					exit (E_BAD_ARG);
+-				}
++							fprintf (stderr,
++								 _
++								 ("%s: invalid date `%s'\n"),
++								 Prog, optarg);
++							exit (E_BAD_ARG);
++						}
+ #ifdef WITH_AUDIT
+-				user_newexpire *= DAY / SCALE;
++						user_newexpire *= DAY / SCALE;
+ #else
+-				user_expire *= DAY / SCALE;
++						user_expire *= DAY / SCALE;
+ #endif
+-			} else
++					} else
+ #ifdef WITH_AUDIT
+-				user_newexpire = -1;
++						user_newexpire = -1;
+ #else
+-				user_expire = -1;
++						user_expire = -1;
+ #endif
+-			eflg++;
+-			break;
+-		case 'f':
++					eflg++;
++					break;
++				case 'f':
+ #ifdef WITH_AUDIT
+-			user_newinactive = get_number (optarg);
++					user_newinactive = get_number (optarg);
+ #else
+-			user_inactive = get_number (optarg);
++					user_inactive = get_number (optarg);
+ #endif
+-			fflg++;
+-			break;
+-		case 'g':
+-			grp = getgr_nam_gid (optarg);
+-			if (!grp) {
+-				fprintf (stderr,
+-					 _("%s: unknown group %s\n"),
+-					 Prog, optarg);
+-				exit (E_NOTFOUND);
+-			}
+-			user_newgid = grp->gr_gid;
+-			gflg++;
+-			break;
+-		case 'G':
+-			if (get_groups (optarg))
+-				exit (E_NOTFOUND);
+-			Gflg++;
+-			break;
+-		case 'l':
+-			if (!check_user_name (optarg)) {
+-				fprintf (stderr,
+-					 _("%s: invalid field `%s'\n"),
+-					 Prog, optarg);
+-				exit (E_BAD_ARG);
+-			}
+-
+-			/*
+-			 * If the name does not really change, we mustn't
+-			 * set the flag as this will cause rather serious
+-			 * problems later!
+-			 */
+-			if (strcmp (user_name, optarg))
+-				lflg++;
+-
+-			user_newname = optarg;
+-			break;
+-		case 'L':
+-			if (Uflg || pflg)
+-				usage ();
+-
+-			Lflg++;
+-			break;
+-		case 'm':
+-			if (!dflg)
+-				usage ();
+-
+-			mflg++;
+-			break;
+-		case 'o':
+-			if (!uflg)
+-				usage ();
+-
+-			oflg++;
+-			break;
+-		case 'p':
+-			if (Lflg || Uflg)
+-				usage ();
+-
+-			user_pass = optarg;
+-			pflg++;
+-			break;
+-		case 's':
+-			if (!VALID (optarg)) {
+-				fprintf (stderr,
+-					 _("%s: invalid field `%s'\n"),
+-					 Prog, optarg);
+-				exit (E_BAD_ARG);
+-			}
++					fflg++;
++					break;
++				case 'g':
++					grp = getgr_nam_gid (optarg);
++					if (!grp) {
++						fprintf (stderr,
++							 _("%s: unknown group %s\n"),
++							 Prog, optarg);
++						exit (E_NOTFOUND);
++					}
++					user_newgid = grp->gr_gid;
++					gflg++;
++					break;
++				case 'G':
++					if (get_groups (optarg))
++					  exit (E_NOTFOUND);
++					Gflg++;
++					break;
++				case 'l':
++					if (!check_user_name (optarg)) {
++						fprintf (stderr,
++							 _("%s: invalid field `%s'\n"),
++							 Prog, optarg);
++						exit (E_BAD_ARG);
++					}
++
++					/*
++					 * If the name does not really change, we mustn't
++					 * set the flag as this will cause rather serious
++					 * problems later!
++					 */
++					if (strcmp (user_name, optarg))
++						lflg++;
++
++					user_newname = optarg;
++					break;
++				case 'L':
++					if (Uflg || pflg)
++						usage ();
++
++					Lflg++;
++					break;
++				case 'm':
++					if (!dflg)
++						usage ();
++
++					mflg++;
++					break;
++				case 'o':
++					if (!uflg)
++						usage ();
++
++					oflg++;
++					break;
++				case 'p':
++					if (Lflg || Uflg)
++						usage ();
++
++					user_pass = optarg;
++					pflg++;
++					break;
++				case 's':
++					if (!VALID (optarg)) {
++						fprintf (stderr,
++							 _("%s: invalid field `%s'\n"),
++							 Prog, optarg);
++						exit (E_BAD_ARG);
++					}
+ #ifdef WITH_AUDIT
+-			user_newshell = optarg;
++					user_newshell = optarg;
+ #else
+-			user_shell = optarg;
++					user_shell = optarg;
+ #endif
+-			sflg++;
+-			break;
+-		case 'u':
+-			user_newid = get_id (optarg);
+-			uflg++;
+-			break;
+-		case 'U':
+-			if (Lflg && pflg)
+-				usage ();
+-
+-			Uflg++;
+-			break;
+-		default:
+-			usage ();
++					sflg++;
++					break;
++				case 'u':
++					user_newid = get_id (optarg);
++					uflg++;
++					break;
++				case 'U':
++					if (Lflg && pflg)
++						usage ();
++
++					Uflg++;
++					break;
++				default:
++					usage ();
++				}
++				anyflag++;
++			}
+ 		}
+-		anyflag++;
+-	}
+ 	if (anyflag == 0) {
+ 		fprintf (stderr, _("%s: no flags given\n"), Prog);
+ 		exit (E_USAGE);

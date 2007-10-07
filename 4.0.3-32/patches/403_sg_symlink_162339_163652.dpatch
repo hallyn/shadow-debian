@@ -1,0 +1,25 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 403_sg_symlink_162339_163652.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: This patch was probably a part of the fix for #162339 and #163652.
+## DP: It was needed because newgrp was installed in /bin, but the sg
+## DP: symlink pointed to /usr/bin/newgrp.
+## DP:
+## DP: The symlink is now done in debian/rules, and sg and newgrp are
+## DP: installed in /usr/bin.
+## DP: This patch can probably be removed now.
+## DP: (We just have to test if sg is linked to newgrp)
+
+@DPATCH@
+diff -urNad shadow-4.0.3/src/Makefile.am /tmp/dpep.Utv29a/shadow-4.0.3/src/Makefile.am
+--- shadow-4.0.3/src/Makefile.am	2005-04-15 23:07:41.589005000 +0200
++++ /tmp/dpep.Utv29a/shadow-4.0.3/src/Makefile.am	2005-04-15 23:10:11.699005000 +0200
+@@ -54,7 +54,6 @@
+ usermod_LDADD  = $(LDADD) $(LIBPAM)
+ 
+ install-exec-hook:
+-	ln -sf newgrp	$(DESTDIR)$(bindir)/sg
+ 	ln -sf vigr	$(DESTDIR)$(bindir)/vipw
+ 	for i in $(suidbins); do \
+ 		chmod 4755 $(DESTDIR)$(bindir)/$$i; \

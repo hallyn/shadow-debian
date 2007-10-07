@@ -1,0 +1,47 @@
+Goal: Fixe some typos.
+
+Status wrt upstream: Fixed in CVS for 4.0.14
+
+Fixes: #333995, #333994, #333993
+
+Thanks to A Costa <agcosta@gis.net>
+
+Index: shadow-4.0.13/man/chage.1.xml
+===================================================================
+--- shadow-4.0.13.orig/man/chage.1.xml	2005-10-15 01:47:48.000000000 +0200
++++ shadow-4.0.13/man/chage.1.xml	2005-10-15 01:49:49.000000000 +0200
+@@ -127,7 +127,7 @@
+ 	    When <replaceable>MAX_DAYS</replaceable> plus
+ 	    <replaceable>LAST_DAY</replaceable> is less than the current
+ 	    day, the user will be required to change her password before
+-	    being able to use her account. This occurence can be planned for
++	    being able to use her account. This occurrence can be planned for
+ 	    in advance by use of the <option>-W</option> option, which
+ 	    provides the user with advance warning.
+ 	  </para>
+Index: shadow-4.0.13/man/chpasswd.8.xml
+===================================================================
+--- shadow-4.0.13.orig/man/chpasswd.8.xml	2005-10-15 01:47:48.000000000 +0200
++++ shadow-4.0.13/man/chpasswd.8.xml	2005-10-15 01:49:49.000000000 +0200
+@@ -34,7 +34,7 @@
+     </para>
+     <para>
+       By default the supplied password must be in clear-text. Default
+-      encription algoritm is DES. Also the password age will be updated, if
++      encription algorithm is DES. Also the password age will be updated, if
+       present.
+     </para>
+     <para>
+Index: shadow-4.0.13/man/faillog.5.xml
+===================================================================
+--- shadow-4.0.13.orig/man/faillog.5.xml	2005-10-15 01:47:48.000000000 +0200
++++ shadow-4.0.13/man/faillog.5.xml	2005-10-15 01:49:49.000000000 +0200
+@@ -19,7 +19,7 @@
+       record, indexed by numerical UID. Each record contains the count of
+       login failures since the last successful login; the maximum number of
+       failures before the account is disabled; the line the last login
+-      failure occured on; and the date the last login failure occured.
++      failure occurred on; and the date the last login failure occurred.
+     </para>
+ 
+     <para>The structure of the file is:</para>

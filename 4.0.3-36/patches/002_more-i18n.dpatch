@@ -1,0 +1,75 @@
+Purpose: Clean up the list of the files containing stuff to translate, and
+         update the pot file accordingly.
+	 
+Detail: remove a bunch of unexisting files (lib/md5.c for example) and add
+some files which were forgotten (libmisc/getdate.c for example)
+
+Status wrt upstream: was submitted once, but not applied was cleanup in the
+meanwhile.
+
+Index: shadow-4.0.3/po/POTFILES.in
+===================================================================
+--- shadow-4.0.3.orig/po/POTFILES.in	2005-06-11 17:16:40.036938526 +0200
++++ shadow-4.0.3/po/POTFILES.in	2005-06-11 17:17:13.947871794 +0200
+@@ -13,6 +13,7 @@ libmisc/entry.c
+ libmisc/env.c
+ libmisc/failure.c
+ libmisc/fields.c
++libmisc/getdate.c
+ libmisc/hushed.c
+ libmisc/isexpired.c
+ libmisc/limits.c
+@@ -25,9 +26,11 @@ libmisc/loginprompt.c
+ libmisc/mail.c
+ libmisc/motd.c
+ libmisc/myname.c
++libmisc/nscd.c
+ libmisc/obscure.c
+ libmisc/pam_pass.c
+ libmisc/pwd2spwd.c
++libmisc/pwdcheck.c
+ libmisc/pwd_init.c
+ libmisc/rlogin.c
+ libmisc/salt.c
+@@ -58,33 +61,19 @@ lib/gsdbm.c
+ lib/gshadow.c
+ lib/gspack.c
+ lib/lockpw.c
+-lib/md5.c
+-lib/md5crypt.c
+-lib/mkdir.c
+ lib/port.c
+-lib/putgrent.c
+-lib/putpwent.c
+-lib/putspent.c
+ lib/pwauth.c
+ lib/pwdbm.c
+ lib/pwio.c
+ lib/pwpack.c
+ lib/rad64.c
+-lib/rename.c
+-lib/rmdir.c
+ lib/sgetgrent.c
+ lib/sgetpwent.c
+-lib/sgetspent.c
+ lib/sgroupio.c
+ lib/shadow.c
+ lib/shadowio.c
+-lib/snprintf.c
+ lib/spdbm.c
+ lib/sppack.c
+-lib/strcasecmp.c
+-lib/strdup.c
+-lib/strerror.c
+-lib/strstr.c
+ lib/tcfsio.c
+ lib/utent.c
+ src/chage.c
+@@ -97,7 +86,6 @@ src/faillog.c
+ src/gpasswd.c
+ src/groupadd.c
+ src/groupdel.c
+-src/groupmems.c
+ src/groupmod.c
+ src/groups.c
+ src/grpck.c

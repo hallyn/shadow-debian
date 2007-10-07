@@ -1,0 +1,92 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 200_de-manpages-2.dpatch by Simon Brandmair <sbrandmair@gmx.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Update of the German chsh man page.
+## DP:
+## DP: It overloads the one from 200_de-manpages.dpatch, and was accepted
+## DP: upstream.
+
+@DPATCH@
+diff -urNad shadow-4.0.3/man/de/chsh.1 /tmp/dpep.H1h3x8/shadow-4.0.3/man/de/chsh.1
+--- shadow-4.0.3/man/de/chsh.1	1998-12-07 01:44:32.000000000 +0100
++++ /tmp/dpep.H1h3x8/shadow-4.0.3/man/de/chsh.1	2005-04-18 20:16:57.990826000 +0200
+@@ -1,36 +1,47 @@
++.\" Copyleft (C) 2003 Josef Spillner <josef@ggzgamingzone.org>
++.\" Übersetzung der englischen Version von Julianne Frances Haugh
++.\" Ersatz für die originale Version von:
++.\" Copyright 1993 Sebastian Hetze und Peter Orbaek.
+ .\"
+-.\"	Copyright 1993 Sebastian Hetze und der/die in der Sektion
+-.\"	AUTOR genannten Autor/Autoren
+-.\"
+-.\"	Dieser Text steht unter der GNU General Public License.
+-.\"	Er darf kopiert und verändert, korrigiert und verbessert werden.
+-.\"	Die Copyright und Lizenzbestimmung müssen allerdings erhalten
+-.\"	bleiben. Die Hinweise auf das LunetIX Linuxhandbuch, aus dem
+-.\"	dieser Text stammt, dürfen nicht entfernt werden.
++.\" Veröffentlicht unter der GNU General Public License (GPL).
+ .\"
+-.TH CHSH 1 "1. Juli 1993" "LunetIX Linuxhandbuch" "Dienstprogramme für Benutzer"
+-.SH BEZEICHNUNG 
+-chsh \- ändert den Loginshell Eintrag in der Paßwortdatei
+-.SH SYNTAX 
+-.B chsh
+-.RI [ Benutzer ]
+-.RI [ Shell ]
++.TH CHSH 1
++.SH BEZEICHNUNG
++chsh \- ändert die Login\-Shell
++.SH "ÜBERSICHT"
++.TP 5
++\fBchsh\fR
++[\fB\-s\fR \fILoginshell\fR] [\fINutzer\fR]
+ .SH BESCHREIBUNG
+-.B chsh
+-ermöglicht es jedem eingetragenen Benutzer, seine Loginshell selbst, das
+-heißt ohne Hilfe des Superusers (root) zu verändern.  Die Loginshell wird
+-in der Paßwortdatei /etc/passwd festgelegt.  Diese Datei kann nur mit
+-Rootprivilegien verändert werden.  Um auch den anderen Anwendern das
+-Verändern des Eintrages zu erlauben, läuft das
+-.B chsh
+-Programm SUID root.  Das heißt, bei seiner Ausführung wird die effektive
+-Benutzerkennung des Superusers gesetzt.  Um die Systemsicherheit trotzdem
+-zu gewährleisten, können nur Programme, die in der Datei /etc/shells
+-eingetragen sind als Loginshell benutzt werden.
++\fBchsh\fR ändert die Login\-Shell eines Nutzers.
++Es legt den Namen des Befehls fest, der beim Login ausgeführt wird.
++Ein normaler Nutzer kann die Login\-Shell nur für sein eigenes
++Konto ändern, während der Supernutzer dies für jedes Konto tun darf.
+ .PP
+-Normalerweise kann ein Anwender nur seine eigene Loginshell ändern.  Der
+-Superuser selbst kann das Programm aber auch für andere Benutzer anwenden,
+-indem er den Benutzernamen in der Kommandozeile angibt.
++Die einzige Beschränkung, die für die Login\-Shell gilt, ist dass der
++Name des Kommandos in der Datei \fI/etc/shells\fR stehen muss.
++Der Supernutzer darf allerdings jedes beliebige Kommando eintragen.
++Nutzern, deren Konten einer Beschränkung unterliegen, ist es nicht
++gestattet, ihre Login\-Shell zu ändern.
++Aus diesem Grund ist es nicht empfehlenswert, \fB/bin/rsh\fR in
++\fI/etc/shells\fR einzutragen, da ein versehentlicher Wechsel
++zu einer beschränkten Shell den Nutzer davon abhalten würde,
++seine Login\-Shell wieder auf den Originalwert zurückzusetzen.
++.SH OPTIONEN
++Wenn die Option \fB\-s\fR nicht ausgewählt ist, wird \fBchsh\fR im
++interaktiven Modus betrieben, in der das Programm den Nutzer mit
++der aktuellen Login\-Shell fragt.
++Durch Eingabe eines Wertes wird die Shell gewechselt, während sie bei
++einer leeren Zeile gleich bleibt.
++Die aktuelle Shell wird zwischen einem Paar von \fB[ ]\fR angezeigt.
++.SH DATEIEN
++\fI/etc/passwd\fR	\- Informationen über Nutzerkonten
++.br
++\fI/etc/shells\fR	\- Liste der gültigen Login\-Shells
++.SH "SIEHE AUCH"
++.BR chfn (1),
++.BR passwd (5)
+ .SH AUTOR
+-Peter Orbaek
+-
++Julianne Frances Haugh <jockgrrl@ix.netcom.com>
++.br
++Deutsche Übersetzung von Josef Spillner <josef@ggzgamingzone.org>

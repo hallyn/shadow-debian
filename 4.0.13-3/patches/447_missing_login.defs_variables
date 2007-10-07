@@ -1,0 +1,31 @@
+Goal: get the right set of variables in the getdef table.
+MAIL_FILE is used in userdel and usermod.
+
+MD5_CRYPT_ENAB is used by crypt_make_salt, which is used by chpasswd,
+               gpasswd and newusers
+
+Status wrt upstream: submitted
+
+
+Index: shadow-4.0.13/lib/getdef.c
+===================================================================
+--- shadow-4.0.13.orig/lib/getdef.c	2005-10-04 08:07:25.860061834 +0200
++++ shadow-4.0.13/lib/getdef.c	2005-10-04 08:07:38.742436989 +0200
+@@ -69,6 +69,8 @@
+ 	{"LOG_OK_LOGINS", NULL},
+ 	{"LOG_UNKFAIL_ENAB", NULL},
+ 	{"MAIL_DIR", NULL},
++	{"MAIL_FILE", NULL},
++	{"MD5_CRYPT_ENAB", NULL},
+ 	{"PASS_MAX_DAYS", NULL},
+ 	{"PASS_MIN_DAYS", NULL},
+ 	{"PASS_WARN_AGE", NULL},
+@@ -93,8 +95,6 @@
+ 	{"LASTLOG_ENAB", NULL},
+ 	{"LOGIN_STRING", NULL},
+ 	{"MAIL_CHECK_ENAB", NULL},
+-	{"MAIL_FILE", NULL},
+-	{"MD5_CRYPT_ENAB", NULL},
+ 	{"MOTD_FILE", NULL},
+ 	{"NOLOGINS_FILE", NULL},
+ 	{"OBSCURE_CHECKS_ENAB", NULL},

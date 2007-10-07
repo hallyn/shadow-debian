@@ -1,0 +1,47 @@
+Goal: fix typos and give more info about login.defs setings influence
+Fixes: #312428
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/chfn.1
+===================================================================
+--- shadow-4.0.3.orig/man/chfn.1	2002-03-13 18:52:15.000000000 +0100
++++ shadow-4.0.3/man/chfn.1	2005-06-09 20:17:12.000000000 +0200
+@@ -37,18 +37,20 @@
+ [\fIuser\fR]
+ .SH DESCRIPTION
+ \fBchfn\fR changes user fullname, office number, office extension, and home
+-phone number information for a user's account. 
+-This information is typically printed by \fBfinger\fR(1) and similiar
++phone number information for a user's account.
++This information is typically printed by \fBfinger\fR(1) and similar
+ programs.
+ A normal user may only change the fields for her own account,
+-the super user may change the fields for any account.
+-Also, only the super user may use the \fB-o\fR option to change the
++subject to the restrictions in /etc/login.defs.  (The default configuration
++is to prevent users from changing their fullname.)
++The super user may change any field for any account.
++Additionally, only the super user may use the \fB-o\fR option to change the
+ undefined portions of the GECOS field.
+ .PP
+ The only restriction placed on the contents of the fields is that no
+ control characters may be present, nor any of comma, colon, or equal sign.
+-The \fIother\fR field does not have this restriction, and is used to
+-store accounting information used by other applications.
++.\" The \fIother\fR field does not have this restriction, and is used to
++.\" store accounting information used by other applications.
+ .PP
+ If none of the options are selected, \fBchfn\fR operates in an interactive
+ fashion, prompting the user with the current values for all of the fields.
+@@ -57,7 +59,9 @@
+ The current value is displayed between a pair of \fB[ ]\fR marks.
+ Without options, chfn prompts for the current user account.
+ .SH FILES
+-/etc/passwd \- user account information
++\fI/etc/passwd\fR	\- user account information
++.br
++\fI/etc/login.defs\fR \- runtime configuration
+ .SH SEE ALSO
+ .BR passwd (5)
+ .SH AUTHOR

@@ -1,0 +1,499 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 317_lastlog_usage_249611.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Fix the lastlog usage and all the translations accordingly
+## DP: (--user instead of --login).
+
+@DPATCH@
+diff -urNad shadow-4.0.3/po/bs.po /tmp/dpep.rhju8j/shadow-4.0.3/po/bs.po
+--- shadow-4.0.3/po/bs.po	2005-04-14 15:43:58.729246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/bs.po	2005-04-14 15:44:00.319246000 +0200
+@@ -1253,7 +1253,7 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+ 
+ #: src/lastlog.c:181
+diff -urNad shadow-4.0.3/po/ca.po /tmp/dpep.rhju8j/shadow-4.0.3/po/ca.po
+--- shadow-4.0.3/po/ca.po	2005-04-14 15:43:58.769246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/ca.po	2005-04-14 15:44:00.319246000 +0200
+@@ -1278,9 +1278,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Forma d'˙s: %s [<-u|--login> nom-usuari] [<-t|--time> dies] [<-h|--help>]\n"
++"Forma d'˙s: %s [<-u|--user> nom-usuari] [<-t|--time> dies] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/cs.po /tmp/dpep.rhju8j/shadow-4.0.3/po/cs.po
+--- shadow-4.0.3/po/cs.po	2005-04-14 15:43:58.349246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/cs.po	2005-04-14 15:44:00.319246000 +0200
+@@ -1275,9 +1275,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"PouæitÌ: %s [<-u|--login> jmÈno_˙Ëtu] [<-t|--time> dny] [<-h|--help>]\n"
++"PouæitÌ: %s [<-u|--user> jmÈno_˙Ëtu] [<-t|--time> dny] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/da.po /tmp/dpep.rhju8j/shadow-4.0.3/po/da.po
+--- shadow-4.0.3/po/da.po	2005-04-14 15:43:58.799246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/da.po	2005-04-14 15:44:00.329246000 +0200
+@@ -1269,8 +1269,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Brug: %s [<-u|--login> brugernavn] [<-t|--time> dage] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Brug: %s [<-u|--user> brugernavn] [<-t|--time> dage] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/de.po /tmp/dpep.rhju8j/shadow-4.0.3/po/de.po
+--- shadow-4.0.3/po/de.po	2005-04-14 15:43:58.389246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/de.po	2005-04-14 15:44:00.329246000 +0200
+@@ -1270,8 +1270,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Syntax: %s [<-u|--login> Login-Name] [<-t|--time> Tage] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Syntax: %s [<-u|--user> Login-Name] [<-t|--time> Tage] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/el.po /tmp/dpep.rhju8j/shadow-4.0.3/po/el.po
+--- shadow-4.0.3/po/el.po	2005-04-14 15:43:58.439246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/el.po	2005-04-14 15:44:00.329246000 +0200
+@@ -1287,8 +1287,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Usage: %s [<-u|--login> œåŒΩŒøŒºŒ± œáœÅŒÆœÉœÑŒ∑] [<-t|--time> ŒºŒ≠œÅŒµœÇ] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Usage: %s [<-u|--user> œåŒΩŒøŒºŒ± œáœÅŒÆœÉœÑŒ∑] [<-t|--time> ŒºŒ≠œÅŒµœÇ] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/es.po /tmp/dpep.rhju8j/shadow-4.0.3/po/es.po
+--- shadow-4.0.3/po/es.po	2005-04-14 15:43:58.849246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/es.po	2005-04-14 15:44:00.329246000 +0200
+@@ -1277,9 +1277,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Modo de uso: %s [<-u|--login> nombre-usuario] [<-t|--time> dÌas] [<-h|--"
++"Modo de uso: %s [<-u|--user> nombre-usuario] [<-t|--time> dÌas] [<-h|--"
+ "help>]\n"
+ 
+ #: src/lastlog.c:181
+diff -urNad shadow-4.0.3/po/eu.po /tmp/dpep.rhju8j/shadow-4.0.3/po/eu.po
+--- shadow-4.0.3/po/eu.po	2005-04-14 15:43:58.879246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/eu.po	2005-04-14 15:44:00.329246000 +0200
+@@ -1272,8 +1272,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Erabilera: %s [<-u|--login> saio-izena] [<-t|--time> egun] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Erabilera: %s [<-u|--user> saio-izena] [<-t|--time> egun] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/fi.po /tmp/dpep.rhju8j/shadow-4.0.3/po/fi.po
+--- shadow-4.0.3/po/fi.po	2005-04-14 15:43:58.919246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/fi.po	2005-04-14 15:44:00.339246000 +0200
+@@ -1279,9 +1279,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"K√§ytt√∂: %s [<-u|--login> sis√§√§nkirjautumistunnus] [<-t|--time> p√§ivi√§] [<-"
++"K√§ytt√∂: %s [<-u|--user> sis√§√§nkirjautumistunnus] [<-t|--time> p√§ivi√§] [<-"
+ "h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+diff -urNad shadow-4.0.3/po/fr.po /tmp/dpep.rhju8j/shadow-4.0.3/po/fr.po
+--- shadow-4.0.3/po/fr.po	2005-04-14 15:43:58.479246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/fr.po	2005-04-14 15:44:00.339246000 +0200
+@@ -1283,9 +1283,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Usage†: %s [<-u|--login> identifiant] [<-t|--time> jours] [<-h|--help>]\n"
++"Usage†: %s [<-u|--user> identifiant] [<-t|--time> jours] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+@@ -2648,14 +2648,14 @@
+ #~ "Usage: lastlog [options]\n"
+ #~ "\n"
+ #~ "Options:\n"
+-#~ "  -u, --login LOGIN\tprint lastlog record for user with specyfied LOGIN\n"
++#~ "  -u, --user LOGIN\tprint lastlog record for user with specyfied LOGIN\n"
+ #~ "  -h, --help\t\tdisplay this help message and exit\n"
+ #~ "  -t, --time DAYS\tprint only lastlog records more recent than DAYS\n"
+ #~ msgstr ""
+ #~ "Usage†: lastlog [options]\n"
+ #~ "\n"
+ #~ "Options†:\n"
+-#~ "  -u, --login LOGIN   afficher l'enregistrement ´†lastlog†ª "
++#~ "  -u, --user LOGIN    afficher l'enregistrement ´†lastlog†ª "
+ #~ "pour                       l'utilisateur dont le compte est LOGIN\n"
+ #~ "  -h, --help          afficher ce message d'aide et quitter\n"
+ #~ "  -t, --time JOURS    afficher uniquement les enregistrements "
+diff -urNad shadow-4.0.3/po/he.po /tmp/dpep.rhju8j/shadow-4.0.3/po/he.po
+--- shadow-4.0.3/po/he.po	2005-04-14 15:43:58.959246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/he.po	2005-04-14 15:44:00.339246000 +0200
+@@ -1262,8 +1262,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "◊©◊ô◊û◊ï◊©: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "◊©◊ô◊û◊ï◊©: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/id.po /tmp/dpep.rhju8j/shadow-4.0.3/po/id.po
+--- shadow-4.0.3/po/id.po	2005-04-14 15:43:58.999246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/id.po	2005-04-14 15:44:00.339246000 +0200
+@@ -1270,9 +1270,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Penggunaan: %s [<-u|--login> namalogin] [<-t|--time hari] [<-h|--help>]\n"
++"Penggunaan: %s [<-u|--user> namalogin] [<-t|--time hari] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/it.po /tmp/dpep.rhju8j/shadow-4.0.3/po/it.po
+--- shadow-4.0.3/po/it.po	2005-04-14 15:43:59.039246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/it.po	2005-04-14 15:44:00.349246000 +0200
+@@ -1296,8 +1296,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Uso: %s [<-u|--login> UTENTE] [<-t|--time> GIORNI] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Uso: %s [<-u|--user> UTENTE] [<-t|--time> GIORNI] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/ja.po /tmp/dpep.rhju8j/shadow-4.0.3/po/ja.po
+--- shadow-4.0.3/po/ja.po	2005-04-14 15:43:58.529246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/ja.po	2005-04-14 15:44:00.349246000 +0200
+@@ -1274,9 +1274,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"ª»Õ—À°: %s [<-u|--login> •Ì•∞•§•ÛÃæ] [<-t|--time> ∆¸§À§¡] [<-h|--help]\n"
++"ª»Õ—À°: %s [<-u|--user> •Ì•∞•§•ÛÃæ] [<-t|--time> ∆¸§À§¡] [<-h|--help]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/ko.po /tmp/dpep.rhju8j/shadow-4.0.3/po/ko.po
+--- shadow-4.0.3/po/ko.po	2005-04-14 15:43:58.569246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/ko.po	2005-04-14 15:44:00.349246000 +0200
+@@ -1271,9 +1271,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"ªÁøÎπ˝: %s [<-u|--login> ∑Œ±◊¿Œ-¿Ã∏ß] [<-t|--time> ∏Áƒ•] [<-h|--help>]\n"
++"ªÁøÎπ˝: %s [<-u|--user> ∑Œ±◊¿Œ-¿Ã∏ß] [<-t|--time> ∏Áƒ•] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/nb.po /tmp/dpep.rhju8j/shadow-4.0.3/po/nb.po
+--- shadow-4.0.3/po/nb.po	2005-04-14 15:43:59.069246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/nb.po	2005-04-14 15:44:00.349246000 +0200
+@@ -1273,8 +1273,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Bruk: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Bruk: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/nl.po /tmp/dpep.rhju8j/shadow-4.0.3/po/nl.po
+--- shadow-4.0.3/po/nl.po	2005-04-14 15:43:59.109246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/nl.po	2005-04-14 15:44:00.359246000 +0200
+@@ -1356,8 +1356,8 @@
+ #: src/lastlog.c:110
+ #: src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Gebruik: %s [<-u|--login> gebruikersnaam] [<-t|--time> dagen] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Gebruik: %s [<-u|--user> gebruikersnaam] [<-t|--time> dagen] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/nn.po /tmp/dpep.rhju8j/shadow-4.0.3/po/nn.po
+--- shadow-4.0.3/po/nn.po	2005-04-14 15:43:59.149246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/nn.po	2005-04-14 15:44:00.359246000 +0200
+@@ -1270,8 +1270,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Bruk: %s [<-u|--login> brukarnamn] [<-t|--time> dagar] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Bruk: %s [<-u|--user> brukarnamn] [<-t|--time> dagar] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/pl.po /tmp/dpep.rhju8j/shadow-4.0.3/po/pl.po
+--- shadow-4.0.3/po/pl.po	2005-04-14 15:43:58.609246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/pl.po	2005-04-14 15:44:00.359246000 +0200
+@@ -1275,8 +1275,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Uøycie: %s [<-u|--login> login] [<-t|--time> dni] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Uøycie: %s [<-u|--user> login] [<-t|--time> dni] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/pt_BR.po /tmp/dpep.rhju8j/shadow-4.0.3/po/pt_BR.po
+--- shadow-4.0.3/po/pt_BR.po	2005-04-14 15:43:59.219246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/pt_BR.po	2005-04-14 15:44:00.359246000 +0200
+@@ -1276,8 +1276,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Uso : %s [<-u|--login> nome-login] [<-t|--time> dias] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Uso : %s [<-u|--user> nome-login] [<-t|--time> dias] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/pt.po /tmp/dpep.rhju8j/shadow-4.0.3/po/pt.po
+--- shadow-4.0.3/po/pt.po	2005-04-14 15:43:59.189246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/pt.po	2005-04-14 15:44:00.359246000 +0200
+@@ -1280,9 +1280,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Utiliza√ß√£o: %s [<-u|--login> login-name] [<-t|--time> dias] [<-h|--help>]\n"
++"Utiliza√ß√£o: %s [<-u|--user> login-name] [<-t|--time> dias] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/ro.po /tmp/dpep.rhju8j/shadow-4.0.3/po/ro.po
+--- shadow-4.0.3/po/ro.po	2005-04-14 15:43:59.449246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/ro.po	2005-04-14 15:44:00.369246000 +0200
+@@ -1272,8 +1272,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Utilizare: %s [<-u|--login> nume_login] [<-t|--time> zile] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Utilizare: %s [<-u|--user> nume_login] [<-t|--time> zile] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/ru.po /tmp/dpep.rhju8j/shadow-4.0.3/po/ru.po
+--- shadow-4.0.3/po/ru.po	2005-04-14 15:43:59.259246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/ru.po	2005-04-14 15:44:00.369246000 +0200
+@@ -1287,9 +1287,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"–∏—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏–µ: %s [<-u|--login> –∏–º—è –ø–æ–ª—å–∑–æ–≤–∞—Ç–µ–ª—è] [<-t|--time> –≤—ã–≤–æ–¥–∏—Ç—å "
++"–∏—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏–µ: %s [<-u|--user> –∏–º—è –ø–æ–ª—å–∑–æ–≤–∞—Ç–µ–ª—è] [<-t|--time> –≤—ã–≤–æ–¥–∏—Ç—å "
+ "—Å—Ç–∞—Ç–∏—Å—Ç–∏–∫—É –∑–∞ (–¥–Ω–µ–π)] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+diff -urNad shadow-4.0.3/po/shadow.pot /tmp/dpep.rhju8j/shadow-4.0.3/po/shadow.pot
+--- shadow-4.0.3/po/shadow.pot	2005-04-14 15:43:57.999246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/shadow.pot	2005-04-14 15:44:00.369246000 +0200
+@@ -1249,7 +1249,7 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+ 
+ #: src/lastlog.c:181
+diff -urNad shadow-4.0.3/po/sk.po /tmp/dpep.rhju8j/shadow-4.0.3/po/sk.po
+--- shadow-4.0.3/po/sk.po	2005-04-14 15:43:59.299246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/sk.po	2005-04-14 15:44:00.369246000 +0200
+@@ -1280,9 +1280,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Pou≈æitie: %s [<-u|--login> n√°zov_√∫ƒçtu] [<-t|--time> dn√≠] [<-h|--help>]\n"
++"Pou≈æitie: %s [<-u|--user> n√°zov_√∫ƒçtu] [<-t|--time> dn√≠] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/sq.po /tmp/dpep.rhju8j/shadow-4.0.3/po/sq.po
+--- shadow-4.0.3/po/sq.po	2005-04-14 15:43:59.409246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/sq.po	2005-04-14 15:44:00.369246000 +0200
+@@ -1255,7 +1255,7 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+ 
+ #: src/lastlog.c:181
+diff -urNad shadow-4.0.3/po/sv.po /tmp/dpep.rhju8j/shadow-4.0.3/po/sv.po
+--- shadow-4.0.3/po/sv.po	2005-04-14 15:43:58.649246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/sv.po	2005-04-14 15:44:00.379246000 +0200
+@@ -1273,9 +1273,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Anv√§ndning: %s [<-u|--login> anv√§ndarnamn] [<-t|--time> dagar] [<-h|--"
++"Anv√§ndning: %s [<-u|--user> anv√§ndarnamn] [<-t|--time> dagar] [<-h|--"
+ "help>]\n"
+ 
+ #: src/lastlog.c:181
+diff -urNad shadow-4.0.3/po/tl.po /tmp/dpep.rhju8j/shadow-4.0.3/po/tl.po
+--- shadow-4.0.3/po/tl.po	2005-04-14 15:43:59.529246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/tl.po	2005-04-14 15:44:00.379246000 +0200
+@@ -1280,9 +1280,9 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Pag-gamit: %s [<-u|--login> pangalan] [<-t|--time> araw] [<-h|--help>]\n"
++"Pag-gamit: %s [<-u|--user> pangalan] [<-t|--time> araw] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/tr.po /tmp/dpep.rhju8j/shadow-4.0.3/po/tr.po
+--- shadow-4.0.3/po/tr.po	2005-04-14 15:43:59.339246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/tr.po	2005-04-14 15:44:00.379246000 +0200
+@@ -1268,8 +1268,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Kullanƒ±m: %s [<-u|--login> giri≈ü-adƒ±] [<-t|--time> g√ºn] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Kullanƒ±m: %s [<-u|--user> giri≈ü-adƒ±] [<-t|--time> g√ºn] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/uk.po /tmp/dpep.rhju8j/shadow-4.0.3/po/uk.po
+--- shadow-4.0.3/po/uk.po	2005-04-14 15:43:58.689246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/uk.po	2005-04-14 15:44:00.379246000 +0200
+@@ -1273,8 +1273,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "˜…Àœ“…”‘¡ŒŒ—: %s [<-u|--login> login] [<-t|--time> ƒŒ¶] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "˜…Àœ“…”‘¡ŒŒ—: %s [<-u|--user> login] [<-t|--time> ƒŒ¶] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/zh_CN.po /tmp/dpep.rhju8j/shadow-4.0.3/po/zh_CN.po
+--- shadow-4.0.3/po/zh_CN.po	2005-04-14 15:43:59.379246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/zh_CN.po	2005-04-14 15:44:00.379246000 +0200
+@@ -1265,8 +1265,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Áî®Ê≥ïÔºö%s [<-u|--login> ÁôªÂΩïÂêç] [<-t|--time> Â§©Êï∞] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Áî®Ê≥ïÔºö%s [<-u|--user> ÁôªÂΩïÂêç] [<-t|--time> Â§©Êï∞] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/po/zh_TW.po /tmp/dpep.rhju8j/shadow-4.0.3/po/zh_TW.po
+--- shadow-4.0.3/po/zh_TW.po	2005-04-14 15:43:59.489246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/po/zh_TW.po	2005-04-14 15:44:00.389246000 +0200
+@@ -1268,8 +1268,8 @@
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Áî®Ê≥ïÔºö%s [<-u|--login> ÁôªÈåÑÂêç] [<-t|--time> Â§©Êï∏] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Áî®Ê≥ïÔºö%s [<-u|--user> ÁôªÈåÑÂêç] [<-t|--time> Â§©Êï∏] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+diff -urNad shadow-4.0.3/src/lastlog.c /tmp/dpep.rhju8j/shadow-4.0.3/src/lastlog.c
+--- shadow-4.0.3/src/lastlog.c	2005-04-14 15:43:58.199246000 +0200
++++ /tmp/dpep.rhju8j/shadow-4.0.3/src/lastlog.c	2005-04-14 15:44:00.389246000 +0200
+@@ -107,13 +107,13 @@
+ 		case 'h':
+ 			fprintf (stdout,
+ 				 _
+-				 ("Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"),
++				 ("Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"),
+ 				 argv[0]);
+ 			exit (0);
+ 		default:
+ 			fprintf (stdout,
+ 				 _
+-				 ("Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"),
++				 ("Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"),
+ 				 argv[0]);
+ 			exit (1);
+ 		}

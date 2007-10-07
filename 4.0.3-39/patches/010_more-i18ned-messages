@@ -1,0 +1,211 @@
+Purpose: Internationalise a few more messages
+	 
+Fixes: #266281
+
+Status wrt upstream: submitted 20050613 (slightly differently as upstream 
+                                         differs opn some files)
+
+Index: shadow-4.0.3/libmisc/obscure.c
+===================================================================
+--- shadow-4.0.3.orig/libmisc/obscure.c	1999-03-07 20:14:40.000000000 +0100
++++ shadow-4.0.3/libmisc/obscure.c	2005-06-13 20:06:09.000000000 +0200
+@@ -161,7 +161,7 @@
+ #endif
+ 
+ 	if (strcmp(new, old) == 0)
+-		return "no change";
++	  return _("no change");
+ 
+ 	newmono = str_lower(xstrdup(new));
+ 	oldmono = str_lower(xstrdup(old));
+@@ -170,19 +170,19 @@
+ 	strcat (wrapped, oldmono);
+ 
+ 	if (palindrome(oldmono, newmono))
+-		msg = "a palindrome";
++	  msg = _("a palindrome");
+ 
+ 	if (!msg && strcmp(oldmono, newmono) == 0)
+-		msg = "case changes only";
++	  msg = _("case changes only");
+ 
+ 	if (!msg && similar(oldmono, newmono))
+-		msg = "too similar";
++	  msg = _("too similar");
+ 
+ 	if (!msg && simple(old, new))
+-		msg = "too simple";
++	  msg = _("too simple");
+ 
+ 	if (!msg && strstr(wrapped, newmono))
+-		msg = "rotated";
++	  msg = _("rotated");
+ 
+ #ifdef HAVE_LIBCRACK
+ 	/*
+@@ -223,7 +223,7 @@
+ #endif
+ 
+ 	if ( newlen < getdef_num("PASS_MIN_LEN", 0) )
+-		return "too short";
++	  return _("too short");
+ 
+ 	/*
+ 	 * Remaining checks are optional.
+Index: shadow-4.0.3/libmisc/utmp.c
+===================================================================
+--- shadow-4.0.3.orig/libmisc/utmp.c	2005-06-13 20:06:07.000000000 +0200
++++ shadow-4.0.3/libmisc/utmp.c	2005-06-13 20:06:09.000000000 +0200
+@@ -54,9 +54,9 @@
+ extern	void	endutent();
+ 
+ #define	NO_UTENT \
+-	"No utmp entry.  You must exec \"login\" from the lowest level \"sh\""
++	_("No utmp entry.  You must exec \"login\" from the lowest level \"sh\"")
+ #define	NO_TTY \
+-	"Unable to determine your tty name."
++	_("Unable to determine your tty name.")
+ 
+ /*
+  * checkutmp - see if utmp file is correct for this process
+Index: shadow-4.0.3/src/chage.c
+===================================================================
+--- shadow-4.0.3.orig/src/chage.c	2005-06-13 20:06:08.000000000 +0200
++++ shadow-4.0.3/src/chage.c	2005-06-13 20:06:09.000000000 +0200
+@@ -586,7 +586,7 @@
+ 	}
+ 
+ 	if (lflg && (setgid (getgid ()) || setuid (ruid))) {
+-		fprintf (stderr, "%s: failed to drop privileges (%s)\n",
++		fprintf (stderr, _("%s: failed to drop privileges (%s)\n"),
+ 			 Prog, strerror (errno));
+ 		exit (1);
+ 	}
+Index: shadow-4.0.3/src/login.c
+===================================================================
+--- shadow-4.0.3.orig/src/login.c	2005-06-13 20:06:07.000000000 +0200
++++ shadow-4.0.3/src/login.c	2005-06-13 20:06:09.000000000 +0200
+@@ -717,7 +717,7 @@
+ 		retcode = pam_start ("login", username, &conv, &pamh);
+ 		if (retcode != PAM_SUCCESS) {
+ 			fprintf (stderr,
+-				 "login: PAM Failure, aborting: %s\n",
++				 _("login: PAM Failure, aborting: %s\n"),
+ 				 pam_strerror (pamh, retcode));
+ 			syslog (LOG_ERR, "Couldn't initialize PAM: %s",
+ 				pam_strerror (pamh, retcode));
+@@ -837,7 +837,7 @@
+ 			  if (!failed)
+ 			    break;
+ 			  
+-			  fprintf(stderr,"Login incorrect\n\n");
++			  fprintf(stderr,_("Login incorrect\n\n"));
+ 			  if (pwd && getdef_bool("FAILLOG_ENAB"))
+ 			    failure (pwent.pw_uid, tty, &faillog);
+ 			  if (getdef_str("FTMP_FILE") != NULL) {
+@@ -1304,7 +1304,7 @@
+ 		if (child < 0) {
+ 			/* error in fork() */
+ 			fprintf (stderr,
+-				 "login: failure forking: %s",
++				 _("login: failure forking: %s"),
+ 				 strerror (errno));
+ 			PAM_END;
+ 			exit (0);
+Index: shadow-4.0.3/src/logoutd.c
+===================================================================
+--- shadow-4.0.3.orig/src/logoutd.c	2002-01-05 16:41:43.000000000 +0100
++++ shadow-4.0.3/src/logoutd.c	2005-06-13 20:06:09.000000000 +0200
+@@ -48,7 +48,7 @@
+ static char *Prog;
+ 
+ #ifndef DEFAULT_HUP_MESG
+-#define DEFAULT_HUP_MESG "login time exceeded\r\n"
++#define DEFAULT_HUP_MESG _("login time exceeded\r\n")
+ #endif
+ 
+ #ifndef HUP_MESG_FILE
+Index: shadow-4.0.3/src/newgrp.c
+===================================================================
+--- shadow-4.0.3.orig/src/newgrp.c	2005-06-13 20:06:07.000000000 +0200
++++ shadow-4.0.3/src/newgrp.c	2005-06-13 20:06:09.000000000 +0200
+@@ -431,7 +431,7 @@
+ 			child = fork ();
+ 			if (child < 0) {
+ 				/* error in fork() */
+-				fprintf (stderr, "%s: failure forking: %s",
++				fprintf (stderr, _("%s: failure forking: %s"),
+ 					 is_newgrp ? "newgrp" : "sg",
+ 					 strerror (errno));
+ 				exit (1);
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-06-13 20:06:02.000000000 +0200
++++ shadow-4.0.3/src/su.c	2005-06-13 20:06:09.000000000 +0200
+@@ -462,7 +462,7 @@
+ 	if (ret != PAM_SUCCESS) {
+ 		SYSLOG ((LOG_ERR, "pam_set_item: %s",
+ 			 pam_strerror (pamh, ret)));
+-		fprintf (stderr, "%s: %s\n", Prog,
++		fprintf (stderr, _("%s: %s\n"), Prog,
+ 			 pam_strerror (pamh, ret));
+ 		pam_end (pamh, ret);
+ 		exit (1);
+@@ -563,7 +563,7 @@
+ 	if (ret != PAM_SUCCESS) {
+ 		SYSLOG ((LOG_ERR, "pam_authenticate: %s",
+ 			 pam_strerror (pamh, ret)));
+-		fprintf (stderr, "%s: %s\n", Prog,
++		fprintf (stderr, _("%s: %s\n"), Prog,
+ 			 pam_strerror (pamh, ret));
+ 		pam_end (pamh, ret);
+ 		su_failure (tty);
+@@ -577,7 +577,7 @@
+ 		} else {
+ 			SYSLOG ((LOG_ERR, "pam_acct_mgmt: %s",
+ 				 pam_strerror (pamh, ret)));
+-			fprintf (stderr, "%s: %s\n", Prog,
++			fprintf (stderr, _("%s: %s\n"), Prog,
+ 				 pam_strerror (pamh, ret));
+ 			pam_end (pamh, ret);
+ 			su_failure (tty);
+@@ -718,7 +718,7 @@
+ 	if (ret != PAM_SUCCESS) {
+ 		SYSLOG ((LOG_ERR, "pam_setcred: %s",
+ 			 pam_strerror (pamh, ret)));
+-		fprintf (stderr, "%s: %s\n", Prog,
++		fprintf (stderr, _("%s: %s\n"), Prog,
+ 			 pam_strerror (pamh, ret));
+ 		pam_end (pamh, ret);
+ 		exit (1);
+@@ -726,7 +726,7 @@
+ 	ret = pam_open_session(pamh, 0);
+ 	if (ret != PAM_SUCCESS) {
+ 		SYSLOG((LOG_ERR, "pam_open_session: %s\n", pam_strerror(pamh, ret)));
+-		fprintf(stderr, "%s: %s\n", Prog, pam_strerror(pamh, ret));
++		fprintf(stderr, _("%s: %s\n"), Prog, pam_strerror(pamh, ret));
+ 		pam_setcred(pamh, PAM_DELETE_CRED);
+ 		pam_end(pamh, ret);
+ 		exit(1);
+Index: shadow-4.0.3/src/useradd.c
+===================================================================
+--- shadow-4.0.3.orig/src/useradd.c	2005-06-13 20:06:08.000000000 +0200
++++ shadow-4.0.3/src/useradd.c	2005-06-13 20:06:09.000000000 +0200
+@@ -904,7 +904,7 @@
+ 		ngrp->gr_mem = add_list (ngrp->gr_mem, user_name);
+ 		if (!gr_update (ngrp)) {
+ 			fprintf (stderr,
+-				 "%s: error adding new group entry\n",
++				 _("%s: error adding new group entry\n"),
+ 				 Prog);
+ 			fail_exit (E_GRP_UPDATE);
+ 		}
+@@ -915,7 +915,7 @@
+ 
+ 		if (!gr_dbm_update (ngrp)) {
+ 			fprintf (stderr,
+-				 "%s: cannot add new dbm group entry\n",
++				 _("%s: cannot add new dbm group entry\n"),
+ 				 Prog);
+ 			fail_exit (E_GRP_UPDATE);
+ 		} else

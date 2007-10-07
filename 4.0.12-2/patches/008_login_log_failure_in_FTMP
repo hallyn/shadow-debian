@@ -1,0 +1,51 @@
+Goal: Log login failures to the btmp file
+
+Notes:
+ * I'm not sure login should add an entry in the FTMP file when PAM is used.
+   (but nothing in /etc/login.defs indicates that the failure is not logged)
+
+Index: shadow-4.0.12/src/login.c
+===================================================================
+--- shadow-4.0.12.orig/src/login.c	2005-08-17 11:50:52.000000000 +0200
++++ shadow-4.0.12/src/login.c	2005-08-17 11:50:54.000000000 +0200
+@@ -705,6 +705,20 @@
+ 			    break;
+ 			  
+ 			  fprintf(stderr,"Login incorrect\n\n");
++			  if (getdef_str("FTMP_FILE") != NULL) {
++#if HAVE_UTMPX_H
++			    failent = utxent;
++			    gettimeofday(&(failent.ut_tv), NULL);
++#else
++			    failent = utent;
++			    time(&failent.ut_time);
++#endif
++			    strncpy(failent.ut_user, failent_user, sizeof(failent.ut_user));
++#ifdef USER_PROCESS
++			    failent.ut_type = USER_PROCESS;
++#endif
++			    failtmp(&failent);
++			  }
+ 			  
+ 			  /* Let's give it another go around */
+ 			  pam_set_item(pamh,PAM_USER,NULL);
+Index: shadow-4.0.12/lib/getdef.c
+===================================================================
+--- shadow-4.0.10.orig/lib/getdef.c	2005-07-11 19:36:42.000000000 +0300
++++ shadow-4.0.10/lib/getdef.c	2005-07-11 19:41:09.000000000 +0300
+@@ -50,6 +50,7 @@
+ 	{"ERASECHAR", NULL},
+ 	{"FAIL_DELAY", NULL},
+ 	{"FAKE_SHELL", NULL},
++	{"FTMP_FILE", NULL},
+ 	{"GETPASS_ASTERISKS", NULL},
+ 	{"GID_MAX", NULL},
+ 	{"GID_MIN", NULL},
+@@ -88,7 +88,6 @@
+ 	{"ENV_TZ", NULL},
+ 	{"ENVIRON_FILE", NULL},
+ 	{"FAILLOG_ENAB", NULL},
+-	{"FTMP_FILE", NULL},
+ 	{"ISSUE_FILE", NULL},
+ 	{"LASTLOG_ENAB", NULL},
+ 	{"LOGIN_STRING", NULL},

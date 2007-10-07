@@ -1,0 +1,27 @@
+Goal: add pam session ability to su (patch from Topi Miettinen)
+Fixes: #57526, #55873, #57532
+
+Note: this is a rewrite of the previous 439_su_PAM_session
+      One difference may be that the session is not closed as root (changing
+      this will require a major rewrite of su).
+
+Index: shadow-4.0.12/src/su.c
+===================================================================
+--- shadow-4.0.12.orig/src/su.c	2005-08-17 11:50:48.000000000 +0200
++++ shadow-4.0.12/src/su.c	2005-08-17 11:50:49.000000000 +0200
+@@ -787,6 +790,7 @@
+ 		SYSLOG ((LOG_ERR, "pam_open_session: %s",
+ 			 pam_strerror (pamh, ret)));
+ 		fprintf (stderr, "%s: %s\n", Prog, pam_strerror (pamh, ret));
++		pam_setcred(pamh, PAM_DELETE_CRED);
+ 		pam_end (pamh, ret);
+ 		exit (1);
+ 	}
+@@ -810,6 +814,7 @@
+ 
+ 	/* become the new user */
+ 	if (change_uid (&pwent)) {
++		pam_close_session(pamh, 0);
+ 		pam_setcred (pamh, PAM_DELETE_CRED);
+ 		pam_end (pamh, PAM_ABORT);
+ 		exit (1);

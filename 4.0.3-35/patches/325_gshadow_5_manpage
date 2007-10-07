@@ -1,0 +1,226 @@
+Goal: Add a gshadow.5 man page, and clarifications in the newgrp and gpasswd
+man pages.
+Fixes: #113191, #166173, #169046, #251926
+
+Status wrt upstream: already applied upstream.
+
+Note: the patch also takes some formatting enhancements from upstream in order
+to make these pages closer to upstream.
+
+Index: shadow-4.0.3/man/gshadow.5
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ shadow-4.0.3/man/gshadow.5	2005-06-04 11:32:42.000000000 +0200
+@@ -0,0 +1,65 @@
++.\"$Id: gshadow.5,v 1.2 2005/04/02 16:10:23 kloczek Exp $
++.\" Copyright 2005, Nicolas FRANCOIS
++.\" All rights reserved.
++.\"
++.\" Redistribution and use in source and binary forms, with or without
++.\" modification, are permitted provided that the following conditions
++.\" are met:
++.\" 1. Redistributions of source code must retain the above copyright
++.\"    notice, this list of conditions and the following disclaimer.
++.\" 2. Redistributions in binary form must reproduce the above copyright
++.\"    notice, this list of conditions and the following disclaimer in the
++.\"    documentation and/or other materials provided with the distribution.
++.\" 3. Neither the name of Nicolas FRANCOIS nor the names of its contributors
++.\"    may be used to endorse or promote products derived from this software
++.\"    without specific prior written permission.
++.\"
++.\" THIS SOFTWARE IS PROVIDED BY NICOLAS FRANCOIS AND CONTRIBUTORS ``AS IS''
++.\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++.\" ARE DISCLAIMED.  IN NO EVENT SHALL NICOLAS FRANCOIS OR CONTRIBUTORS BE
++.\" LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++.\" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++.\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++.\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
++.\" THE POSSIBILITY OF SUCH DAMAGE.
++.TH GSHADOW 5
++.SH NAME
++gshadow \- shadowed group file
++.SH DESCRIPTION
++.I gshadow
++contains the shadowed information for group accounts.
++It contains lines with the folowing colon\-separated fields:
++.IP "" .5i
++Group name
++.IP "" .5i
++Encrypted password
++.IP "" .5i
++Comma\-separated list of group administrators
++.IP "" .5i
++Comma\-separated list of group members.
++.PP
++The group name and password fields must be filled.
++The encryped password consists of 13 characters from the 64\-character
++alphabet a thru z, A thru Z, 0 thru 9, \. and /.
++Refer to \fBcrypt\fR(3) for details on how this string is interpreted.
++If the password field contains some string that is not valid result
++of \fBcrypt\fR(3), for instance ! or *, the user will not be able to use
++a unix password to log in, subject to \fBpam\fR(7).
++.PP
++This information supercedes any password present in \fI/etc/group\fR.
++.PP
++This file must not be readable by regular users if password
++security is to be maintained.
++.SH FILES
++\fI/etc/group\fR	\- user group file
++.br
++\fI/etc/gshadow\fR	\- shadowed group file
++.SH SEE ALSO
++.BR group (5),
++.BR gpasswd (5),
++.BR newgrp (5)
++.SH AUTHOR
++Nicolas FRANCOIS
+Index: shadow-4.0.3/man/gpasswd.1
+===================================================================
+--- shadow-4.0.3.orig/man/gpasswd.1	2005-06-04 11:31:51.000000000 +0200
++++ shadow-4.0.3/man/gpasswd.1	2005-06-04 11:32:42.000000000 +0200
+@@ -12,33 +12,30 @@
+ .SH SYNOPSIS
+ \fBgpasswd \fIgroup\fR
+ .br
+-\fBgpasswd -a \fIuser\fR \fIgroup\fR
++\fBgpasswd \-a \fIuser\fR \fIgroup\fR
+ .br
+-\fBgpasswd -d \fIuser\fR \fIgroup\fR
++\fBgpasswd \-d \fIuser\fR \fIgroup\fR
+ .br
+-\fBgpasswd -R \fIgroup\fR
++\fBgpasswd \-R \fIgroup\fR
+ .br
+-\fBgpasswd -r \fIgroup\fR
++\fBgpasswd \-r \fIgroup\fR
+ .br
+-\fBgpasswd\fR [\fB-A \fIuser\fR,...] [\fB-M\fR \fIuser\fR,...] \fIgroup\fR
++\fBgpasswd\fR [\fB\-A \fIuser\fR,...] [\fB\-M\fR \fIuser\fR,...] \fIgroup\fR
+ .SH DESCRIPTION
+-.B gpasswd
+-is used to administer the /etc/group file (and /etc/gshadow
+-file if compiled with SHADOWGRP defined). Every group can
++\fBgpasswd\fR is used to administer the \fI/etc/group\fR file (and
++\fI/etc/gshadow\fR file if compiled with SHADOWGRP defined). Every group can
+ have administrators, members and a password. System
+-administrator can use \fB-A\fR option to define group
+-administrator(s) and \fB-M\fR option to define members and
++administrator can use \fB\-A\fR option to define group
++administrator(s) and \fB\-M\fR option to define members and
+ has all rights of group administrators and members.
++.SH OPTIONS
+ .PP
+-Group administrator can add and delete users using \fB-a\fR
+-and \fB-d\fR options respectively. Administrators can use
+-\fB-r\fR option to remove group password. When no password 
+-is set only group members can use
+-.BR newgrp (1)
+-to join the group. Option \fB-R\fR disables 
+-access to the group through
+-.BR newgrp (1)
+-command.
++Group administrator can add and delete users using \fB\-a\fR and \fB\-d\fR
++options respectively. Administrators can use \fB\-r\fR option to remove group
++password. When no password is set only group members can use \fBnewgrp\fR to
++join the group. Option \fB\-R\fR disables access via a password to the group
++through \fBnewgrp\fR command (however members will still be able to switch to
++this group).
+ .PP
+ \fBgpasswd\fR called by a group administrator with group name only prompts
+ for the group password. If password is set the members can still
+@@ -46,14 +43,16 @@
+ without a password, non-members must supply the password.
+ 
+ .SH FILES
+-/etc/group \- group information
++\fI/etc/group\fR	\- group account information
+ .br
+-/etc/gshadow \- shadow group information
++\fI/etc/gshadow\fR	\- shadow group information
+ .SH SEE ALSO
+ .BR newgrp (1),
+ .BR groupadd (8),
+ .BR groupdel (8),
+ .BR groupmod (8),
+-.BR grpck (8)
++.BR grpck (8),
++.BR group (5),
++.BR gshadow (5)
+ .SH AUTHOR
+ Rafal Maszkowski <rzm@pdi.net>
+Index: shadow-4.0.3/man/newgrp.1
+===================================================================
+--- shadow-4.0.3.orig/man/newgrp.1	2005-06-04 11:32:36.000000000 +0200
++++ shadow-4.0.3/man/newgrp.1	2005-06-04 11:32:42.000000000 +0200
+@@ -31,9 +31,9 @@
+ .br
+ sg \- execute command as different group ID
+ .SH SYNOPSIS
+-\fBnewgrp\fR [\fB-\fR] [\fIgroup\fR]
++\fBnewgrp\fR [\fB\-\fR] [\fIgroup\fR]
+ .br
+-\fBsg\fR [\fB-\fR] [\fIgroup\fR [[\fB-c\fR] \fIcommand\fR]]
++\fBsg\fR [\fB\-\fR] [\fIgroup\fR [[\fB\-c\fR] \fIcommand\fR]]
+ .SH DESCRIPTION
+ \fBnewgrp\fR is used to change the current group ID during a login session.
+ If the optional \fB\-\fR flag is given, the user's environment
+@@ -42,26 +42,38 @@
+ remains unchanged.
+ .PP
+ \fBnewgrp\fR changes the current real group ID to the named group, or to the
+-default group listed in \fI/etc/passwd\fR if no group name is given. The
+-user will be prompted for a password if she do not have a password and the
++default group listed in \fI/etc/passwd\fR if no group name is given.
++\fBnewgrp\fR also tries to add the group to the user groupset. If not root,
++the user will be prompted for a password if she do not have a password and the
+ group does, or if the user is not listed as a member and the group has a
+ password. The user will be denied access if the group password is empty and
+ the user is not listed as a member.
++If compiled with SHADOWPWD (respectively SHADOWGRP) defined, the password
++of the user (respectively, the password and the members of the group) will
++be overwritten by the value defined in \fI/etc/shadow\fR (respectively in
++\fI/etc/gshadow\fR) if an entry exists for this user (resp. group).
+ .PP
+ The \fBsg\fR command works similar to \fBnewgrp\fR but accepts a command.
+-The command will be executed with the Bourne shell.  With most shells you
++The command will be executed with the \fB/bin/sh\fR shell. With most shells you
+ may run \fBsg\fR from, you need to enclose multi-word commands in quotes.
+ Another difference between \fBnewgrp\fR and \fBsg\fR is that some shells
+ treat \fBnewgrp\fR specially, replacing themselves with a new instance of
+ a shell that \fBnewgrp\fR creates.  This doesn't happen with \fBsg\fR, so
+ upon exit from a \fBsg\fR command you are returned to your previous group ID.
+ .SH FILES
+-/etc/passwd \- user account information
++\fI/etc/passwd\fR	\- user account information
+ .br
+-/etc/group \- group information
++\fI/etc/shadow\fR	\- secure user account information
++.br
++\fI/etc/group\fR	\- group account information
++.br
++\fI/etc/gshadow\fR	\- shadow group file
+ .SH SEE ALSO
+ .BR id (1),
+ .BR login (1),
+-.BR su (1)
++.BR su (1),
++.BR gpasswd (1),
++.BR group (5),
++.BR gshadow (5)
+ .SH AUTHOR
+ Julianne Frances Haugh <jockgrrl@ix.netcom.com>
+Index: shadow-4.0.3/man/Makefile.am
+===================================================================
+--- shadow-4.0.3.orig/man/Makefile.am	2005-06-04 11:34:30.000000000 +0200
++++ shadow-4.0.3/man/Makefile.am	2005-06-04 11:35:39.000000000 +0200
+@@ -36,6 +36,7 @@
+ 	pwunconv.8 \
+ 	sg.1 \
+ 	shadow.5 \
++	gshadow.5 \
+ 	su.1 \
+ 	suauth.5 \
+ 	useradd.8 \

@@ -1,0 +1,27 @@
+Goal: fix typos 
+Fixes: #312430
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/shadow.5
+===================================================================
+--- shadow-4.0.3.orig/man/shadow.5	2005-06-08 23:00:31.000000000 +0200
++++ shadow-4.0.3/man/shadow.5	2005-06-08 23:03:37.000000000 +0200
+@@ -53,7 +53,7 @@
+ A reserved field
+ .PP
+ The password field must be filled.
+-The encryped password consists of 13 to 24 characters from the
++The encrypted password consists of 13 to 24 characters from the
+ 64 character alphabet
+ a thru z, A thru Z, 0 thru 9, \. and /.
+ Refer to \fBcrypt\fR(3) for details on how this string is
+@@ -77,7 +77,7 @@
+ An account will also be disabled on the specified day
+ regardless of other password expiration information.
+ .PP
+-This information supercedes any password or password age
++This information supersedes any password or password age
+ information present in \fI/etc/passwd\fR.
+ .PP
+ This file must not be readable by regular users if password

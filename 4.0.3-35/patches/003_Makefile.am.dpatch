@@ -1,0 +1,33 @@
+#! /bin/sh -e
+## 003_Makefile.am.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+--- shadow-4.0.3.orig/Makefile.am
++++ shadow-4.0.3/Makefile.am
+@@ -5,4 +5,4 @@
+ AUTOMAKE_OPTIONS = 1.5 dist-bzip2 foreign
+ 
+ SUBDIRS = intl po man libmisc lib src \
+-	contrib debian doc etc
++	contrib doc etc

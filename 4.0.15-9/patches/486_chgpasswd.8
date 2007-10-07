@@ -1,0 +1,135 @@
+Goal: Add a man page for chgpasswd
+
+Status wrt upstream: will be in 4.0.16
+      
+Index: shadow-4.0.15/man/Makefile.am
+===================================================================
+--- shadow-4.0.15.orig/man/Makefile.am	2006-03-12 19:53:48.000000000 +0100
++++ shadow-4.0.15/man/Makefile.am	2006-03-25 15:33:42.000000000 +0100
+@@ -10,6 +10,7 @@
+ man_XMANS = \
+ 	chage.1.xml \
+ 	chfn.1.xml \
++	chgpasswd.8.xml \
+ 	chpasswd.8.xml \
+ 	chsh.1.xml \
+ 	expiry.1.xml \
+@@ -50,6 +51,7 @@
+ man_MANS = \
+ 	chage.1 \
+ 	chfn.1 \
++	chgpasswd.8 \
+ 	chpasswd.8 \
+ 	chsh.1 \
+ 	expiry.1 \
+@@ -116,6 +118,9 @@
+ chfn.1: chfn.1.xml
+ 	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
+ 
++chgpasswd.8: chgpasswd.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
+ chpasswd.8: chpasswd.8.xml
+ 	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
+ 
+Index: shadow-4.0.15/man/chgpasswd.8.xml
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ shadow-4.0.15/man/chgpasswd.8.xml	2006-03-25 15:32:01.000000000 +0100
+@@ -0,0 +1,96 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
++	           "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
++<refentry id='chgpasswd.8'>
++  <!-- $Id: $ -->
++  <refmeta>
++    <refentrytitle>chgpasswd</refentrytitle>
++    <manvolnum>8</manvolnum>
++    <refmiscinfo class="sectdesc">System Management Commands</refmiscinfo>
++  </refmeta>
++  <refnamediv id='name'>
++    <refname>chgpasswd</refname>
++    <refpurpose>update group passwords in batch mode</refpurpose>
++  </refnamediv>
++
++  <refsynopsisdiv id='synopsis'>
++    <cmdsynopsis>
++      <command>chgpasswd</command>
++      <arg choice='opt'>
++	<replaceable>options</replaceable>
++      </arg>
++    </cmdsynopsis>
++  </refsynopsisdiv>
++
++  <refsect1 id='description'>
++    <title>DESCRIPTION</title>
++    <para>
++      <command>chgpasswd</command> reads a list of group name and password
++      pairs from standard input and uses this information to update a set
++      of existing groups. Each line is of the format:
++    </para>
++    <para>
++      <emphasis remap='I'>group_name</emphasis>:<emphasis
++      remap='I'>password</emphasis>
++    </para>
++    <para>
++      By default the supplied password must be in clear-text. Default
++      encryption algorithm is DES.
++    </para>
++    <para>
++      This command is intended to be used in a large system environment
++      where many accounts are created at a single time.
++    </para>
++  </refsect1>
++
++  <refsect1 id='options'>
++    <title>OPTIONS</title>
++    <para>
++      The options which apply to the <command>chgpasswd</command> command
++      are:
++    </para>
++    <variablelist remap='IP'>
++      <varlistentry>
++	<term><option>-e</option>, <option>--encrypted</option></term>
++	<listitem>
++	  <para>Supplied passwords are in encrypted form.</para>
++	</listitem>
++      </varlistentry>
++      <varlistentry>
++	<term><option>-h</option>, <option>--help</option></term>
++	<listitem>
++	  <para>Display help message and exit.</para>
++	</listitem>
++      </varlistentry>
++      <varlistentry>
++	<term><option>-m</option>, <option>--md5</option></term>
++	<listitem>
++	  <para>
++	    Use MD5 encryption instead DES when the supplied passwords are
++	    not encrypted.
++	  </para>
++	</listitem>
++      </varlistentry>
++    </variablelist>
++  </refsect1>
++
++  <refsect1 id='caveats'>
++    <title>CAVEATS</title>
++    <para>
++      Remember to set permissions or umask to prevent readability of
++      unencrypted files by other users.
++    </para>
++  </refsect1>
++
++  <refsect1 id='see_also'>
++    <title>SEE ALSO</title>
++    <para>
++      <citerefentry>
++	<refentrytitle>gpasswd</refentrytitle><manvolnum>1</manvolnum>
++      </citerefentry>,
++      <citerefentry>
++	<refentrytitle>groupadd</refentrytitle><manvolnum>8</manvolnum>
++      </citerefentry>.
++    </para>
++  </refsect1>
++</refentry>

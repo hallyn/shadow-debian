@@ -1,0 +1,13 @@
+Index: shadow-4.0.15/src/su.c
+===================================================================
+--- shadow-4.0.15.orig/src/su.c	2006-03-08 19:33:08.617392925 +0100
++++ shadow-4.0.15/src/su.c	2006-03-08 19:33:09.823148673 +0100
+@@ -301,7 +301,7 @@
+ #endif
+ #endif				/* !USE_PAM */
+ 
+-	sanitize_env ();
++	/* sanitize_env (); */
+ 
+ 	setlocale (LC_ALL, "");
+ 	bindtextdomain (PACKAGE, LOCALEDIR);

@@ -1,0 +1,28 @@
+Goal: better document "!" and "*" fields in /etc/shadow
+Fixes: some old bug in Debian..:-)
+
+Status wrt upstream: Forwarded but not applied yet
+
+Index: shadow-4.0.12/man/shadow.5.xml
+===================================================================
+--- shadow-4.0.12.orig/man/shadow.5.xml	2005-08-17 11:49:22.000000000 +0200
++++ shadow-4.0.12/man/shadow.5.xml	2005-08-17 11:50:34.000000000 +0200
+@@ -64,6 +64,18 @@
+       for details on how this string is interpreted.
+     </para>
+     
++    <para>If the password field contains some string that is not valid result
++      of
++      <citerefentry>
++        <refentrytitle>crypt</refentrytitle><manvolnum>3</manvolnum>
++      </citerefentry>,
++      for instance ! or *, the user will not be able to use
++      a unix password to log in, subject to
++      <citerefentry>
++        <refentrytitle>pam</refentrytitle><manvolnum>7</manvolnum>
++      </citerefentry>.
++    </para>
++
+     <para>The date of the last password change is given as the number of
+       days since Jan 1, 1970. The password may not be changed again until
+       the proper number of days have passed, and must be changed after the

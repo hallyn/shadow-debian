@@ -1,0 +1,376 @@
+Goal: add -m, -p and -s command line options to match GNU options
+Fixes: #45394, #46424
+
+Status wrt upstream: Upstream does not support these options.
+
+Note: As the patch is quite big, and it probably cannot be splitted in
+      smaller parts, I will try to describe the diffs:
+
+ * switch to getopt to add the -m, -p and -s options
+ * by default (if no -m or -p is provided), the environment is changed
+   (change_environment=1)
+ * the user can specify the shell, if he does not have a restricted shell
+ * some functions were borrowed to GNU shell-utils' su
+   (this is also the case of current upstream, even if those functions
+   drastically evoled separately in Debian and upstream (run_shell))
+   In debian, more work is performed in run_shell, because all options are
+   parsed earlier with getopt.
+ * There is an "usage"
+ * if the user don't whant to change the environment (-m or -p options),
+   SHELL is used for the new shell (except if this user has a restricted
+   shell, in this case, she keep her restricted shell).
+   Also, even when the environment is not changed, IFS is reset to the
+   default \t\n value.
+
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-05-30 23:13:57.716974000 +0200
++++ shadow-4.0.3/src/su.c	2005-05-30 23:17:27.126974000 +0200
+@@ -49,6 +49,7 @@
+ #include <grp.h>
+ #include <signal.h>
+ #include <pwd.h>
++#include <getopt.h>
+ #include "pwauth.h"
+ #include "getdef.h"
+ 
+@@ -79,6 +80,18 @@
+ 
+ /* local function prototypes */
+ 
++/* If nonzero, change some environment vars to indicate the user su'd to.  */
++static int change_environment;
++
++static struct option const longopts[] =
++{
++  {"command", required_argument, 0, 'c'},
++  {"preserve-environment", no_argument, 0, 'p'},
++  {"shell", required_argument, 0, 's'},
++  {"help", no_argument, 0, 'h'},
++  {0, 0, 0, 0}
++};
++
+ #ifndef USE_PAM
+ 
+ static RETSIGTYPE die (int);
+@@ -118,6 +131,96 @@
+ }
+ #endif				/* !USE_PAM */
+ 
++/* borrowed from GNU sh-utils' "su.c" */
++static int
++restricted_shell (const char *shell)
++{
++       char *line;
++
++       setusershell ();
++       while ((line = getusershell ()) != NULL) {
++               if (*line != '#' && strcmp (line, shell) == 0) {
++                       endusershell ();
++                       return 0;
++               }
++       }
++       endusershell ();
++       return 1;
++}
++
++/* borrowed from GNU sh-utils' "su.c" */
++static int
++elements (char **arr)
++{
++  int n = 0;
++
++  for (n = 0; *arr; ++arr)
++    ++n;
++  return n;
++}
++
++/* borrowed from GNU sh-utils' "su.c" */
++static void
++run_shell (char *shell, const char *command, char **additional_args, int login)
++{
++  const char **args;
++  int argno = 1;
++  char cmd[BUFSIZ];
++  int cmd_len_left = sizeof(cmd) - 1;
++
++  cmd[0] = '\0';
++
++  if (additional_args)
++    args = (const char **) xmalloc (sizeof (char *)
++                                    * (10 + elements (additional_args)));
++  else
++    args = (const char **) xmalloc (sizeof (char *) * 10);
++
++  if (login)
++    {
++      char *arg0;
++      char *shell_basename;
++
++      shell_basename = getdef_str("SU_NAME");
++      if (!shell_basename)
++       shell_basename = Basename(shell);
++
++      arg0 = xmalloc (strlen (shell_basename) + 2);
++      arg0[0] = '-';
++      strcpy (arg0 + 1, shell_basename);
++      args[0] = arg0;
++    }
++  else
++    args[0] = Basename(shell);
++  if (command || additional_args)
++    args[argno++] = "-c";
++  if (command) {
++    if (strlen(command) > cmd_len_left) {
++      fprintf(stderr, _("Command line args too long\n"));
++      exit(1);
++    }
++    strcat(cmd, command);
++    cmd_len_left -= strlen(command);
++  }
++  if (additional_args)
++    for (; *additional_args; ++additional_args) {
++      if ((strlen(*additional_args) + 1) > cmd_len_left) {
++	fprintf(stderr, _("Command line args too long\n"));
++	exit(1);
++      }
++      if (cmd[0]) {
++	strcat(cmd, " ");
++	cmd_len_left--;
++      }
++      strcat(cmd, *additional_args);
++      cmd_len_left -= strlen(*additional_args);
++    }
++  if (cmd[0]) args[argno++] = cmd;
++  args[argno] = NULL;
++  execv (shell, (char **) args);
++  fprintf (stderr, _("No shell\n"));
++  SYSLOG((LOG_WARN, "Cannot execute %s\n", shell));
++}
+ 
+ static void su_failure (const char *tty)
+ {
+@@ -153,13 +256,14 @@
+ {
+ 	char *cp;
+ 	const char *tty = 0;	/* Name of tty SU is run from        */
+-	int doshell = 0;
+ 	int fakelogin = 0;
+ 	int amroot = 0;
+ 	uid_t my_uid;
+ 	struct passwd *pw = 0;
+ 	char **envp = environ;
+-
++	char *command = 0, *shell = 0, **additional_args = 0;
++	int optc;
++	char *tmp_name;
+ #ifdef USE_PAM
+ 	int ret;
+ #else				/* !USE_PAM */
+@@ -180,6 +284,8 @@
+ 	bindtextdomain (PACKAGE, LOCALEDIR);
+ 	textdomain (PACKAGE);
+ 
++	change_environment = 1;
++
+ 	/*
+ 	 * Get the program name. The program name is used as a prefix to
+ 	 * most error messages.
+@@ -224,15 +330,55 @@
+ 	 * Process the command line arguments. 
+ 	 */
+ 
+-	argc--;
+-	argv++;			/* shift out command name */
+-
+-	if (argc > 0 && strcmp (argv[0], "-") == 0) {
++	while ((optc = getopt_long (argc, argv, "c:mps:h", longopts, NULL)) != -1) {
++		switch (optc) {
++		    case 0:
++			break;
++		    case 'c':
++			command = optarg;
++			break;
++		    case 'm':
++		    case 'p':
++			change_environment = 0;
++			break;
++		    case 's':
++			shell = optarg;
++			break;
++		    default:
++			fprintf(stderr, _("\
++Usage: su [OPTS] [-] [username [ARGS]]\n\
++	-	make this a login shell\n\
++	-c, --command=<command>\n\
++		pass command to the invoked shell using its -c\n\
++		option\n\
++       -m, -p, --preserve-environment\n\
++		do not reset environment variables, and keep the\n\
++		same shell\n\
++       -s, --shell=<shell>\n\
++		use shell instead of the default in /etc/passwd\n"));
++			exit(1);
++		}
++	}
++	
++        if (optind < argc && !strcmp (argv[optind], "-")) {
+ 		fakelogin = 1;
+-		argc--;
+-		argv++;		/* shift ... */
++		++optind;
+ 	}
+ 
++	if (optind < argc)
++		strncpy(name, argv[optind++], sizeof(name) - 1);
++	else {
++	        struct passwd *root_pw = getpwuid(0);
++		if (root_pw == NULL) {
++		  SYSLOG((LOG_CRIT, "There is no UID 0 user."));
++		  su_failure(tty);
++		}
++                strcpy(name, root_pw->pw_name);
++	}
++
++	if (optind < argc)
++		additional_args = argv + optind;
++
+ 	/*
+ 	 * If a new login is being set up, the old environment will be
+ 	 * ignored and a new one created later on.
+@@ -258,30 +404,6 @@
+ 	}
+ 
+ 	/*
+-	 * The next argument must be either a user ID, or some flag to a
+-	 * subshell. Pretty sticky since you can't have an argument which
+-	 * doesn't start with a "-" unless you specify the new user name.
+-	 * Any remaining arguments will be passed to the user's login shell.
+-	 */
+-
+-	if (argc > 0 && argv[0][0] != '-') {
+-		STRFCPY (name, argv[0]);	/* use this login id */
+-		argc--;
+-		argv++;		/* shift ... */
+-	}
+-	if (!name[0])		/* use default user ID */
+-	{
+-		struct passwd *root_pw = getpwuid(0);
+-		if (root_pw == NULL) {
+-			SYSLOG((LOG_CRIT, "There is no UID 0 user."));
+-			su_failure(tty)
+-		}
+-		strcpy(name, root_pw->pw_name);
+-	}
+-
+-	doshell = argc == 0;	/* any arguments remaining? */
+-
+-	/*
+ 	 * Get the user's real name. The current UID is used to determine
+ 	 * who has executed su. That user ID must exist.
+ 	 */
+@@ -406,8 +528,15 @@
+ 	 * Set the default shell.
+ 	 */
+ 
+-	if (pwent.pw_shell[0] == '\0')
+-		pwent.pw_shell = "/bin/sh";	/* XXX warning: const */
++	if (pwent.pw_shell == NULL || pwent.pw_shell[0] == '\0')
++		pwent.pw_shell = (char *) "/bin/sh";
++
++	if (shell == 0 && change_environment == 0)
++		shell = getenv ("SHELL");
++	if (shell != 0 && getuid () && restricted_shell (pwent.pw_shell))
++		shell = 0;
++	if (shell == 0)
++		shell = (char *) strdup (pwent.pw_shell);
+ 
+ #ifdef USE_PAM
+ 	ret = pam_authenticate (pamh, 0);
+@@ -514,10 +643,14 @@
+ 	}
+ #endif
+ 
+-	environ = newenvp;	/* make new environment active */
+-
+-	if (getenv ("IFS"))	/* don't export user IFS ... */
+-		addenv ("IFS= \t\n", NULL);	/* ... instead, set a safe IFS */
++	if (change_environment || restricted_shell(pwent.pw_shell)) {
++		environ = newenvp;			/* make new environment active */
++		if (getenv ("IFS"))			/* don't export user IFS ... */
++			addenv("IFS= \t\n", NULL);	/* ... instead, set a safe IFS */
++	} else {
++		if (getenv ("IFS"))
++			putenv("IFS= \t\n");
++	}
+ 
+ 	if (pwent.pw_shell[0] == '*') {	/* subsystem root required */
+ 		pwent.pw_shell++;	/* skip the '*' */
+@@ -580,13 +713,13 @@
+ 		exit (1);
+ #endif				/* !USE_PAM */
+ 
+-	if (fakelogin)
+-		setup_env (&pwent);
++	if (fakelogin && (change_environment || restricted_shell(pwent.pw_shell)))
++		setup_env(&pwent);
+ #if 1				/* Suggested by Joey Hess. XXX - is this right?  */
+-	else {
+-		addenv ("HOME", pwent.pw_dir);
+-		addenv ("USER", pwent.pw_name);
+-		addenv ("SHELL", pwent.pw_shell);
++	else if (change_environment || restricted_shell(pwent.pw_shell)) {
++		addenv("HOME", pwent.pw_dir);
++		addenv("USER", pwent.pw_name);
++		addenv("SHELL", shell);
+ 	}
+ #endif
+ 
+@@ -599,46 +732,6 @@
+ 	 */
+ 	closelog ();
+ 
+-	/*
+-	 * See if the user has extra arguments on the command line. In that
+-	 * case they will be provided to the new user's shell as arguments.
+-	 */
+-
+-	if (fakelogin) {
+-		char *arg0;
+-
+-#if 0				/* XXX - GNU su doesn't do this.  --marekm */
+-		if (!hushed (&pwent)) {
+-			motd ();
+-			mailcheck ();
+-		}
+-#endif
+-		cp = getdef_str ("SU_NAME");
+-		if (!cp)
+-			cp = Basename (pwent.pw_shell);
+-
+-		arg0 = xmalloc (strlen (cp) + 2);
+-		arg0[0] = '-';
+-		strcpy (arg0 + 1, cp);
+-		cp = arg0;
+-	} else
+-		cp = Basename (pwent.pw_shell);
+-
+-	if (!doshell) {
+-
+-		/*
+-		 * Use new user's shell from /etc/passwd and create an argv
+-		 * with the rest of the command line included.
+-		 */
+-
+-		argv[-1] = pwent.pw_shell;
+-		(void) execv (pwent.pw_shell, &argv[-1]);
+-		(void) fprintf (stderr, _("No shell\n"));
+-		SYSLOG ((LOG_WARN, "Cannot execute %s", pwent.pw_shell));
+-		closelog ();
+-		exit (1);
+-	}
+-
+-	shell (pwent.pw_shell, cp);
++	run_shell (shell, command, additional_args, fakelogin);
+ 	 /*NOTREACHED*/ exit (1);
+ }

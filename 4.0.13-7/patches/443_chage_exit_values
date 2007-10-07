@@ -1,0 +1,72 @@
+Goal: differentiate the different failure causes by the exit value
+      This will permit to adduser to detect if chage failed because the
+      system doesn't have shadowed passwords.
+Fixes: #317012
+
+Status wrt upstream: will be in 4.0.13
+
+Index: shadow-4.0.12/src/chage.c
+===================================================================
+--- shadow-4.0.12.orig/src/chage.c	2005-08-17 11:51:15.000000000 +0200
++++ shadow-4.0.12/src/chage.c	2005-08-17 11:51:19.000000000 +0200
+@@ -541,6 +541,15 @@
+ 	pwent = *pw;
+ 	STRFCPY (name, pwent.pw_name);
+ 
++	if (!spw_file_present()) {
++		fprintf (stderr,
++		         _("%s: the shadow password file is not present\n"),
++		         Prog);
++		SYSLOG ((LOG_ERR, "can't find the shadow password file"));
++		closelog ();
++		exit (E_SHADOW_NOTFOUND);
++	}
++
+ 	/*
+ 	 * For shadow password files we have to lock the file and read in
+ 	 * the entries as was done for the password file. The user entries
+Index: shadow-4.0.12/lib/exitcodes.h
+===================================================================
+--- shadow-4.0.12.orig/lib/exitcodes.h	2005-08-17 11:49:12.000000000 +0200
++++ shadow-4.0.12/lib/exitcodes.h	2005-08-17 11:51:19.000000000 +0200
+@@ -7,3 +7,4 @@
+ #define E_NOPERM        1	/* permission denied */
+ #define E_USAGE         2	/* invalid command syntax */
+ #define E_BAD_ARG       3	/* invalid argument to option */
++#define E_SHADOW_NOTFOUND 15	/* no shadow password file */
+Index: shadow-4.0.12/man/chage.1.xml
+===================================================================
+--- shadow-4.0.12.orig/man/chage.1.xml	2005-08-10 10:58:05.000000000 +0200
++++ shadow-4.0.12/man/chage.1.xml	2005-08-30 19:55:45.000000000 +0200
+@@ -183,6 +183,31 @@
+     
+   </refsect1>
+   
++  <refsect1 id='exit_values'>
++    <title>EXIT VALUES</title>
++    <para>
++      The <command>chage</command> command exits with the following values:
++      <variablelist>
++	<varlistentry>
++	  <term><replaceable>0</replaceable></term>
++	  <listitem>success</listitem>
++	</varlistentry>
++	<varlistentry>
++	  <term><replaceable>1</replaceable></term>
++	  <listitem>permission denied</listitem>
++	</varlistentry>
++	<varlistentry>
++	  <term><replaceable>2</replaceable></term>
++	  <listitem>invalid command syntax</listitem>
++	</varlistentry>
++	<varlistentry>
++	  <term><replaceable>15</replaceable></term>
++	  <listitem>can't find the shadow password file</listitem>
++	</varlistentry>
++      </variablelist>
++    </para>
++  </refsect1>
++
+   <refsect1 id='see_also'>
+     <title>SEE ALSO</title>
+     <para><citerefentry>

@@ -1,0 +1,46 @@
+Goal: Correct a typo in su.1, pwconv.8 and newgrp.1 man pages and avoid a repetition of "user" in su.1
+Fixes: #309666
+
+Status wrt upstream: Applied upstream, except for the "user" repetition
+
+Index: shadow-4.0.3/man/su.1
+===================================================================
+--- shadow-4.0.3.orig/man/su.1	2005-06-10 00:31:22.722729000 +0200
++++ shadow-4.0.3/man/su.1	2005-06-10 00:44:39.512729000 +0200
+@@ -38,8 +38,8 @@
+ Invoked without a username, \fBsu\fR defaults to becoming
+ the super user.
+ The optional argument \fB\-\fR may be used to provide an
+-environment similiar to what the user would expect had
+-the user logged in directly.
++environment similar to what the user would expect had
++(s)he logged in directly.
+ .PP
+ The user will be prompted for a password, if appropriate.  Invalid
+ passwords will produce an error message.  All attempts, both valid and
+Index: shadow-4.0.3/man/pwconv.8
+===================================================================
+--- shadow-4.0.3.orig/man/pwconv.8	2005-06-10 00:31:22.722729000 +0200
++++ shadow-4.0.3/man/pwconv.8	2005-06-10 00:44:39.512729000 +0200
+@@ -44,7 +44,7 @@
+ .IR /etc/shadow .
+ 
+ .RB "Likewise, " pwunconv " and " grpunconv
+-are similiar.  Passwords in the main file are updated from the
++are similar.  Passwords in the main file are updated from the
+ shadowed file.  Entries which exist in the main file but not in the
+ shadowed file are left alone.  Finally, the shadowed file is removed.
+ 
+Index: shadow-4.0.3/man/newgrp.1
+===================================================================
+--- shadow-4.0.3.orig/man/newgrp.1	2005-06-10 00:44:33.352729000 +0200
++++ shadow-4.0.3/man/newgrp.1	2005-06-10 00:48:44.112729000 +0200
+@@ -53,7 +53,7 @@
+ be overwritten by the value defined in \fI/etc/shadow\fR (respectively in
+ \fI/etc/gshadow\fR) if an entry exists for this user (resp. group).
+ .PP
+-The \fBsg\fR command works similiar to \fBnewgrp\fR but accepts a command.
++The \fBsg\fR command works similar to \fBnewgrp\fR but accepts a command.
+ The command will be executed with the \fB/bin/sh\fR shell. With most shells you
+ may run \fBsg\fR from, you need to enclose multi-word commands in quotes.
+ Another difference between \fBnewgrp\fR and \fBsg\fR is that some shells

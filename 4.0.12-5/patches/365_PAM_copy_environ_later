@@ -1,0 +1,22 @@
+Goal: When PAM is used, the environment must be copied later.
+      This was present in 4.0.11
+
+Status wrt upstream: will be in 4.0.13
+      
+Index: shadow-4.0.12/src/su.c
+===================================================================
+--- shadow-4.0.12.orig/src/su.c	2005-08-11 21:15:07.000000000 +0200
++++ shadow-4.0.12/src/su.c	2005-08-11 21:30:06.000000000 +0200
+@@ -781,9 +781,12 @@
+ 		addenv ("PATH", cp);
+ 	}
+ 
++#ifndef USE_PAM
++/* setup the environment for pam later on, else we run into auth problems */
+ 	if (change_environment || restricted_shell(pwent.pw_shell)) {
+ 		environ = newenvp;	/* make new environment active */
+ 	}
++#endif				/* !USE_APM */
+ 
+ 	if (getenv ("IFS"))	/* don't export user IFS ... */
+ 		addenv ("IFS= \t\n", NULL);	/* ... instead, set a safe IFS */

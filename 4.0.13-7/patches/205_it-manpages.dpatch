@@ -1,0 +1,1116 @@
+Status wrt upstream: Fixed in 4.0.14
+
+Index: shadow-4.0.13/man/it/groupdel.8
+===================================================================
+--- shadow-4.0.13.orig/man/it/groupdel.8	2005-04-05 21:08:54.000000000 +0200
++++ shadow-4.0.13/man/it/groupdel.8	2005-10-12 22:36:52.000000000 +0200
+@@ -1,4 +1,7 @@
+-.\" Copyright 1991 \- 1993, Julianne Frances Haugh
++.\" This file was generated with po4a. Translate the source file.
++.\" 
++.\"$Id: groupdel.8,v 1.1 2005/03/20 15:34:24 bubulle Exp $
++.\" Copyright 1991 - 1993, Julianne Frances Haugh
+ .\" All rights reserved.
+ .\"
+ .\" Redistribution and use in source and binary forms, with or without
+@@ -24,40 +27,52 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.\"
+-.\"	$Id: groupdel.8,v 1.4 2005/04/05 19:08:54 kloczek Exp $
+-.\"
+-.\" Traduzione in italiano a cura di Isabella Ruocco <isacher@nettaxi.com>
+-.\" luglio 1999
+-.\"
+-.TH GROUPDEL 8
++.TH GROUPDEL 8   
+ .SH NOME
+ groupdel \- Rimuove un gruppo
+ .SH SINTASSI
+-.B groupdel
+-.I gruppo
++\fBgroupdel\fP \fIgruppo\fP
+ .SH DESCRIZIONE
+-Il comando \fBgroupdel\fR modifica i file di account di sistema, rimuovendo
+-tutte le voci che si riferiscono a \fIgruppo\fR.
+-Il gruppo nominato deve esistere.
++Il comando \fBgroupdel\fP modifica i file di account di sistema, rimuovendo 
++tutte le voci che si riferiscono a \fIgruppo\fP.  Il gruppo nominato deve 
++esistere.
+ .PP
+-Occorre controllare manualmente tutti i filesystem per assicurarsi che non
+-rimanga alcun file avente come ID di gruppo del file il gruppo specificato.
++Occorre controllare manualmente tutti i filesystem per assicurarsi che non 
++rimanga alcun file avente come ID di gruppo il gruppo specificato.
+ .SH CAVEAT
+-Non si può rimuovere il gruppo primario di qualche utente esistente.
++Non si può rimuovere un gruppo che sia gruppo primario di un utente.  
+ Occorre rimuovere l'utente prima di rimuovere il gruppo.
+ .SH FILE
+-\fI/etc/group\fR \- informazioni sui gruppi
++/etc/group \- informazioni sui gruppi
++.br
++/etc/gshadow \- informazioni sicure sui gruppi
++.SH "VALORI RESTITUITI"
++0	\- successo
++.br
++2	\- errore di sintassi
++.br
++6	\- il gruppo specificato non esiste
++.br
++8	\- operazione impossibile perché il gruppo è primario per un utente
+ .br
+-\fI/etc/gshadow\fR \- informazioni sicure sui gruppi 
+-.SH VEDERE ANCHE
+-.BR chfn (1),
+-.BR chsh (1),
+-.BR useradd (8),
+-.BR userdel (8),
+-.BR usermod (8),
+-.BR passwd (1),
+-.BR groupadd (8),
+-.BR groupmod (8)
++10	\- non è possibile aggiornare il file group
++.SH "VEDERE ANCHE"
++\fBchfn\fP(1), \fBchsh\fP(1), \fBpasswd\fP(1), \fBgroupadd\fP(8), \fBgroupmod\fP(8)  
++\fBuseradd\fP(8), \fBuserdel\fP(8), \fBusermod\fP(8),
+ .SH AUTORE
+-Julianne Frances Haugh (jfh@tab.com)
++Julianne Frances Haugh (jockgrrl@ix.netcom.com)
++.\" Questa sezione si trova in un file separato che viene aggiunto
++.\" automaticamente alla pagina tradotta.
++.\" Per semplicità ho usato lo stesso file per tutte le traduzioni,
++.\" di conseguenza mischiando tutti i nomi dei traduttori: mi auguro
++.\" che non sia un problema per nessuno.
++.\"             -- Danilo Piazzalunga <danilopiazza@libero.it>, 2005
++.SH TRADUZIONE
++.nf
++Giovanni Bortolozzo <borto@dei.unipd.it>, 1996-1997
++Roberto Pertile <triplej@iol.it>, 1999
++Isabella Ruocco <isacher@nettaxi.com>, 1999
++Giuseppe Sacco <eppesuig@debian.org>, 2005
++.fi
++.\" Conversione a PO4A:
++.\" Danilo Piazzalunga <danilopiazza@libero.it>, 2005
+Index: shadow-4.0.13/man/it/passwd.1
+===================================================================
+--- shadow-4.0.13.orig/man/it/passwd.1	2005-04-13 12:02:27.000000000 +0200
++++ shadow-4.0.13/man/it/passwd.1	2005-10-12 22:36:52.000000000 +0200
+@@ -1,58 +1,197 @@
+-.\" $Id: passwd.1,v 1.2 2005/04/13 10:02:27 kloczek Exp $
+-.\" Copyright 1992 Rickard E. Faith (faith@cs.unc.edu)
+-.\" May be distributed under the GNU General Public License
++.\" This file was generated with po4a. Translate the source file.
++.\" 
++.\"$Id: passwd.1,v 1.1 2005/03/20 15:34:24 bubulle Exp $
++.\" Copyright 1989 - 1994, Julianne Frances Haugh
++.\" All rights reserved.
+ .\"
+-.\" Traduzione in italiano di Giovanni Bortolozzo <borto@dei.unipd.it>
+-.\" Agosto 1996
++.\" Redistribution and use in source and binary forms, with or without
++.\" modification, are permitted provided that the following conditions
++.\" are met:
++.\" 1. Redistributions of source code must retain the above copyright
++.\"    notice, this list of conditions and the following disclaimer.
++.\" 2. Redistributions in binary form must reproduce the above copyright
++.\"    notice, this list of conditions and the following disclaimer in the
++.\"    documentation and/or other materials provided with the distribution.
++.\" 3. Neither the name of Julianne F. Haugh nor the names of its contributors
++.\"    may be used to endorse or promote products derived from this software
++.\"    without specific prior written permission.
+ .\"
+-.\" " for hilit19
+-.TH PASSWD 1 "22 giugno 1994" "Linux 1.2" "Linux Programmer's Manual"
++.\" THIS SOFTWARE IS PROVIDED BY JULIE HAUGH AND CONTRIBUTORS ``AS IS'' AND
++.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++.\" ARE DISCLAIMED.  IN NO EVENT SHALL JULIE HAUGH OR CONTRIBUTORS BE LIABLE
++.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++.\" SUCH DAMAGE.
++.TH PASSWD 1   
+ .SH NOME
+-passwd \- cambia la password
++passwd \- cambia la password utente
+ .SH SINTASSI
+-.BR "passwd [ " utente " [ " password " ] ]"
+-.SH DESCRIZIONE
+-Senza alcun argomento 
+-.B passwd
+-cambierà la password per l'attuale utente. Per prima cosa all'utente è chiesta
+-la vecchia password, dopo di che, per evitare errori di battitura, va immessa
+-per due volte la nuova password. La nuova password deve essere lunga almeno 
+-sei caratteri ed essere composta sia da maiuscole che da minuscole o da 
+-caratteri non alfabetici. La nuova password non deve essere uguale alla
+-vecchia password, e non deve coincidere con il nome dell'utente.
+-
+-Le forme a uno e due argomenti possono essere usate solo dal superuser. Usando
+-la forma ad un argomento, il superuser può cambiare la password per 
+-quell'utente. Al superuser non è chiesta la vecchia password, e non sono
+-applicate le regole per le password valide, poiché il superuser potrebbe
+-avere valide ragioni per scegliere una password che non ne sia conforme.
+-
+-La forma a due argomenti assegna ad
+-.I utente
+-la password passata come secondo argomento. Ciò può essere utile quando
+-si deve assegnare a molti utenti una password iniziale.
+-
+-Passando una stringa vuota come secondo argomento si cancella la password 
+-dell'utente.
+-
+-.SH FILE
+-.I /etc/passwd
++\fBpasswd\fP [\fB\-f\fP|\fB\-s\fP] [\fInome\fP]
+ .br
+-.I /etc/shells
+-.SH BACHI
+-Sono permesse password composte solo da numeri.
++\fBpasswd\fP [\fB\-g\fP] [\fB\-r\fP|\fB\-R\fP] \fIgruppo\fP
+ .br
+-Non viene prodotto nessun messaggio d'avviso se il superuser sceglie una
+-password ``scadente''.
++\fBpasswd\fP [\fB\-x \fP\fImax\fP] [\fB\-n \fP\fImin\fP] [\fB\-w \fP\fIwarn\fP] [\fB\-i \fP\fIinact\fP] 
++\fIlogin\fP
+ .br
+-Le opzioni
+-.B \-f
+-e
+-.B \-s
+-non sono supportare.
++\fBpasswd\fP {\fB\-l\fP|\fB\-u\fP|\fB\-d\fP|\fB\-S\fP|\fB\-e\fP} \fIlogin\fP
++.SH DESCRIZIONE
++\fBpasswd\fP cambia la password per account utente o di gruppo.  Un utente 
++normale può solo cambiare la password per il proprio account, mentre il 
++super utente può cambiarla per qualsiasi account.  L'amministratore di un 
++gruppo può cambiare la password del gruppo.  \fBpasswd\fP può cambiare altri 
++dati dell\'utente come il nome completo, la shell di login, la data e 
++l\'intervallo di scadenza della password.
++.PP
++L\'opzione \fB\-s\fP fa sì che \fBpasswd\fP chiami \fBchsh\fP per cambiare la shell 
++utente. L\'opzione \fB\-f\fP fa sì che passwd chiami chfn per cambiare le 
++informazioni GECOS dell\'utente. Queste due opzioni sono presenti solo per 
++compatibilità perché gli altri programmi possono essere chiamati 
++direttamente.
++.SS "Modifiche delle password"
++All\'utente viene prima chiesta la propria password attuale, se presente.  
++Questa password viene cifrata e confrontata con quella memorizzata.  
++All\'utente viene data solo una possibilità di inserire la password 
++corretta.  Il super utente non ha questo obbligo.
++.PP
++Dopo che la password è stata inserita, vengono controllati i parametri 
++dell'invecchiamento delle password per verificare che l'utente possa 
++modificarla in questo momento.  Se il risultato è negativo, \fBpasswd\fP non 
++fa cambiare la password ed esce.
++.PP
++All\'utente viene poi chiesta la nuova password.  Viene misurata la 
++complessità della password.  In linea di massima le password dovrebbero 
++contenere dai 6 agli 8 caratteri di uno o più dei seguenti insiemi:
++.IP "" .5i
++Lettere minuscole
++.IP "" .5i
++Lettere maiuscole
++.IP "" .5i
++Numeri da 0 a 9
++.IP "" .5i
++Segni di punteggiatura
++.PP
++Si deve fare attenzione a non inserire il carattere di cancellazione o di 
++kill (azzeramento della linea).  \fBpasswd\fP non accetta password non 
++sufficientemente complesse.
++.PP
++Se la password viene accettata, \fBpasswd\fP la chiede una seconda volta e 
++confronta le due password.  Le due password devono essere eguali affinché 
++la password venga accettata.
++.SS "Password di gruppo"
++Quando viene speficata l\'opzione \fB\-g\fP, viene cambiata la password per il 
++gruppo specificato.  L\'utente deve essere il super utente oppure 
++l'amministratore del gruppo.  La password corrente non viene richiesta.  
++L\'opzione \fB\-r\fP, assieme alla \fB\-g\fP elimina la password attuale dal 
++gruppo.  Questo permette l'accesso al gruppo a tutti i membri.
++.SS "Informazioni sulla scadenza della password"
++Le informazioni sull\'invecchiamanto delle password possono essere 
++modificate dal super utente con le opzioni \fB\-x\fP, \fB\-n\fP, \fB\-w\fP e \fB\-i\fP.  
++L\'opzione \fB\-x\fP è usata per impostare il massimo numero di giorni per il 
++quale la password è valida.  Dopo il numero \fImax\fP di giorni viene 
++richiesta la modifica della password.  L\'opzione \fB\-n\fP è usata per 
++impostare il minimo numero di giorni prima che una password possa essere 
++modificata.  L\'utente non potrà modificare la password prima che siano 
++passati \fImin\fP giorni.  L\'opzione \fB\-w\fP è usata per impostare il numero di 
++giorni durante i quali l\'utente verrà avvisato che la propria password è 
++in scadenza.  L'avviso parte \fIwarn\fP giorni prima della scadenza e riporta 
++il numero di giorni che ancora gli rimangono.  L\'opzione \fB\-i\fP è usata per 
++disabilitare un account dopo che non è stato più usato per un certo numero 
++di giorni.  Dopo che un account non è stato usato per \fIinact\fP giorni 
++successivi alla scadenza, l\'utente non può più accedere al sistema.
++.PP
++Se si vuole fare scadere subito una password, si può utilizzare l\'opzione 
++\fB\-e\fP. Questo in pratica obbliga l\'utente a inserire una nuova password al 
++successivo login. Si può anche utilizzare l\'opzione \fB\-d\fP per azzerare una 
++password. Usare questa opzione con attenzione perché potrebbe permettere 
++l\'accesso al sistema senza l\'utilizzo di una password, lasciando quindi 
++spazio di azione a intrusi.
++.SS "Gestione dell\'account"
++Gli account utente possono essere bloccati e sbloccati con i flag \fB\-l\fP e 
++\fB\-u\fP.  L\'opzione \fB\-l\fP disabilita l\'account impostando la password ad un 
++valore che non corrisponde a nessuna possibile password cifrata.  L\'opzione 
++\fB\-u\fP abilita un account impostando la password al suo valore precedente.
++.PP
++Lo stato attuale di un account può essere ispeziona con l\'opzione 
++\fB\-S\fP. Lo stato consiste di 7 campi.  Il primo campo è il nome 
++dell\'utente.  Il secondo campo indica se l\'account è bloccato (L), non ha 
++password (NP) o ha una password valida (P).  Il terzo campo contiene la data 
++di ultima modifica della password.  I successivi quattro campi sono l'età 
++minima, la massima, il periodi di avviso e quello di iniattività.  Queste 
++età sono espresse in giorni.  Vedere la precedente discussione su 
++\fBInformazioni sulla scadenza della password\fP per una discussione su questi 
++campi.
++.SS "Suggerimenti per password utente"
++La sicurezza di una password dipende dalla resistenza dell\'algoritmo e 
++dalla dimensione della chiave utilizzata.  Il metodi di cifratura del 
++sistema \fB\s-2UNIX\s+2\fP si basa sull'algoritmo NBS DES ed è abbastanza 
++sicuro.  La dimensione della chiave dipende dall aleatorità della password 
++che viene utilizzata.
++.PP
++La compromissione di una password avviene normalmente a seguito di incuria 
++nella scelta o nella gestione della password.  Per questo motivo non si 
++devono utilizzare password che appaiono nei dizionari o che devono essere 
++scritte.  La password non deve essere uno nome proprio, il numero della 
++patente, la data di nascita o l'indirizzo.  Uno qualunque di questi potrebbe 
++essere indovinato per violare la sicurezza del sistema.
++.PP
++La password deve essere facile da ricordare in modo tale da non essere 
++costretti a scriversela.  Un modo per farlo è quello di concatenare due 
++parole brevi separandole con della punteggiatura o un numero.  Per esempio 
++Pass%word.
++.PP
++Un altro metodo di costruzione di implica la selezione di una frase imparata 
++a memoria perché presente in letteratura, selezionandone le prime o ultime 
++lettere di ogni parola.  Un esempio di questo tipo è
++.IP "" .5i
++Non chiedere per chi suona la campana.
++.PP
++che produce
++.IP "" .5i
++NcXcslc.
++.PP
++Si può essere abbastanza certi che pochi malintenzionati l\'abbiano inclusa 
++nel proprio dizionario.  Si dovrebbe, comunque, selezionare un proprio 
++metodo per contruire password e non affidarsi esclusivamente a quelli 
++proposti qui.
++.SS "Note sulle password di gruppo"
++Le password di gruppo non un problema di sicurezza perché più di una 
++persona deve conoscerle. Ciononostante i gruppi sono uno strumento molto 
++utile per la cooperazione tra vari utenti.
++.SH CAVEAT
++Non tutte le opzioni potrebbero essere supportate.  Il controllo della 
++complessità delle password varia da sistema a sistema.  L\'utente deve 
++poter selezionare la possibilità di selezionare una password che ritenga 
++sufficientemente complessa.  Gli utenti potrebbero non essere in condizione 
++di modificare la propria password se NIS è abilitato e loro non hanno fatto 
++il login sul server NIS.
++.SH FILE
++.TP
++\fI/etc/passwd\fP
++informazioni sugli account utente
++.TP
++\fI/etc/shadow\fP
++password utenti cifrate
+ .SH "VEDERE ANCHE"
+-.BR group (5),
+-.BR passwd (5),
+-.BR shadow (5)
++\fBgroup\fP(5), \fBpasswd\fP(5), \fBshadow\fP(5)
+ .SH AUTORE
+-Peter Orbaek (poe@daimi.aau.dk)
++Julianne Frances Haugh <jockgrrl@ix.netcom.com>
++.\" Questa sezione si trova in un file separato che viene aggiunto
++.\" automaticamente alla pagina tradotta.
++.\" Per semplicità ho usato lo stesso file per tutte le traduzioni,
++.\" di conseguenza mischiando tutti i nomi dei traduttori: mi auguro
++.\" che non sia un problema per nessuno.
++.\"             -- Danilo Piazzalunga <danilopiazza@libero.it>, 2005
++.SH TRADUZIONE
++.nf
++Giovanni Bortolozzo <borto@dei.unipd.it>, 1996-1997
++Roberto Pertile <triplej@iol.it>, 1999
++Isabella Ruocco <isacher@nettaxi.com>, 1999
++Giuseppe Sacco <eppesuig@debian.org>, 2005
++.fi
++.\" Conversione a PO4A:
++.\" Danilo Piazzalunga <danilopiazza@libero.it>, 2005
+Index: shadow-4.0.13/man/it/pwconv.8
+===================================================================
+--- shadow-4.0.13.orig/man/it/pwconv.8	2002-03-10 08:41:06.000000000 +0100
++++ shadow-4.0.13/man/it/pwconv.8	2005-10-12 22:36:53.000000000 +0200
+@@ -1,58 +1,69 @@
+-.\" $Id: pwconv.8,v 1.1 2002/03/10 07:41:06 kloczek Exp $
+-.\" Traduzione in italiano  di Isabella Ruocco <isacher@nettaxi.com>
+-.\" Giugno 1999
+-.TH PWCONV 8 "26 sep 1997"
++.\" This file was generated with po4a. Translate the source file.
++.\" 
++.\"$Id: pwconv.8,v 1.1 2005/03/20 15:34:24 bubulle Exp $
++.TH PWCONV 8 "26 sep 1997"  
+ .SH NOME
+-pwconv, pwunconv, grpconv, grpunconv \- convertono a e da password e gruppi shadow.
++pwconv, pwunconv, grpconv, grpunconv \- convertono a e da password e gruppi 
++shadow.
+ .SH SINTASSI
+-.B pwconv
++\fBpwconv\fP
+ .br
+-.B pwunconv
++\fBpwunconv\fP
+ .br
+-.B grpconv
++\fBgrpconv\fP
+ .br
+-.B grpunconv
+-.SH DESCRIPTION
+-Questi quattro programmi agiscono tutti sui file normali e e oscurati (shadow) 
+-delle password e dei gruppi:
+-.IR /etc/passwd ", " /etc/group ", " /etc/shadow ", e " /etc/gshadow .
+-
+-.B pwconv
+-.RI "crea " shadow " da " passwd " e, in modo opzionale, da un preesistente " shadow .
+-.B pwunconv
+-.RI "crea " passwd " da " passwd " e " shadow " e quindi rimuove " shadow .
+-.B grpconv
+-.RI "crea " gshadow " da " group " e, in modo opzionale, da un preesistente " gshadow .
+-.B grpunconv
+-.RI "crea " group " da " group " e " gshadow " e quindi rimuove " gshadow .
++\fBgrpunconv\fP
++.SH DESCRIZIONE
++Questi quattro programmi agiscono tutti sui file normali e oscurati (shadow)  
++delle password e dei gruppi: \fI/etc/passwd\fP, \fI/etc/group\fP, \fI/etc/shadow\fP e 
++\fI/etc/gshadow\fP.
++
++\fBpwconv\fP crea \fIshadow\fP da \fIpasswd\fP e, in modo opzionale, da un 
++preesistente \fIshadow\fP.  \fBpwunconv\fP crea \fIpasswd\fP da \fIpasswd\fP e \fIshadow\fP 
++e quindi rimuove \fIshadow\fP.  \fBgrpconv\fP crea \fIgshadow\fP da \fIgroup\fP e, in 
++modo opzionale, da un preesistente \fIgshadow\fP.  \fBgrpunconv\fP crea \fIgroup\fP 
++da \fIgroup\fP e \fIgshadow\fP e quindi rimuove \fIgshadow\fP.
+ 
+ Ciascun programma, prima della conversione, acquisisce i lock necessari.
+ 
+-.BR pwconv " e " grpconv
+-sono simili.  Per prima cosa vengono rimosse le voci nel file oscurato che non esistono 
+-nel file principale.  Quindi vengono aggiornate le voci oscurate che 
+-non hanno `x' come password nel file principale.  Vengono aggiunte le eventuali voci
+-oscurate mancanti.  Infine, le password nel file principale vengono 
+-sostituite con `x'.  Questi programmi possono essere usati per le conversioni iniziali
+-così come per aggiornare il file oscurato se il file principale viene editato 
+-a mano.
+-
+-.B pwconv
+-userà i valori di
+-.BR PASS_MIN_GIORNI ", " PASS_MAX_GIORNI ", e " PASS_GIORNI_PREAVVISO
+-da
+-.I /etc/login.defs
+-quando si aggiungono nuove voci a
+-.IR /etc/shadow .
+-
+-.RB "Analogamente, " pwunconv " e " grpunconv
+-sono simili.  Le password nel file principale vengono aggiornate 
+-dal file oscurato. Voci che esistono nel file principale ma non 
+-nel file oscurato vengono lasciate stare.  Infine, viene rimosso il file oscurato.
+-
+-Alcune informazioni sull'invecchiamento delle password vengono perse da
+-.BR pwunconv .
+-Questo convertirà quello che potrà.
++\fBpwconv\fP e \fBgrpconv\fP sono simili.  Per prima cosa vengono rimosse le voci 
++nel file oscurato che non esistono nel file principale.  Quindi vengono 
++aggiornate le voci oscurate che non hanno `x' come password nel file 
++principale.  Vengono aggiunte le eventuali voci oscurate mancanti.  Infine, 
++le password nel file principale vengono sostituite con `x'.  Questi 
++programmi possono essere usati per le conversioni iniziali così come per 
++aggiornare il file oscurato se il file principale viene editato a mano.
++
++\fBpwconv\fP userà i valori di \fBPASS_MIN_DAYS\fP, \fBPASS_MAX_DAYS\fP e 
++\fBPASS_WARN_AGE\fP da \fI/etc/login.defs\fP quando si aggiungono nuove voci a 
++\fI/etc/shadow\fP.
++
++Analogamente, \fBpwunconv\fP e \fBgrpunconv\fP sono simili.  Le password nel file 
++principale vengono aggiornate dal file oscurato. Voci che esistono nel file 
++principale ma non nel file oscurato vengono lasciate stare.  Infine, viene 
++rimosso il file oscurato.
++
++Alcune informazioni sull'invecchiamento delle password vengono perse da 
++\fBpwunconv\fP.  Convertirà solo quello che potrà.
++.SH PROBLEMI
++Errors in the password or group files (such as invalid or duplicate entries) 
++may cause these programs to loop forever or fail in other strange ways.  
++Please run \fBpwck\fP and \fBgrpck\fP to correct any such errors before converting 
++to or from shadow passwords or groups.
+ .SH "VEDERE ANCHE"
+-.BR login.defs (5),
+-.BR shadowconfig (8)
++\fBlogin.defs\fP(5), \fBshadowconfig\fP(8), \fBpwck\fP(8)
++.\" Questa sezione si trova in un file separato che viene aggiunto
++.\" automaticamente alla pagina tradotta.
++.\" Per semplicità ho usato lo stesso file per tutte le traduzioni,
++.\" di conseguenza mischiando tutti i nomi dei traduttori: mi auguro
++.\" che non sia un problema per nessuno.
++.\"             -- Danilo Piazzalunga <danilopiazza@libero.it>, 2005
++.SH TRADUZIONE
++.nf
++Giovanni Bortolozzo <borto@dei.unipd.it>, 1996-1997
++Roberto Pertile <triplej@iol.it>, 1999
++Isabella Ruocco <isacher@nettaxi.com>, 1999
++Giuseppe Sacco <eppesuig@debian.org>, 2005
++.fi
++.\" Conversione a PO4A:
++.\" Danilo Piazzalunga <danilopiazza@libero.it>, 2005
+Index: shadow-4.0.13/man/it/useradd.8
+===================================================================
+--- shadow-4.0.13.orig/man/it/useradd.8	2005-04-05 21:08:54.000000000 +0200
++++ shadow-4.0.13/man/it/useradd.8	2005-10-12 22:36:53.000000000 +0200
+@@ -1,4 +1,7 @@
+-.\" Copyright 1991 \- 1994, Julianne Frances Haugh
++.\" This file was generated with po4a. Translate the source file.
++.\" 
++.\"$Id: useradd.8,v 1.1 2005/03/20 15:34:24 bubulle Exp $
++.\" Copyright 1991 - 1994, Julianne Frances Haugh
+ .\" All rights reserved.
+ .\"
+ .\" Redistribution and use in source and binary forms, with or without
+@@ -24,175 +27,140 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.\"
+-.\"	$Id: useradd.8,v 1.7 2005/04/05 19:08:54 kloczek Exp $
+-.\"
+-.\" Traduzione in italiano a cura di Isabella Ruocco <isacher@nettaxi.com>
+-.\" luglio 1999
+-.\" 
+-.TH USERADD 8
++.TH USERADD 8   
+ .SH NOME
+-useradd \- Crea un nuovo utente o aggiorna le informazioni predefinite per
+-i nuovi utenti
++useradd \- Crea un nuovo utente o aggiorna le informazioni predefinite per i 
++nuovi utenti
+ .SH SINTASSI
+ .TP 8
+-.B useradd
+-.\" .RB [ \-A
+-.\" .RI { metodo | \fBPREDEFINITO\fR "},... ]"
+-.RB [ \-c
+-.IR commento ]
+-.RB [ \-d
+-.IR home_dir ]
+-.br
+-.RB [ \-e
+-.IR data_scadenza ]
+-.RB [ \-f
+-.IR tempo_inattività ]
+-.br
+-.RB [ \-g
+-.IR gruppo_iniziale ]
+-.RB [ \-G
+-.IR gruppo [,...]]
+-.br
+-.RB [ \-m " [" \-k
+-.IR dir_scheletro ]]
+-.RB [ \-s
+-.IR shell ]
+-.br
+-.RB [ \-u
+-.IR uid " ["
+-.BR \-o ]]
+-.I login
++\fBuseradd\fP [\fB\-c\fP \fIcommento\fP] [\fB\-d\fP \fIhome_dir\fP]
++.br
++[\fB\-e\fP \fIdata_scadenza\fP] [\fB\-f\fP \fItempo_inattività\fP]
++.br
++[\fB\-g\fP \fIgruppo_iniziale\fP] [\fB\-G\fP \fIgruppo\fP[,...]]
++.br
++[\fB\-m\fP [\fB\-k\fP \fIdir_scheletro\fP]] [ \fB\-o\fP] [\fB\-p\fP \fIpassword\fP]
++.br
++[\fB\-s\fP \fIshell\fP] [\fB\-u\fP \fIuid\fP] \fIlogin\fP
+ .TP 8
+-.B useradd
+-\fB\-D\fR
+-[\fB\-g\fI gruppo_predefinito\fR]
+-[\fB\-b\fI home_predefinita\fR]
++\fBuseradd\fP \fB\-D\fP [\fB\-g\fP\fIgruppo_predefinito\fP] [\fB\-b\fP\fIhome_predefinita\fP]
+ .br
+-[\fB\-f\fI inattività_predefinita\fR]
+-[\fB\-e\fI data_scadenza_predefinita\fR]
++[\fB\-e\fP\fI data_scadenza_predefinita\fP] [\fB\-f\fP\fI inattività_predefinita\fP]
+ .br
+-[\fB\-s\fI shell_predefinita\fR]
++[\fB\-s\fP\fI shell_predefinita\fP]
+ .SH DESCRIZIONE
+-.SS Creare Nuovi Utenti
+-Quando viene invocato senza l'opzione \fB\-D\fR, il comando \fBuseradd\fR 
+-crea un nuovo account di utente usando i valori specificati sulla linea di
+-comando ed i valori predefiniti dal sistema.
+-Il nuovo account di utente verrà aggiunto ai file di sistema che lo necessitano,
+-verrà creata la home directory, e lì verranno copiati i file iniziali, a seconda
+-delle opzioni sulla linea di comando.
+-.SH OPZIONI
+-Le opzioni che si applicano al comando \fBuseradd\fR sono:
+-.\" .IP "\fB\-A {\fImetodo\fR|\fBPREDEFINITO\fR},..."
+-.\" Il valore del metodo di autenticazione dell'utente.
+-.\" Il metodo di autenticazione è il nome di un programma che è responsabile
+-.\" della validazione dell'identità dell'utente.
+-.\" La stringa \fBPREDEFINITO\fR può essere usata per cambiare il metodo di
+-.\" autenticazione dell'utente con il metodo standard di sistema delle
+-.\" password.
+-.\" Questa è una lista di nomi di programmi separati da virgole.
+-.\" Può includere \fBPREDEFINITO\fR esattamente una volta.
+-.IP "\fB\-c \fIcommento\fR"
++.SS "Creare Nuovi Utenti"
++Quando viene invocato senza l'opzione \fB\-D\fP, il comando \fBuseradd\fP crea un 
++nuovo account di utente usando i valori specificati sulla linea di comando 
++ed i valori predefiniti dal sistema.  Il nuovo account di utente verrà 
++aggiunto ai file di sistema che lo necessitano, verrà creata la home 
++directory, e lì verranno copiati i file iniziali, a seconda delle opzioni 
++sulla linea di comando.  Le opzioni che si applicano al comando \fBuseradd\fP 
++sono
++.IP "\fB\-c \fP\fIcommento\fP"
+ Il campo commento del nuovo utente nel file password.
+-.IP "\fB\-d \fIhome_dir\fR"
+-Il nuovo utente verrà creato usando \fIhome_dir\fR come valore per la
+-directory di login dell'utente.
+-Il comportamento predefinito è di appendere il nome \fIlogin\fR a
+-\fIhome_predefinita\fR  ed usare quella come nome di directory di login.
+-.IP "\fB\-e \fIdata_scadenza\fR"
+-La data in cui verrà disabilitato l'account dell'utente.
+-La data è specificata nel formato \fIMM/GG/AA\fR.
+-.IP "\fB\-f \fIgiorni_inattività\fR"
+-Il numero di giorni dopo la scadenza della password fino a quando l'account
+-verrà permanentemente disabilitato.
+-Un valore pari a 0 disabilita l'account non appena è scaduta la password,
+-ed un valore pari a \-1 disabilita questa caratteristica.
+-Il valore predefinito è \-1.
+-.IP "\fB\-g \fIgruppo_iniziale\fR"
+-IL nome o numero del gruppo iniziale di login dell'utente.
+-Il nome del gruppo deve esistere. Un numero di gruppo deve fare riferimento
+-ad un gruppo già esistente.
+-Il numero di gruppo predefinito è 1.
+-.IP "\fB\-G \fIgruppo,[...]\fR"
+-Una lista di gruppi supplementari di cui l'utente è altresì membro.
+-Ciascun gruppo è separato dal successivo da una virgola, senza spazi
+-bianchi intermedi.
+-I gruppi sono soggetti alle stesse restrizioni del gruppo dato con
+-l'opzione \fB\-g\fR.
+-Il comportamento predefinito è che l'utente appartenga solo al gruppo
+-iniziale.
+-.IP \fB\-m\fR
+-La home directory dell'utente verrà creata se non esiste.
+-I file contenuti in \fIdir_scheletro\fR saranno copiati nella home directory
+-se viene usata l'opzione \fB\-k\fR, altrimenti verranno usati i file
+-contenuti in \fI/etc/skel\fR.
+-Anche tutte le directory contenute in \fIdir_scheletro\fR o \fI/etc/skel\fR
+-verranno create nella home directory dell'utente.
+-L'opzione \fB\-k\fR è valida solo in congiunzione con l'opzione \fB\-m\fR.
+-Il comportamento predefinito è di non creare la directory e di non copiarvi
+-alcun file.
+-.IP "\fB\-s \fIshell\fR"
+-Il nome della shell di login dell'utente.
+-Il comportamento predefinito è di lasciare vuoto questo campo, che fa sì che
+-il sistema selezioni la shell di connessione predefinita.
+-.IP "\fB\-u \fIuid\fR"
+-Il valore numerico dell'ID dell'utente.
+-Questo valore deve essere univoco, a meno che non venga usata l'opzione
+-\fI\-o\fR.
+-Il valore deve essere non\-negativo.
+-Il comportamento predefinito è di usare il minimo valore di ID superiore a 999
+-e superiore a quello di ogni altro utente.
+-Valori tra 0 e 999 sono tipicamente riservati per account di sistema.
+-.SS Cambiare i valori predefiniti
+-Quando invocato con l'opzione \fB\-D\fR, \fBuseradd\fR o mostrerà i valori
+-predefiniti correnti, oppure aggiornerà i valori predefiniti dalla linea
+-di comando.
+-Le opzioni valide sono
+-.IP "\fB\-b \fIhome_predefinita\fR"
+-Il prefisso del percorso per la home directory del nuovo utente.
+-Il nome dell'utente verrà aggiunto alla fine di \fIhome_predefinita\fR
+-per creare il nome della nuova directory se non viene usata l'opzione \fB\-d\fI
+-quando si crea un nuovo account.
+-.IP "\fB\-e \fIdata_scadenza_predefinita\fR"
++.IP "\fB\-d \fP\fIhome_dir\fP"
++Il nuovo utente verrà creato usando \fIhome_dir\fP come valore per la 
++directory di login dell'utente.  Il comportamento predefinito è di 
++appendere il nome \fIlogin\fP a \fIhome_predefinita\fP ed usare quella come nome 
++di directory di login.
++.IP "\fB\-e \fP\fIdata_scadenza\fP"
++La data in cui l'account dell'utente verrà disabilitato.  La data è 
++specificata nel formato \fIMM/GG/AA\fP.
++.IP "\fB\-f \fP\fIgiorni_inattività\fP"
++Il numero di giorni dopo la scadenza della password prima che l'account 
++verrà permanentemente disabilitato.  Un valore pari a 0 disabilita 
++l'account non appena la password è scaduta, ed un valore pari a \-1 
++disabilita questa caratteristica.  Il valore predefinito è \-1.
++.IP "\fB\-g \fP\fIgruppo_iniziale\fP"
++IL nome o numero del gruppo iniziale di login dell'utente.  Il nome del 
++gruppo deve esistere. Un numero di gruppo deve fare riferimento ad un gruppo 
++già esistente.  Il numero di gruppo predefinito è 1.
++.IP "\fB\-G \fP\fIgruppo,[...]\fP"
++Una lista di gruppi supplementari di cui l'utente è altresì membro.  
++Ciascun gruppo è separato dal successivo da una virgola, senza spazi 
++bianchi intermedi.  I gruppi sono soggetti alle stesse restrizioni del 
++gruppo dato con l'opzione \fB\-g\fP.  Il comportamento predefinito è che 
++l'utente appartenga solo al gruppo iniziale.
++.IP \fB\-m\fP
++La home directory dell'utente verrà creata se non esiste.  I file contenuti 
++in \fIdir_scheletro\fP saranno copiati nella home directory se viene usata 
++l'opzione \fB\-k\fP, altrimenti verranno usati i file contenuti in 
++\fI/etc/skel\fP.  Anche tutte le directory contenute in \fIdir_scheletro\fP o 
++\fI/etc/skel\fP verranno create nella home directory dell'utente.  L'opzione 
++\fB\-k\fP è valida solo in congiunzione con l'opzione \fB\-m\fP.  Il comportamento 
++predefinito è di non creare la directory e di non copiarvi alcun file.
++.IP \fB\-o\fP
++Allow create user with duplicate (non\-unique) UID.
++.IP "\fB\-p \fP\fIpasswd\fP"
++The encrypted password, as returned by \fBcrypt\fP(3).  The default is to 
++disable the account.
++.IP "\fB\-s \fP\fIshell\fP"
++Il nome della shell di login dell'utente.  Il comportamento predefinito è 
++di lasciare vuoto questo campo, che fa sì che il sistema selezioni la shell 
++di connessione predefinita.
++.IP "\fB\-u \fP\fIuid\fP"
++Il valore numerico dell'ID dell'utente.  Questo valore deve essere univoco, 
++a meno che non venga usata l'opzione \fI\-o\fP.  Il valore deve essere 
++non\-negativo.  Il comportamento predefinito è di usare il minimo valore di 
++ID superiore a 99 e superiore a quello di ogni altro utente.  Valori tra 0 e 
++99 sono tipicamente riservati per account di sistema.
++.SS "Cambiare i valori predefiniti"
++Quando invocato con l'opzione \fB\-D\fP, \fBuseradd\fP o mostrerà i valori 
++predefiniti correnti, oppure aggiornerà i valori predefiniti dalla linea di 
++comando.  Le opzioni valide sono
++.IP "\fB\-b \fP\fIhome_predefinita\fP"
++Il prefisso del percorso per la home directory del nuovo utente.  Il nome 
++dell'utente verrà aggiunto alla fine di \fIhome_predefinita\fP per creare il 
++nome della nuova directory se non viene usata l'opzione \fB\-d\fP\fI quando si 
++crea un nuovo account.\fP
++.IP "\fB\-e \fP\fIdata_scadenza_predefinita\fP"
+ La data in cui l'account dell'utente verrà disabilitato.
+-.IP "\fB\-f \fIinattività_predefinita\fR"
+-Il numero di giorni dopo la scadenza di una password prima che l'account
++.IP "\fB\-f \fP\fIinattività_predefinita\fP"
++Il numero di giorni dopo la scadenza di una password prima che l'account 
+ venga disabilitato.
+-.IP "\fB\-g \fIgruppo_predefinito\fR"
+-Il nome o ID del gruppo iniziale per un nuovo utente.
+-Il gruppo nominato deve esistere, ed un ID numerico di gruppo deve avere una
+-voce esistente.
+-.IP "\fB\-s \fIshell_predifinita\fR"
+-Il nome della shell di login per un nuovo utente.
+-Il programma nominato verrà usato per tutti gli account dei futuri nuovi
+-utenti.
++.IP "\fB\-g \fP\fIgruppo_predefinito\fP"
++Il nome o ID del gruppo iniziale per un nuovo utente.  Il gruppo nominato 
++deve esistere, ed un ID numerico di gruppo deve avere una voce esistente.
++.IP "\fB\-s \fP\fIshell_predifinita\fP"
++Il nome della shell di login per un nuovo utente.  Il programma nominato 
++verrà usato per tutti gli account dei futuri nuovi utenti.
+ .PP
+-Se non è specificata alcuna opzione, \fBuseradd\fR mostra i valori predefiniti
++Se non è specificata alcuna opzione, \fBuseradd\fP mostra i valori predefiniti 
+ correnti.
+ .SH NOTE
+-L'amministratore di sistema è responsabile del posizionamento dei file
+-predefiniti degli utenti nella directory \fI/etc/skel\fR.
++L'amministratore di sistema è responsabile del posizionamento dei file 
++predefiniti degli utenti nella directory \fI/etc/skel\fP.
+ .SH CAVEAT
+-Non è possibile aggiungere un utente ad un gruppo NIS.
+-Questo deve essere fatto sul server NIS. 
++Non è possibile aggiungere un utente ad un gruppo NIS.  Questo deve essere 
++fatto sul server NIS.
+ .SH FILE
+-\fI/etc/passwd\fR \- informazioni sugli account di utenti
++/etc/passwd \- informazioni sugli account utente
+ .br
+-\fI/etc/shadow\fR \- informazioni sicure sugli account di utenti
++/etc/shadow \- informazioni sicure sugli account di utenti
+ .br
+-\fI/etc/group\fR \- informazioni sui gruppi
++/etc/group \- informazioni sui gruppi
+ .br
+-\fI/etc/default/useradd\fR \- informazioni predefinite
++/etc/default/useradd \- informazioni predefinite
+ .br
+-\fI/etc/skel/ \fR\- directory contenente i file predefiniti
+-.SH VEDERE ANCHE
+-.BR chfn (1),
+-.BR chsh (1),
+-.BR groupadd (8),
+-.BR groupdel (8),
+-.BR groupmod (8),
+-.BR passwd (1),
+-.BR userdel (8),
+-.BR usermod (8)
++/etc/skel \- directory contenente i file predefiniti
++.SH "VEDERE ANCHE"
++\fBchfn\fP(1), \fBchsh\fP(1), \fBgroupadd\fP(8), \fBgroupdel\fP(8), \fBgroupmod\fP(8), 
++\fBpasswd\fP(1), \fBuserdel\fP(8), \fBusermod\fP(8)
+ .SH AUTORE
+-Julianne Frances Haugh (jfh@tab.com)
++Julianne Frances Haugh (jockgrrl@ix.netcom.com)
++.\" Questa sezione si trova in un file separato che viene aggiunto
++.\" automaticamente alla pagina tradotta.
++.\" Per semplicità ho usato lo stesso file per tutte le traduzioni,
++.\" di conseguenza mischiando tutti i nomi dei traduttori: mi auguro
++.\" che non sia un problema per nessuno.
++.\"             -- Danilo Piazzalunga <danilopiazza@libero.it>, 2005
++.SH TRADUZIONE
++.nf
++Giovanni Bortolozzo <borto@dei.unipd.it>, 1996-1997
++Roberto Pertile <triplej@iol.it>, 1999
++Isabella Ruocco <isacher@nettaxi.com>, 1999
++Giuseppe Sacco <eppesuig@debian.org>, 2005
++.fi
++.\" Conversione a PO4A:
++.\" Danilo Piazzalunga <danilopiazza@libero.it>, 2005
+Index: shadow-4.0.13/man/it/userdel.8
+===================================================================
+--- shadow-4.0.13.orig/man/it/userdel.8	2005-04-05 21:08:54.000000000 +0200
++++ shadow-4.0.13/man/it/userdel.8	2005-10-12 22:36:54.000000000 +0200
+@@ -1,4 +1,7 @@
+-.\" Copyright 1991 \- 1994, Julianne Frances Haugh
++.\" This file was generated with po4a. Translate the source file.
++.\" 
++.\"$Id: userdel.8,v 1.1 2005/03/20 15:34:24 bubulle Exp $
++.\" Copyright 1991 - 1994, Julianne Frances Haugh
+ .\" All rights reserved.
+ .\"
+ .\" Redistribution and use in source and binary forms, with or without
+@@ -24,49 +27,62 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.\"
+-.\"	$Id: userdel.8,v 1.4 2005/04/05 19:08:54 kloczek Exp $
+-.\"
+-.\" Traduzione in italiano a cura di Isabella Ruocco <isacher@nettaxi.com>
+-.\" luglio 1999
+-.\"
+-.TH USERDEL 8
++.TH USERDEL 8   
+ .SH NOME
+ userdel \- Rimuove l'account di un utente ed i file relativi
+ .SH SINTASSI
+-.B userdel
+-[\fB\-r\fR]
+-.I login
++\fBuserdel\fP [\fB\-r\fP] \fIlogin\fP
+ .SH DESCRIZIONE
+-Il comando \fBuserdel\fR modifica i file di account del sistema, rimuovendo
+-tutte le voci che si riferiscono a \fIlogin\fR.
+-L'utente nominato deve esistere.
+-.IP \fB\-r\fR
+-I file nella home directory dell'utente verranno rimossi insieme alla home
+-directory stessa.
+-I file collocati in altri file system dovranno essere ricercati e rimossi
+-manualmente.
++Il comando \fBuserdel\fP modifica i file di account del sistema, rimuovendo 
++tutte le voci che si riferiscono a \fIlogin\fP.  L'utente nominato deve 
++esistere.
++.IP \fB\-r\fP
++I file nella home directory dell'utente verranno rimossi insieme alla home 
++directory stessa.  I file collocati in altri file system dovranno essere 
++ricercati e rimossi manualmente.
+ .SH FILE
+-\fI/etc/passwd\fR \- informazioni sugli account di utenti
++/etc/passwd \- informazioni sugli account utente
++.br
++/etc/shadow \- informazioni sicure sugli account di utenti
++.br
++/etc/group \- informazioni sui gruppi
++.SH "VALORI RESTITUITI"
++0	\- successo
++.br
++1 \- can't update password file
++.br
++2	\- errore di sintassi
++.br
++6 \- specified user doesn't exist
++.br
++8 \- user currently logged in
+ .br
+-\fI/etc/shadow\fR \- informazioni sicure sugli account di utenti
++10	\- non è possibile aggiornare il file group
+ .br
+-\fI/etc/group\fR \- informazioni sui gruppi
++12 \- can't remove home directory
+ .SH CAVEAT
+-\fBuserdel\fR non permetterà di rimuovere alcun account se l'utente è
+-attualmente connesso.
+-Occorre uccidere qualunque processo in esecuzione che appartenga ad un account
+-che si sta rimuovendo.
+-Non è possibile rimuovere nessun attributo NIS su un client NIS.
+-Questo deve essere fatto sul server NIS.
+-.SH VEDERE ANCHE
+-.BR chfn (1),
+-.BR chsh (1),
+-.BR groupadd (8),
+-.BR groupdel (8),
+-.BR groupmod (8),
+-.BR passwd (1),
+-.BR useradd (8),
+-.BR usermod (8)
++\fBuserdel\fP non permetterà di rimuovere alcun account se l'utente è 
++attualmente connesso.  Occorre uccidere qualunque processo in esecuzione che 
++appartenga ad un account che si sta rimuovendo.  Non è possibile rimuovere 
++nessun attributo NIS su un client NIS.  Questo deve essere fatto sul server 
++NIS.
++.SH "VEDERE ANCHE"
++\fBchfn\fP(1), \fBchsh\fP(1), \fBgroupadd\fP(8), \fBgroupdel\fP(8), \fBgroupmod\fP(8), 
++\fBpasswd\fP(1), \fBuseradd\fP(8), \fBusermod\fP(8)
+ .SH AUTORE
+-Julianne Frances Haugh (jfh@tab.com)
++Julianne Frances Haugh (jockgrrl@ix.netcom.com)
++.\" Questa sezione si trova in un file separato che viene aggiunto
++.\" automaticamente alla pagina tradotta.
++.\" Per semplicità ho usato lo stesso file per tutte le traduzioni,
++.\" di conseguenza mischiando tutti i nomi dei traduttori: mi auguro
++.\" che non sia un problema per nessuno.
++.\"             -- Danilo Piazzalunga <danilopiazza@libero.it>, 2005
++.SH TRADUZIONE
++.nf
++Giovanni Bortolozzo <borto@dei.unipd.it>, 1996-1997
++Roberto Pertile <triplej@iol.it>, 1999
++Isabella Ruocco <isacher@nettaxi.com>, 1999
++Giuseppe Sacco <eppesuig@debian.org>, 2005
++.fi
++.\" Conversione a PO4A:
++.\" Danilo Piazzalunga <danilopiazza@libero.it>, 2005
+Index: shadow-4.0.13/man/it/usermod.8
+===================================================================
+--- shadow-4.0.13.orig/man/it/usermod.8	2005-04-05 21:08:54.000000000 +0200
++++ shadow-4.0.13/man/it/usermod.8	2005-10-12 22:36:55.000000000 +0200
+@@ -1,4 +1,7 @@
+-.\" Copyright 1991 \- 1994, Julianne Frances Haugh
++.\" This file was generated with po4a. Translate the source file.
++.\" 
++.\"$Id: usermod.8,v 1.2 2005/04/04 18:25:39 bubulle Exp $
++.\" Copyright 1991 - 1994, Julianne Frances Haugh
+ .\" All rights reserved.
+ .\"
+ .\" Redistribution and use in source and binary forms, with or without
+@@ -24,119 +27,108 @@
+ .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ .\" SUCH DAMAGE.
+-.\"
+-.\"	$Id: usermod.8,v 1.7 2005/04/05 19:08:54 kloczek Exp $
+-.\"
+-.\" Traduzione in italiano a cura di Isabella Ruocco <isacher@nettaxi.com>
+-.\" luglio 1999
+-.\"
+-.TH USERMOD 8
++.TH USERMOD 8   
+ .SH NOME
+ usermod \- Modifica l'account di un utente
+ .SH SINTASSI
+ .TP 8
+-.B usermod
+-.RB [ \-c
+-.IR commento ]
+-.RB [ \-d
+-.IR home_dir " ["
+-.BR \-m ]]
+-.br
+-.RB [ \-e
+-.IR data_scadenza ]
+-.RB [ \-f
+-.IR tempo_inattività ]
+-.br
+-.RB [ \-g
+-.IR gruppo_iniziale ]
+-.RB [ \-G
+-.IR gruppo [,...]]
+-.br
+-.RB [ \-l
+-.IR nome_login ]
+-.RB [ \-s
+-.IR shell ]
+-.br
+-.RB [ \-u
+-.IR uid " ["
+-.BR \-o ]]
+-.I login
++\fBusermod\fP [\fB\-c\fP \fIcommento\fP] [\fB\-d\fP \fIhome_dir\fP [\fB\-m\fP]]
++.br
++[\fB\-e\fP \fIdata_scadenza\fP] [\fB\-f\fP \fItempo_inattività\fP]
++.br
++[\fB\-g\fP \fIgruppo_iniziale\fP] [\fB\-G\fP \fIgruppo\fP[,...]]
++.br
++[\fB\-l\fP \fInome_login\fP] [\fB\-p\fP \fIpassword\fP]
++.br
++[\fB\-s\fP \fIshell\fP] [\fB\-u\fP \fIuid\fP [ \fB\-o\fP]] [\fB\-L\fP|\fB\-U\fP] \fIlogin\fP
+ .SH DESCRIZIONE
+-Il comando \fBusermod\fR modifica i file di account di sistema in modo da
+-riflettere le modifiche specificate sulla linea di comando.
+-Le opzioni che si applicano al comando \fBusermod\fR sono
+-.IP "\fB\-c\fR \fIcommento\fR"
+-Il campo commento del nuovo utente nel file password.
+-Normalmente viene modificato usando l'utilità \fBchfn\fR(1).
+-.IP "\fB\-d\fR \fIhome_dir\fR"
+-La nuova directory di login dell'utente.
+-Se è data l'opzione \fB\-m\fR il contenuto della home directory corrente
+-sarà spostato nella nuova home directory, che viene creata se non esiste già.
+-.IP "\fB\-e\fR \fIdata_scadenza\fR"
+-La data in cui l'account dell'utente verrà disabilitato.
+-La data è specificata nel formato \fIMM/GG/AA\fR.
+-.IP "\fB\-f\fR \fIgiorni_inattività\fR"
+-Il numero di giorni dopo la scadenza di una password prima che l'account 
+-venga permanentemente disabilitato.
+-Un valore pari a 0 disabilita l'account non appena la password è scaduta,
+-ed un valore pari a \-1 disabilita la caratteristica.
+-Il valore predefinito è \-1.
+-.IP "\fB\-g\fR \fIgruppo_iniziale\fR"
+-Il nuome o numero del nuovo gruppo di connessione dell'utente.
+-Il nome del gruppo deve esistere. Un numero di gruppo deve riferirsi ad un
+-gruppo già esistente.
+-Il numero di gruppo predefinito è 1.
+-.IP "\fB\-G\fR \fIgruppo,[...]\fR"
+-Una lista di gruppi supplementari di cui l'utente è altresì membro.
+-Ciascun gruppo è separato dal successivo da una virgola, senza spazi bianchi
+-intermedi.
+-I gruppi sono soggetti alle stesse restrizioni del gruppo dato con l'opzione
+-\fB\-g\fR.
+-Se l'utente è attualmente membro di un gruppo che non è elencato, l'utente
+-verrà rimosso dal gruppo.
+-.IP "\fB\-l\fR \fInome_login\fR"
+-Il nome dell'utente verrà cambiato da \fIlogin\fR a \fInome_login\fR.
+-Niente altro viene cambiato.
+-In particolare, la home directory dell'utente dovrebbe probabilmente
+-essere modificata in modo da riflettere il nuovo nome di login.
+-.IP "\fB\-s\fR \fIshell\fR"
+-Il nome della nuova shell di login dell'utente.
+-Lasciando questo campo vuoto si fa in modo che il sistema selezioni la shell
+-di connessione predefinita.
+-.IP "\fB\-u\fR \fIuid\fR"
+-Il valore numerico dell'ID dell'utente.
+-Questo valore deve essere univoco, a meno che non venga usata l'opzione
+-\fB\-o\fR.
+-Questo valore deve essere non\-negativo.
+-Valori tra 0 e 999 sono tipicamente riservati ad account di sistema.
+-Tutti i file che l'utente possiede e che sono posiszionati nell'albero di
+-directory avente come radice la home directory dell'utente avranno l'ID utente del
+-file cambiato automaticamente.
+-I file fuori della home directory dell'utente devono essere modificati
+-manualmente.
++Il comando \fBusermod\fP modifica i file di account di sistema in modo da 
++riflettere le modifiche specificate sulla linea di comando.  Le opzioni che 
++si applicano al comando \fBusermod\fP sono
++.IP "\fB\-c \fP\fIcommento\fP"
++Il campo commento del nuovo utente nel file password.  Normalmente viene 
++modificato usando l'utilità \fBchfn\fP(1).
++.IP "\fB\-d \fP\fIhome_dir\fP"
++La nuova directory di login dell'utente.  Se è data l'opzione \fB\-m\fP il 
++contenuto della home directory corrente sarà spostato nella nuova home 
++directory, che viene creata se non esiste già.
++.IP "\fB\-e \fP\fIdata_scadenza\fP"
++La data in cui l'account dell'utente verrà disabilitato.  La data è 
++specificata nel formato \fIMM/GG/AA\fP.
++.IP "\fB\-f \fP\fIgiorni_inattività\fP"
++Il numero di giorni dopo la scadenza della password prima che l'account 
++verrà permanentemente disabilitato.  Un valore pari a 0 disabilita 
++l'account non appena la password è scaduta, ed un valore pari a \-1 
++disabilita questa caratteristica.  Il valore predefinito è \-1.
++.IP "\fB\-g \fP\fIgruppo_iniziale\fP"
++Il nuome o numero del nuovo gruppo di connessione dell'utente.  Il nome del 
++gruppo deve esistere. Un numero di gruppo deve riferirsi ad un gruppo già 
++esistente.  Il numero di gruppo predefinito è 1.
++.IP "\fB\-G \fP\fIgruppo,[...]\fP"
++Una lista di gruppi supplementari di cui l'utente è altresì membro.  
++Ciascun gruppo è separato dal successivo da una virgola, senza spazi 
++bianchi intermedi.  I gruppi sono soggetti alle stesse restrizioni del 
++gruppo dato con l'opzione \fB\-g\fP.  Se l'utente è attualmente membro di un 
++gruppo che non è elencato, l'utente verrà rimosso dal gruppo.
++.IP "\fB\-l \fP\fInome_login\fP"
++Il nome dell'utente verrà cambiato da \fIlogin\fP a \fInome_login\fP.  Niente 
++altro viene cambiato.  In particolare, la home directory dell'utente 
++dovrebbe probabilmente essere modificata in modo da riflettere il nuovo nome 
++di login.
++.IP \fB\-o\fP
++Used with \fI\-r\fP option allow change user ID to non\-unique value.
++.IP "\fB\-p \fP\fIpasswd\fP"
++The encrypted password, as returned by \fBcrypt\fP(3).
++.IP "\fB\-s \fP\fIshell\fP"
++Il nome della nuova shell di login dell'utente.  Lasciando questo campo 
++vuoto si fa in modo che il sistema selezioni la shell di connessione 
++predefinita.
++.IP "\fB\-u \fP\fIuid\fP"
++Il valore numerico dell'ID dell'utente.  Questo valore deve essere univoco, 
++a meno che non venga usata l'opzione \fI\-o\fP.  Questo valore deve essere 
++non\-negativo.  Valori tra 0 e 99 sono tipicamente riservati ad account di 
++sistema.  Tutti i file che l'utente possiede e che sono posiszionati 
++nell'albero di directory avente come radice la home directory dell'utente 
++avranno l'ID utente del file cambiato automaticamente.  I file fuori della 
++home directory dell'utente devono essere modificati manualmente.
++.IP \fB\-L\fP
++Lock a user's password.  This puts a '!' in front of the encrypted password, 
++effectively disabling the password.  You can't use this option with \fI\-p\fP or 
++\fI\-U\fP.
++.IP \fB\-U\fP
++Unlock a user's password.  This removes the '!' in front of the encrypted 
++password.  You can't use this option with \fI\-p\fP or \fI\-L\fP.
+ .SH CAVEAT
+-\fBusermod\fR non permetterà di modificare il nome di un utente che è
+-attualmente connesso.
+-Occorre essere certi che l'utente nominato non sta eseguendo alcun processo
+-quando questo comando viene eseguito se l'ID numerico dell'utente sta per
+-essere cambiato.
+-Occorre cambiare il proprietario di ogni file crontab manualmente.
+-Occorre cambiare il proprietario di ogni job manualmente.
+-Occorre fare qualunque cambiamento che riguarda NIS sul server NIS.
++\fBusermod\fP non permetterà di modificare il nome di un utente che è 
++attualmente connesso.  Occorre essere certi che l'utente nominato non sta 
++eseguendo alcun processo quando questo comando viene eseguito se l'ID 
++numerico dell'utente sta per essere cambiato.  Occorre cambiare il 
++proprietario di ogni file crontab manualmente.  Occorre cambiare il 
++proprietario di ogni job manualmente.  Occorre fare qualunque cambiamento 
++che riguarda NIS sul server NIS.
+ .SH FILE
+-\fI/etc/passwd\fR \- informazioni sugli account di utenti
++/etc/passwd \- informazioni sugli account utente
+ .br
+-\fI/etc/shadow\fR \- informazioni sicure sugli account di utenti
++/etc/shadow \- informazioni sicure sugli account di utenti
+ .br
+-\fI/etc/group\fR \- informazioni sui gruppi
+-.SH VEDERE ANCHE
+-.BR chfn (1),
+-.BR chsh (1),
+-.BR groupadd (8),
+-.BR groupdel (8),
+-.BR groupmod (8),
+-.BR passwd (1),
+-.BR useradd (8),
+-.BR userdel (8)
++/etc/group \- informazioni sui gruppi
++.SH "VEDERE ANCHE"
++\fBchfn\fP(1), \fBchsh\fP(1), \fBgroupadd\fP(8), \fBgroupdel\fP(8), \fBgroupmod\fP(8), 
++\fBpasswd\fP(1), \fBuseradd\fP(8), \fBuserdel\fP(8)
+ .SH AUTORE
+-Julianne Frances Haugh (jfh@tab.com)
++Julianne Frances Haugh (jockgrrl@ix.netcom.com)
++.\" Questa sezione si trova in un file separato che viene aggiunto
++.\" automaticamente alla pagina tradotta.
++.\" Per semplicità ho usato lo stesso file per tutte le traduzioni,
++.\" di conseguenza mischiando tutti i nomi dei traduttori: mi auguro
++.\" che non sia un problema per nessuno.
++.\"             -- Danilo Piazzalunga <danilopiazza@libero.it>, 2005
++.SH TRADUZIONE
++.nf
++Giovanni Bortolozzo <borto@dei.unipd.it>, 1996-1997
++Roberto Pertile <triplej@iol.it>, 1999
++Isabella Ruocco <isacher@nettaxi.com>, 1999
++Giuseppe Sacco <eppesuig@debian.org>, 2005
++.fi
++.\" Conversione a PO4A:
++.\" Danilo Piazzalunga <danilopiazza@libero.it>, 2005

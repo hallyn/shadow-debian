@@ -1,0 +1,42 @@
+Goal: man_nonpam was renamed to man_nopam, but is still used in
+      man/sv/Makefile.am and man/it/Makefile.am
+
+Note: this patch patches the .in (otherwise the clean rule fails). Thus
+      building twice from the same source will fail.
+
+Status wrt upstream: not reported yet
+
+Index: shadow-4.0.18.1/man/sv/Makefile.am
+===================================================================
+--- shadow-4.0.18.1.orig/man/sv/Makefile.am	2006-08-03 12:13:27.000000000 +0200
++++ shadow-4.0.18.1/man/sv/Makefile.am	2006-08-04 19:22:37.000000000 +0200
+@@ -54,4 +54,4 @@
+ 
+ EXTRA_DIST = \
+ 	$(man_MANS) \
+-	$(man_nonpam)
++	$(man_nopam)
+Index: shadow-4.0.18.1/man/it/Makefile.am
+===================================================================
+--- shadow-4.0.18.1.orig/man/it/Makefile.am	2006-08-04 19:26:20.000000000 +0200
++++ shadow-4.0.18.1/man/it/Makefile.am	2006-08-04 19:26:26.000000000 +0200
+@@ -46,5 +46,5 @@
+                         
+ EXTRA_DIST = \
+ 	$(man_MANS) \
+-	$(man_nonpam) \
++	$(man_nopam) \
+ 	id.1
+Index: shadow-4.0.18.1/man/it/Makefile.in
+===================================================================
+--- shadow-4.0.18.1.orig/man/it/Makefile.in	2006-08-04 19:24:40.000000000 +0200
++++ shadow-4.0.18.1/man/it/Makefile.in	2006-08-04 19:24:53.000000000 +0200
+@@ -215,7 +215,7 @@
+ 
+ EXTRA_DIST = \
+ 	$(man_MANS) \
+-	$(man_nonpam) \
++	$(man_nopam) \
+ 	id.1
+ 
+ subdir = man/it

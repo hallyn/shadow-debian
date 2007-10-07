@@ -1,0 +1,40 @@
+Goal: userdel now deletes user groups from /etc/gshdow as well as
+      /etc/group.
+Fixes: #99442
+
+Status wrt upstream: applied upstream (4.0.10).
+
+Index: shadow-4.0.3/src/userdel.c
+===================================================================
+--- shadow-4.0.3.orig/src/userdel.c	2005-05-22 22:41:28.837167000 +0200
++++ shadow-4.0.3/src/userdel.c	2005-05-22 23:02:35.137167000 +0200
+@@ -147,6 +147,7 @@
+ 	struct group *ngrp;
+ 
+ #ifdef	SHADOWGRP
++	int deleted_user_group = 0;
+ 	const struct sgrp *sgrp;
+ 	struct sgrp *nsgrp;
+ #endif				/* SHADOWGRP */
+@@ -209,6 +210,10 @@
+ 
+ 		gr_remove (grp->gr_name);
+ 
++#ifdef SHADOWGRP
++		deleted_user_group = 1;
++#endif
++
+ 		/*
+ 		 * Update the DBM group file with the new entry as well.
+ 		 */
+@@ -279,6 +284,10 @@
+ 		SYSLOG ((LOG_INFO, "delete `%s' from shadow group `%s'\n",
+ 			 user_name, nsgrp->sg_name));
+ 	}
++
++	if (deleted_user_group)
++		sgr_remove(user_name);
++
+ #ifdef	NDBM
+ 	endsgent ();
+ #endif				/* NDBM */

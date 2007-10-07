@@ -1,0 +1,45 @@
+Goal: Document that useradd/groupadd refuse adding entries already in an
+      external database.
+
+Fixes: #282184
+
+Status wrt upstream: Fixed in 4.0.14
+
+Index: shadow-4.0.13/man/groupadd.8.xml
+===================================================================
+--- shadow-4.0.13.orig/man/groupadd.8.xml	2005-09-30 18:16:20.000000000 +0200
++++ shadow-4.0.13/man/groupadd.8.xml	2005-10-14 19:21:31.889986342 +0200
+@@ -139,6 +139,15 @@
+        follow. In regular expression terms: [a-z_][a-z0-9_-]*[$]
+      </para>
+      <para>Groupnames may only be up to 16 characters long.</para>
++
++     <para>
++       If the groupname already exists in an external group database
++       such as NIS, <command>groupadd</command> will deny the group
++       creation request.
++     </para>
++
++     <para>Groupnames may only be up to 16 characters long.</para>
++
+    </refsect1>
+ 
+   <refsect1 id='exit_values'>
+Index: shadow-4.0.13/man/useradd.8.xml
+===================================================================
+--- shadow-4.0.13.orig/man/useradd.8.xml	2005-10-14 19:20:57.559973008 +0200
++++ shadow-4.0.13/man/useradd.8.xml	2005-10-14 19:21:41.078116422 +0200
+@@ -348,6 +348,13 @@
+       You may not add a user to a NIS group. This must be performed on the
+       NIS server.
+     </para>
++
++     <para>
++       Similarly, if the username already exists in an external group
++       database such as NIS, <command>useradd</command> will deny
++       the user account creation request.
++     </para>
++
+     <para>
+       Usernames must begin with a lower case letter or an underscore, and
+       only lower case letters, underscores, dashes, and dollar signs may

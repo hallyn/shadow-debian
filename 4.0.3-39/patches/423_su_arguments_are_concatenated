@@ -1,0 +1,61 @@
+Goal: document in the source and man pages why the arguments are
+      concatenated and why they are always provided to the shell with the
+      -c option of that shell.
+Fixes: #317264
+       see also #276419
+
+Status wrt upstream: This is a Debian specific patch
+
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-07-10 01:50:31.000000000 +0300
++++ shadow-4.0.3/src/su.c	2005-07-10 02:42:48.000000000 +0300
+@@ -210,6 +210,15 @@
+     }
+   else
+     args[0] = Basename(shell);
++  /**
++   * If some arguments are provided (even without a -c), we use the -c
++   * option of the shell.
++   *
++   * This differs from FreeBSD's or SUN's su.
++   *
++   * If you want to supply arguments to the shell, you will need to put
++   * the shell with its arguments in the command.
++   */
+   if (command || additional_args)
+     args[argno++] = "-c";
+   if (command) {
+@@ -220,6 +229,15 @@
+     strcat(cmd, command);
+     cmd_len_left -= strlen(command);
+   }
++  /**
++   * Arguments are concatenated because the the shell requires the command
++   * to be specified in one argument following -c.
++   *
++   * This differs from at least FreeBSD's or SUN's su.
++   *
++   * If you need to supply separated arguments to the shell, then put
++   * the shell and its arguments in the command line.
++   */
+   if (additional_args)
+     for (; *additional_args; ++additional_args) {
+       if ((strlen(*additional_args) + 1) > cmd_len_left) {
+Index: shadow-4.0.3/man/su.1
+===================================================================
+--- shadow-4.0.3.orig/man/su.1	2005-07-10 02:31:34.000000000 +0300
++++ shadow-4.0.3/man/su.1	2005-07-10 02:42:24.000000000 +0300
+@@ -48,8 +48,10 @@
+ An optional command can be executed. This is done by the shell specified
+ in \fI/etc/passwd\fR for the target user unless the \fB-s\fR or \fB-m\fR
+ options are used.  Any arguments supplied after the \fBusername\fR will be
+-passed to the invoked shell (shell must support the -c command line
+-option in order for a command to be passed to it).
++concatenated in a single command and passed to the invoked shell with the
++\fB\-c\fR option of that shell.
++If you want to provide separated arguments to the shell, you can supply
++\fBexec <shell> <arguments>\fR as the command.
+ .PP
+ Unless the \fB-m\fR or \fB-p\fR options are used, the current environment is
+ passed to the new shell with alterations.  The value of \fB$PATH\fR is

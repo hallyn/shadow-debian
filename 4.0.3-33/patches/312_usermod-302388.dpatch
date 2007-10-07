@@ -1,0 +1,38 @@
+#! /bin/sh -e
+## 312_usermod-302388.dpatch by Tomasz Kłoczko <kloczek@zie.pg.gda.pl>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Document -o option in usermod(8)
+## DP: Debian bug #302288
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+--- shadow-4.0.3/man/usermod.8	2002-03-08 05:39:12.000000000 +0100
++++ shadow-4.0.3-31sarge3/man/usermod.8	2005-04-18 08:24:21.000000000 +0200
+@@ -100,6 +100,8 @@
+ Lock a user's password.
+ This puts a '!' in front of the encrypted password, effectively disabling
+ the password.  You can't use this option with \fI-p\fR or \fI-U\fR.
++.IP "\fB\-o\fR"
++Allows changing the user ID to a non\-unique value when used with \fI\-u\fR option.
+ .IP "\fB-U\fR"
+ Unlock a user's password.
+ This removes the '!' in front of the encrypted password.

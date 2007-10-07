@@ -1,0 +1,22 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 318_passwd_src_warning.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: This patch fixed #61313.
+## DP: Upstream committed a similar patch.
+
+@DPATCH@
+diff -urNad shadow-4.0.3/src/passwd.c /tmp/dpep.MC22M9/shadow-4.0.3/src/passwd.c
+--- shadow-4.0.3/src/passwd.c	2005-04-15 23:07:41.599005000 +0200
++++ /tmp/dpep.MC22M9/shadow-4.0.3/src/passwd.c	2005-04-16 00:04:40.899005000 +0200
+@@ -1173,8 +1173,8 @@
+ 
+ 	if (!amroot && pw->pw_uid != getuid ()) {
+ 		fprintf (stderr,
+-			 _("You may not change the password for %s.\n"),
+-			 name);
++			 _("%s: You may not view or modify password information for %s.\n"),
++			 Prog, name);
+ 		SYSLOG ((LOG_WARN, "can't change pwd for `%s'", name));
+ 		closelog ();
+ 		exit (E_NOPERM);

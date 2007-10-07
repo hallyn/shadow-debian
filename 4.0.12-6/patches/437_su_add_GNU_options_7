@@ -1,0 +1,171 @@
+Note: * Document the changes from the other 437_ patches
+
+Index: shadow-4.0.12/man/su.1.xml
+===================================================================
+--- shadow-4.0.12.orig/man/su.1.xml	2005-07-21 16:36:32.000000000 +0200
++++ shadow-4.0.12/man/su.1.xml	2005-09-01 11:51:13.000000000 +0200
+@@ -15,6 +15,7 @@
+   <refsynopsisdiv id='synopsis'>
+     <cmdsynopsis>
+       <command>su</command>
++      <arg choice='opt'>OPTS </arg>
+       <arg choice='opt'>- </arg>
+       <arg choice='opt'>
+         <arg choice='plain'>
+@@ -36,26 +37,39 @@
+       expect had the user logged in directly.
+     </para>
+     
+-    <para>Additional arguments may be provided after the username, in which
+-      case they are supplied to the user&acute;s login shell. In particular,
+-      an argument of <option>-c</option> will cause the next argument to be
+-      treated as a command by most command interpreters. The command will be
+-      executed by the shell specified in <filename>/etc/passwd</filename>
+-      for the target user.
+-    </para>
+-    
+     <para>The user will be prompted for a password, if appropriate. Invalid
+       passwords will produce an error message. All attempts, both valid and
+       invalid, are logged to detect abuses of the system.
+     </para>
+     
+-    <para>The current environment is passed to the new shell. The value of
+-      <emphasis remap='B'>$PATH</emphasis> is reset to
++    <para>An optional command can be executed. This is done by the shell
++      specified in <filename>/etc/passwd</filename> for the target user
++      unless the <option>-s</option> or <option>-m</option>
++      options are used.  Any arguments supplied after the <emphasis remap='I'>
++      username</emphasis> will be passed to the invoked shell (shell must
++      support the <option>-c</option> command line option in order for a
++      command to be passed to it).
++    </para>
++
++    <para>
++      Unless the <option>-m</option> or <option>-p</option> options are used,
++      the current environment is passed to the new shell with alterations.
++      The value of <emphasis remap='B'>$PATH</emphasis> is reset to
+       <filename>/bin:/usr/bin</filename> for normal users, or
+-      <filename>/sbin:/bin:/usr/sbin:/usr/bin</filename> for the super user. 
++      <filename>/sbin:/bin:/usr/sbin:/usr/bin</filename> for the super user.
+       This may be changed with the <emphasis remap='B'>ENV_PATH</emphasis>
+       and <emphasis remap='B'>ENV_SUPATH</emphasis> definitions in
+       <filename>/etc/login.defs</filename>.
++      <emphasis remap='B'>$IFS</emphasis>, if is set, is reset to contain
++      space, tab, and newline.
++      <emphasis remap='B'>$USER</emphasis> is set to the name of the target
++      user,
++      <emphasis remap='B'>$HOME</emphasis> is set to the home directory of
++      the target user, and
++      <emphasis remap='B'>$SHELL</emphasis> is set to the shell of the target
++      user.
++      When using the <option>-m</option> or <option>-p</option> options,
++      the user's environment is not changed.
+     </para>
+     
+     <para>A subsystem login is indicated by the presence of a "*" as the
+@@ -65,6 +79,71 @@
+     </para>
+   </refsect1>
+   
++  <refsect1 id='options'>
++    <title>OPTIONS</title>
++    <variablelist remap='IP'>
++      <varlistentry>
++        <term>
++          <option>-</option>
++        </term>
++        <listitem>
++          <para>make this a login shell</para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term>
++          <option>-c</option>, <option>--command</option>=
++          <replaceable>command</replaceable>
++        </term>
++        <listitem>
++          <para>pass <emphasis remap='I'>command</emphasis> to the invoked
++          shell using its <option>-c</option> option</para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term>
++          <option>-m</option>, <option>-p</option>,
++          <option>--preserve-environment</option>
++        </term>
++        <listitem>
++          <para>do not reset environment variables, and keep the same shell
++          </para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term>
++          <option>-s</option>, <option>--shell</option>=
++          <replaceable>shell</replaceable>
++        </term>
++        <listitem>
++          <para>use <emphasis remap='I'>shell</emphasis> instead of the
++            default in <filename>/etc/passwd</filename>
++          </para>
++        </listitem>
++      </varlistentry>
++    </variablelist>
++  </refsect1>
++
++  <refsect1 id='notes'>
++    <title>NOTES</title>
++    <para>The <option>-m</option>, <option>-p</option> and <option>-s</option>
++      options are restricted by the target user's shell being listed in
++      <filename>/etc/shells</filename>. If it's not listed, then it's assumed
++      to be a restricted account, a normal su is performed, and those options
++      are ignored silently.
++    </para>
++
++    <para>A subsystem login is indicated by the presence of a "*" as the first
++      character of the login shell. The given home directory will be used as
++      the root of a new filesystem which the user is actually logged into.
++    </para>
++
++    <para>Much of the behavior of this command can be altered via its pam
++      configuration - see <citerefentry><refentrytitle>pam</refentrytitle>
++      <manvolnum>7</manvolnum></citerefentry>.
++    </para>
++  </refsect1>
++
+   <refsect1 id='caveats'>
+     <title>CAVEATS</title>
+     <para>
+@@ -84,6 +163,14 @@
+         <term><filename>/etc/shadow</filename></term>
+         <listitem>secure user account information</listitem>
+       </varlistentry>
++      <varlistentry>
++        <term><filename>/etc/shells</filename></term>
++        <listitem>valid user shells</listitem>
++      </varlistentry>
++      <varlistentry>
++        <term><filename>$HOME/.profile</filename></term>
++        <listitem>initialization script for default shell</listitem>
++      </varlistentry>
+     </variablelist>
+   </refsect1>
+   
+@@ -101,11 +188,17 @@
+       <citerefentry>
+         <refentrytitle>suauth</refentrytitle><manvolnum>5</manvolnum>
+       </citerefentry>
++      <citerefentry>
++        <refentrytitle>shells</refentrytitle><manvolnum>5</manvolnum>
++      </citerefentry>
++      <citerefentry>
++        <refentrytitle>pam</refentrytitle><manvolnum>7</manvolnum>
++      </citerefentry>
+     </para>
+   </refsect1>
+   
+   <refsect1 id='author'>
+     <title>AUTHOR</title>
+-    <para>Julianne Frances Haugh &lt;jockgrrl@ix.netcom.com&gt;</para>
++    <para>Julianne Frances Haugh (jfh@austin.ibm.com)</para>
+   </refsect1>
+ </refentry>

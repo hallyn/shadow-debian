@@ -1,0 +1,110 @@
+Goal: * pass the argument to the shell or command without concatenation
+        before the call to exec.
+        (su --shell=/bin/sh -c 'printf :%q:\\n ${1+"$@"}' "$USER" sh a "b\'c" d)
+      * If no command is provided, the arguments after the username are for the shell,
+        no -c has to be appended.
+        (su -- - "$LOGNAME" -x)
+      * The submitter also reported some changes I consider being only aesthetical (only
+        malloc the exact number of elements)
+      * He also proposed another patch that would change the return type of
+        "elements" to size_t instead of int. But I did not included this one.
+Fixes: #276419
+
+Status wrt upstream: Upstream do not concatenate arguments.
+                     Upstream never add a "-c" (there is no options to
+                     upstream su).
+                     (run_shell in upstream is quite different
+                     and don't suffer from the first point and don't have
+                     "elements" function, which voids the last two points)
+
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-06-20 23:28:48.000000000 +0200
++++ shadow-4.0.3/src/su.c	2005-06-21 20:49:22.128723000 +0200
+@@ -172,8 +172,9 @@
+ {
+   int n = 0;
+ 
+-  for (n = 0; *arr; ++arr)
+-    ++n;
++  if (arr)
++    for (n = 0; *arr; ++arr)
++      ++n;
+   return n;
+ }
+ 
+@@ -183,16 +184,25 @@
+ {
+   const char **args;
+   int argno = 1;
+-  char cmd[BUFSIZ];
+-  int cmd_len_left = sizeof(cmd) - 1;
+ 
+-  cmd[0] = '\0';
+-
+-  if (additional_args)
+-    args = (const char **) xmalloc (sizeof (char *)
+-                                    * (10 + elements (additional_args)));
+-  else
+-    args = (const char **) xmalloc (sizeof (char *) * 10);
++  /* Allocate 2 up to 4 more slots for the argument vector than there are
++     additional args:
++     1 for args[0],
++     2 (optional) for a commandline, preceded with "-c",
++     1 for the args[]-terminating NULL entry.
++   */
++  args = (const char **)
++    xmalloc (
++      sizeof (char *) *
++      (
++	1 /* args[0] */
++	+
++	(command ? 2 : 0) /* "-c" "commandline", if supplied */
++	+
++	elements (additional_args) /* number of additional args: */
++	+
++	1 /* the terminating NULL entry */
++      ));
+ 
+   if (login)
+     {
+@@ -210,30 +220,17 @@
+     }
+   else
+     args[0] = Basename(shell);
+-  if (command || additional_args)
+-    args[argno++] = "-c";
+-  if (command) {
+-    if (strlen(command) > cmd_len_left) {
+-      fprintf(stderr, _("Command line args too long\n"));
+-      exit(1);
++  if (command)
++    { /* A command option "-c" or "--command" has been supplied.  Insert
++       * "-c" and its option argument, i.e. the commandline, into the
++       * argument vector.
++       */
++      args[argno++] = "-c";
++      args[argno++] = command;
+     }
+-    strcat(cmd, command);
+-    cmd_len_left -= strlen(command);
+-  }
+   if (additional_args)
+-    for (; *additional_args; ++additional_args) {
+-      if ((strlen(*additional_args) + 1) > cmd_len_left) {
+-	fprintf(stderr, _("Command line args too long\n"));
+-	exit(1);
+-      }
+-      if (cmd[0]) {
+-	strcat(cmd, " ");
+-	cmd_len_left--;
+-      }
+-      strcat(cmd, *additional_args);
+-      cmd_len_left -= strlen(*additional_args);
+-    }
+-  if (cmd[0]) args[argno++] = cmd;
++    for (; *additional_args; ++additional_args)
++      args[argno++] = *additional_args;
+   args[argno] = NULL;
+   execv (shell, (char **) args);
+   fprintf (stderr, _("No shell\n"));

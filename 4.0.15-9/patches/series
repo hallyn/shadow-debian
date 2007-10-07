@@ -1,0 +1,49 @@
+# Tomasz suggests it's probably useless as this is a workaround for 
+# wrongly linked PAM
+# 004_configure.in.dpatch
+503_shadowconfig.8
+431_su_uid_0_not_root
+008_su_no_sanitize_env
+008_su_get_PAM_username
+428_grpck_add_prune_option
+434_login_stop_checking_args_after--
+008_login_log_failure_in_FTMP
+429_login_FAILLOG_ENAB
+432_login_cancel_timout_after_authentication
+438_su_GNU_origin
+#
+# 419_time_structures.dpatch  # must be checked another time
+433_shadow.5-typo_312430
+401_cppw_src.dpatch
+404_undef_USE_PAM.dpatch
+404_undef_USE_PAM.nolibpam
+506_relaxed_usernames
+407_32char_grnames.dpatch
+326_grpck_group-gshadow_members_consistency
+542_useradd-O_option
+451_login_PATH
+352_doc_password_check_order
+454_userdel_no_MAIL_FILE
+501_commonio_group_shadow
+461_keep_sticky_bit_for_dirs
+462_warn_to_edit_shadow
+463_login_delay_obeys_to_PAM
+467_useradd_-r_LSB
+466_fflush-prompt
+468_duplicate_passwd_struct_before_usage
+523_su_arguments_are_concatenated
+523_su_arguments_are_no_more_concatenated_by_default
+479_chowntty_debug
+480_getopt_args_reorder
+382_libmisc_copydir_check_return_values
+483_su_fakelogin_wrong_arg0
+491_configure.in_friendly_selinux_detection
+592_manpages_typos
+486_chgpasswd.8
+492_correct_exit_status_for_run_commands
+303_usermod_-a_in_man
+351_nl-359913
+352_id-361186
+353_hu-362749
+402-clarify_usermod_usage
+487_passwd_chauthtok_failed_message

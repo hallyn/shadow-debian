@@ -1,0 +1,22 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 320_nscd_header.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add header file nscd.h (fixed upstrem)
+
+@DPATCH@
+--- shadow-4.0.3.ori/lib/nscd.h	1970-01-01 01:00:00.000000000 +0100
++++ shadow-4.0.3-31sarge1/lib/nscd.h	2005-01-11 11:37:02.000000000 +0100
+@@ -0,0 +1,12 @@
++/* Copyright (c) 1999 SuSE GmbH Nuerenberg, Germany
++   Author: Thorsten Kukuk <kukuk@suse.de> */
++
++#ifndef _FAILURE_H_
++#define _FAILURE_H_
++
++/*
++ * nscd_flush_cache - flush specyfied service bufor in nscd cache
++ */
++extern int nscd_flush_cache (char *service);
++
++#endif

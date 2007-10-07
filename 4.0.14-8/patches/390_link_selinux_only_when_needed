@@ -1,0 +1,72 @@
+Goal: Do not link login and su (and others) with libselinux
+
+Status wrt upstream: will be in 4.0.15
+
+Index: shadow-4.0.14/lib/Makefile.am
+===================================================================
+--- shadow-4.0.14.orig/lib/Makefile.am	2005-08-31 19:16:44.000000000 +0200
++++ shadow-4.0.14/lib/Makefile.am	2006-02-09 14:29:37.000000000 +0100
+@@ -6,7 +6,7 @@
+ lib_LTLIBRARIES = libshadow.la
+ 
+ libshadow_la_LDFLAGS = -version-info 0:0:0
+-libshadow_la_LIBADD = $(INTLLIBS) $(LIBCRYPT) $(LIBSKEY) $(LIBMD) $(LIBSELINUX)
++libshadow_la_LIBADD = $(INTLLIBS) $(LIBCRYPT) $(LIBSKEY) $(LIBMD)
+ 
+ libshadow_la_SOURCES = \
+ 	commonio.c \
+Index: shadow-4.0.14/src/Makefile.am
+===================================================================
+--- shadow-4.0.14.orig/src/Makefile.am	2006-02-09 14:21:44.000000000 +0100
++++ shadow-4.0.14/src/Makefile.am	2006-02-09 14:45:25.000000000 +0100
+@@ -52,29 +52,37 @@
+ 		 $(top_builddir)/lib/libshadow.la
+ AM_CPPFLAGS    = -DLOCALEDIR=\"$(datadir)/locale\"
+ 
+-chage_LDADD    = $(LDADD) $(LIBAUDIT)
+-chfn_LDADD     = $(LDADD) $(LIBPAM)
+-chsh_LDADD     = $(LDADD) $(LIBPAM)
+-chpasswd_LDADD = $(LDADD)
+-gpasswd_LDADD  = $(LDADD) $(LIBAUDIT)
+-groupadd_LDADD = $(LDADD) $(LIBAUDIT)
+-groupdel_LDADD = $(LDADD) $(LIBAUDIT)
+-groupmod_LDADD = $(LDADD) $(LIBAUDIT)
++chage_LDADD    = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++chfn_LDADD     = $(LDADD) $(LIBPAM) $(LIBSELINUX)
++chsh_LDADD     = $(LDADD) $(LIBPAM) $(LIBSELINUX)
++chpasswd_LDADD = $(LDADD) $(LIBSELINUX)
++gpasswd_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++groupadd_LDADD = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++groupdel_LDADD = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++groupmod_LDADD = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
+ login_SOURCES  = \
+ 	login.c \
+ 	login_nopam.c
+ login_LDADD    = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+ newgrp_LDADD   = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+-newusers_LDADD = $(LDADD)
++newusers_LDADD = $(LDADD) $(LIBSELINUX)
+ nologin_LDADD  =
+-passwd_LDADD   = $(LDADD) $(LIBPAM) $(LIBCRACK) $(LIBAUDIT)
++passwd_LDADD   = $(LDADD) $(LIBPAM) $(LIBCRACK) $(LIBAUDIT) $(LIBSELINUX)
+ su_SOURCES     = \
+ 	su.c \
+ 	suauth.c
+ su_LDADD       = $(LDADD) $(LIBPAM)
+-useradd_LDADD  = $(LDADD) $(LIBAUDIT)
+-userdel_LDADD  = $(LDADD) $(LIBAUDIT)
+-usermod_LDADD  = $(LDADD) $(LIBAUDIT)
++useradd_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++userdel_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++usermod_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++grpck_LDADD    = $(LDADD) $(LIBSELINUX)
++grpconv_LDADD  = $(LDADD) $(LIBSELINUX)
++grpunconv_LDADD = $(LDADD) $(LIBSELINUX)
++pwck_LDADD     = $(LDADD) $(LIBSELINUX)
++pwconv_LDADD   = $(LDADD) $(LIBSELINUX)
++pwunconv_LDADD = $(LDADD) $(LIBSELINUX)
++vipw_LDADD     = $(LDADD) $(LIBSELINUX)
++cppw_LDADD     = $(LDADD) $(LIBSELINUX)
+ 
+ install-am: all-am
+ 	$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am

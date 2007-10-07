@@ -1,0 +1,85 @@
+Goal: Do not fail if /proc is not mounted
+      (passwd, chfn, chage, chsh)
+
+Fixes: #352494, #353562
+
+Note: It works on non-SELinux systems, and when /proc is not mounted.
+      I don't know if it works on SELinux systems.
+
+      IMHO, the following should be tested:
+      * try to use chage on another user's account
+      * try to use chfn on another user's account
+      * try to use chsh on another user's account
+      * try to chnage the password of another user's account
+
+      In the following cases:
+      + from an UID=0 account without SELinux permission
+      + from an UID!=0 account with SELinux permission
+      + from an UID=0 account with SELinux permission
+      + from an UID!=0 account with SELinux permission
+
+      (only the two laters should be permitted)
+
+The "with SELinux permission" probably means passwd, chfn, chsh or rootok
+in an SELinux policy.
+
+Status wrt to upstream: Will be in 4.0.15
+
+Index: shadow-4.0.14/src/chage.c
+===================================================================
+--- shadow-4.0.14.orig/src/chage.c	2006-02-20 20:49:21.000000000 +0100
++++ shadow-4.0.14/src/chage.c	2006-02-20 20:49:22.000000000 +0100
+@@ -361,11 +361,10 @@
+ 	textdomain (PACKAGE);
+ 
+ 	ruid = getuid ();
+-#ifdef WITH_SELINUX
+-	amroot = (ruid == 0
+-		  && selinux_check_passwd_access (PASSWD__ROOTOK) == 0);
+-#else
+ 	amroot = (ruid == 0);
++#ifdef WITH_SELINUX
++	if (amroot && is_selinux_enabled () > 0)
++		amroot = (selinux_check_passwd_access (PASSWD__ROOTOK) == 0);
+ #endif
+ 
+ 	/*
+Index: shadow-4.0.14/src/chfn.c
+===================================================================
+--- shadow-4.0.14.orig/src/chfn.c	2006-02-20 20:49:21.000000000 +0100
++++ shadow-4.0.14/src/chfn.c	2006-02-20 20:49:22.000000000 +0100
+@@ -378,6 +378,7 @@
+ 	 * check if the change is allowed by SELinux policy.
+ 	 */
+ 	if ((pw->pw_uid != getuid ())
++	    && (is_selinux_enabled () > 0)
+ 	    && (selinux_check_passwd_access (PASSWD__CHFN) != 0)) {
+ 		fprintf (stderr, _("%s: Permission denied.\n"), Prog);
+ 		closelog ();
+Index: shadow-4.0.14/src/chsh.c
+===================================================================
+--- shadow-4.0.14.orig/src/chsh.c	2006-02-20 20:49:21.000000000 +0100
++++ shadow-4.0.14/src/chsh.c	2006-02-20 20:49:22.000000000 +0100
+@@ -304,6 +304,7 @@
+ 	 * check if the change is allowed by SELinux policy.
+ 	 */
+ 	if ((pw->pw_uid != getuid ())
++	    && (is_selinux_enabled () > 0)
+ 	    && (selinux_check_passwd_access (PASSWD__CHSH) != 0)) {
+ 		SYSLOG ((LOG_WARN, "can't change shell for `%s'", user));
+ 		closelog ();
+Index: shadow-4.0.14/src/passwd.c
+===================================================================
+--- shadow-4.0.14.orig/src/passwd.c	2006-02-20 20:49:21.000000000 +0100
++++ shadow-4.0.14/src/passwd.c	2006-02-21 23:49:02.000000000 +0100
+@@ -802,7 +802,9 @@
+ 	 * check if the change is allowed by SELinux policy.
+ 	 */
+ 	if ((pw->pw_uid != getuid ())
+-	    && (selinux_check_passwd_access (PASSWD__PASSWD) != 0)) {
++	    && (is_selinux_enabled () > 0 ?
++		(selinux_check_passwd_access (PASSWD__PASSWD) != 0) :
++		!amroot)) {
+ #else
+ 	/*
+ 	 * If the UID of the user does not match the current real UID,

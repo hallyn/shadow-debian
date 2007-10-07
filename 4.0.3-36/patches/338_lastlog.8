@@ -1,0 +1,45 @@
+Goal: Various formatting issues and an inaccuracy corrected
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/lastlog.8
+===================================================================
+--- shadow-4.0.3.orig/man/lastlog.8	2005-05-12 12:12:08.887059874 +0200
++++ shadow-4.0.3/man/lastlog.8	2005-05-12 12:12:18.802578367 +0200
+@@ -36,19 +36,21 @@ lastlog \- examine lastlog file
+ .SH DESCRIPTION
+ .PP
+ \fBlastlog\fR formats and prints the contents of the last login log
+-\fI/var/log/lastlog\fR file . The \fBlogin-name\fR, \fBport\fR, and \fBlast
++\fI/var/log/lastlog\fR file. The \fBlogin-name\fR, \fBport\fR, and \fBlast
+ login time\fR will be printed. The default (no flags) causes lastlog entries
+-to be printed, sorted by the numerical UID.
++to be printed, sorted by their order in /etc/passwd.
+ .TP
+-\fB-u\fR, \fB--user\fR \fIlogin-name\fR will cause the lastlog record for
++\fB-u\fR, \fB--user\fR \fIlogin-name\fR
++will cause the lastlog record for
+ \fIlogin-name\fR only to be printed
+ .TP
+-\fB-t\fR, \fB--time\fR \fIdays\fR will cause only the lastlogins more recent
+-\than fIdays\fR to be printed
+-.TP
+-\fB-h\fR, \fB--help\fR print a one-line help message and exit.
+-.BR
++\fB-t\fR, \fB--time\fR \fIdays\fR
++will cause only the lastlogins more recent
++than fIdays\fR to be printed
+ .TP
++\fB-h\fR, \fB--help\fR
++print a one-line help message and exit.
++.PP
+ The \fB-t\fR flag overrides the use of \fB-u\fR.
+ .PP
+ If the user has never logged in the message \fB"**Never logged in**"\fR will
+@@ -61,5 +63,5 @@ no output to the screen (i.e. if mmdf=80
+ appear to hang as it processes uid 171-799).
+ .SH AUTHORS
+ Julianne Frances Haugh (jockgrrl@ix.netcom.com)
+-.BR
++.br
+ Phillip Street

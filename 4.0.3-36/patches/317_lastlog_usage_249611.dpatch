@@ -1,0 +1,30 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 317_lastlog_usage_249611.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Fix the lastlog usage and all the translations accordingly
+## DP: (--user instead of --login).
+## DP: 
+## DP: STATUS: commited to upstream CVS on 9 May 2005 (before 4.0.9)
+
+@DPATCH@  
+Index: shadow-4.0.3/src/lastlog.c
+===================================================================
+--- shadow-4.0.3.orig/src/lastlog.c	2005-05-11 22:03:39.000000000 +0200
++++ shadow-4.0.3/src/lastlog.c	2005-05-12 11:02:24.773677563 +0200
+@@ -107,13 +107,13 @@ int main (int argc, char **argv)
+ 		case 'h':
+ 			fprintf (stdout,
+ 				 _
+-				 ("Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"),
++				 ("Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"),
+ 				 argv[0]);
+ 			exit (0);
+ 		default:
+ 			fprintf (stdout,
+ 				 _
+-				 ("Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"),
++				 ("Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"),
+ 				 argv[0]);
+ 			exit (1);
+ 		}

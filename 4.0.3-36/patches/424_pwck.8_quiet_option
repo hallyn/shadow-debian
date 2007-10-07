@@ -1,0 +1,36 @@
+Goal: document the -q option
+Fixes: 309408
+
+Status wrt upstream: It should be forwarded to upstream.
+
+Index: shadow-4.0.3/man/pwck.8
+===================================================================
+--- shadow-4.0.3.orig/man/pwck.8	2005-06-23 12:47:43.152712000 +0200
++++ shadow-4.0.3/man/pwck.8	2005-06-23 12:59:21.002712000 +0200
+@@ -29,7 +29,7 @@
+ .SH NAME
+ pwck \- verify integrity of password files
+ .SH SYNOPSIS
+-\fBpwck\fR [\fB-sr\fR] [\fIpasswd\fR \fIshadow\fR]
++\fBpwck\fR [\fB\-qsr\fR] [\fIpasswd\fR \fIshadow\fR]
+ .SH DESCRIPTION
+ \fBpwck\fR verifies the integrity of the system authentication information.
+ All entries in the \fI/etc/passwd\fR and \fI/etc/shadow\fR are checked to
+@@ -73,12 +73,15 @@
+ The user may select alternate files with the \fIpasswd\fR and \fIshadow\fR
+ parameters.
+ Additionally, the user may execute the command in read-only mode by
+-specifying the \fB-r\fR flag.
++specifying the \fB\-r\fR flag.
+ This causes all questions regarding changes to be answered \fBno\fR
+ without user intervention.
+ \fBpwck\fR can also sort entries in \fI/etc/passwd\fR and \fI/etc/shadow\fR
+-by UID. To run it in sort mode pass it \fB-s\fR flag. No checks are
++by UID. To run it in sort mode pass it \fB\-s\fR flag. No checks are
+ performed then, it just sorts.
++.P
++With the \fB\-q\fR flag, \fBpwck\fR will only report errors which require an
++action from the user.
+ .SH FILES
+ /etc/passwd \- user account information
+ .br

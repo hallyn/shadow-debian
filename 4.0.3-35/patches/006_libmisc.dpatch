@@ -1,0 +1,95 @@
+#! /bin/sh -e
+## 006_libmisc.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Various patches in libmisc for the Debian package (before switch to dpatch)
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+diff -Nru shadow-4.0.3/libmisc/chowntty.c shadow-4.0.3_30.4/libmisc/chowntty.c
+--- shadow-4.0.3/libmisc/chowntty.c	2001-06-23 13:09:02.000000000 +0200
++++ shadow-4.0.3_30.4/libmisc/chowntty.c	2004-11-02 22:17:35.000000000 +0100
+@@ -116,7 +116,7 @@
+ 			tty, info->pw_name));
+ 		closelog();
+ 
+-		if (!(err == EROFS && info->pw_uid == 0))
++		if (err != EROFS)
+ 			exit(1);
+ 	}
+ 
+diff -Nru shadow-4.0.3/libmisc/failure.c shadow-4.0.3_30.4/libmisc/failure.c
+--- shadow-4.0.3/libmisc/failure.c	1998-12-28 21:34:46.000000000 +0100
++++ shadow-4.0.3_30.4/libmisc/failure.c	2004-11-02 22:17:35.000000000 +0100
+@@ -39,7 +39,11 @@
+ #include "getdef.h"
+ #include "failure.h"
+ 
++#ifdef HAVE_UTMPX_H
++#include <utmpx.h>
++#else
+ #include <utmp.h>
++#endif
+ 
+ #define	YEAR	(365L*DAY)
+ 
+@@ -248,7 +252,13 @@
+  */
+ 
+ void
+-failtmp(const struct utmp *failent)
++failtmp(
++#ifdef HAVE_UTMPX_H
++	const struct utmpx *failent
++#else
++	const struct utmp *failent
++#endif
++)
+ {
+ 	char *ftmp;
+ 	int fd;
+diff -Nru shadow-4.0.3/libmisc/failure.h shadow-4.0.3_30.4/libmisc/failure.h
+--- shadow-4.0.3/libmisc/failure.h	2000-08-26 20:27:17.000000000 +0200
++++ shadow-4.0.3_30.4/libmisc/failure.h	2004-11-02 22:17:35.000000000 +0100
+@@ -4,7 +4,11 @@
+ 
+ #include "defines.h"
+ #include "faillog.h"
++#ifdef HAVE_UTMPX_H
++#include <utmpx.h>
++#else
+ #include <utmp.h>
++#endif
+ 
+ /*
+  * failure - make failure entry
+@@ -38,7 +42,11 @@
+  *	failtmp updates the (struct utmp) formatted failure log which
+  *	maintains a record of all login failures.
+  */
++#ifdef HAVE_UTMPX_H
++extern void failtmp(const struct utmpx *);
++#else
+ extern void failtmp(const struct utmp *);
++#endif
+ 
+ #endif
+ 

@@ -1,0 +1,346 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 317_lastlog_usage_249611.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Fix the lastlog usage and all the translations accordingly
+## DP: (--user instead of --login).
+## DP: 
+## DP: STATUS: commited to upstream CVS on 9 May 2005 (before 4.0.9)
+
+@DPATCH@  
+Index: shadow-4.0.3/po/bs.po
+===================================================================
+--- shadow-4.0.3.orig/po/bs.po	2005-05-12 11:01:53.565340493 +0200
++++ shadow-4.0.3/po/bs.po	2005-05-12 11:02:24.718685780 +0200
+@@ -1253,7 +1253,7 @@ msgstr ""
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+ 
+ #: src/lastlog.c:181
+Index: shadow-4.0.3/po/da.po
+===================================================================
+--- shadow-4.0.3.orig/po/da.po	2005-05-12 11:01:53.646328392 +0200
++++ shadow-4.0.3/po/da.po	2005-05-12 11:02:24.724684884 +0200
+@@ -1269,8 +1269,8 @@ msgstr " grupper="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Brug: %s [<-u|--login> brugernavn] [<-t|--time> dage] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Brug: %s [<-u|--user> brugernavn] [<-t|--time> dage] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/el.po
+===================================================================
+--- shadow-4.0.3.orig/po/el.po	2005-05-12 11:01:53.175398755 +0200
++++ shadow-4.0.3/po/el.po	2005-05-12 11:02:24.727684435 +0200
+@@ -1287,8 +1287,8 @@ msgstr " ŒøŒºŒ¨Œ¥ŒµœÇ="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Usage: %s [<-u|--login> œåŒΩŒøŒºŒ± œáœÅŒÆœÉœÑŒ∑] [<-t|--time> ŒºŒ≠œÅŒµœÇ] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Usage: %s [<-u|--user> œåŒΩŒøŒºŒ± œáœÅŒÆœÉœÑŒ∑] [<-t|--time> ŒºŒ≠œÅŒµœÇ] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/es.po
+===================================================================
+--- shadow-4.0.3.orig/po/es.po	2005-05-12 11:01:53.661326152 +0200
++++ shadow-4.0.3/po/es.po	2005-05-12 11:02:24.729684137 +0200
+@@ -1277,9 +1277,9 @@ msgstr "grupos="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Modo de uso: %s [<-u|--login> nombre-usuario] [<-t|--time> dÌas] [<-h|--"
++"Modo de uso: %s [<-u|--user> nombre-usuario] [<-t|--time> dÌas] [<-h|--"
+ "help>]\n"
+ 
+ #: src/lastlog.c:181
+Index: shadow-4.0.3/po/eu.po
+===================================================================
+--- shadow-4.0.3.orig/po/eu.po	2005-05-12 11:01:53.683322865 +0200
++++ shadow-4.0.3/po/eu.po	2005-05-12 11:02:24.730683987 +0200
+@@ -1272,8 +1272,8 @@ msgstr " taldeak="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Erabilera: %s [<-u|--login> saio-izena] [<-t|--time> egun] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Erabilera: %s [<-u|--user> saio-izena] [<-t|--time> egun] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/fi.po
+===================================================================
+--- shadow-4.0.3.orig/po/fi.po	2005-05-12 11:01:53.698320624 +0200
++++ shadow-4.0.3/po/fi.po	2005-05-12 11:02:24.732683688 +0200
+@@ -1279,9 +1279,9 @@ msgstr " ryhm√§t="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"K√§ytt√∂: %s [<-u|--login> sis√§√§nkirjautumistunnus] [<-t|--time> p√§ivi√§] [<-"
++"K√§ytt√∂: %s [<-u|--user> sis√§√§nkirjautumistunnus] [<-t|--time> p√§ivi√§] [<-"
+ "h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+Index: shadow-4.0.3/po/he.po
+===================================================================
+--- shadow-4.0.3.orig/po/he.po	2005-05-12 11:01:53.729315993 +0200
++++ shadow-4.0.3/po/he.po	2005-05-12 11:02:24.737682941 +0200
+@@ -1262,8 +1262,8 @@ msgstr " ◊ß◊ë◊ï◊¶◊ï◊™="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "◊©◊ô◊û◊ï◊©: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "◊©◊ô◊û◊ï◊©: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/id.po
+===================================================================
+--- shadow-4.0.3.orig/po/id.po	2005-05-12 11:01:53.744313752 +0200
++++ shadow-4.0.3/po/id.po	2005-05-12 11:02:24.738682792 +0200
+@@ -1270,9 +1270,9 @@ msgstr " grup="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Penggunaan: %s [<-u|--login> namalogin] [<-t|--time hari] [<-h|--help>]\n"
++"Penggunaan: %s [<-u|--user> namalogin] [<-t|--time hari] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/it.po
+===================================================================
+--- shadow-4.0.3.orig/po/it.po	2005-05-12 11:01:53.772309569 +0200
++++ shadow-4.0.3/po/it.po	2005-05-12 11:02:24.740682493 +0200
+@@ -1294,8 +1294,8 @@ msgstr " gruppi="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Uso: %s [<-u|--login> UTENTE] [<-t|--time> GIORNI] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Uso: %s [<-u|--user> UTENTE] [<-t|--time> GIORNI] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ msgid "Username         Port     From             Latest\n"
+Index: shadow-4.0.3/po/ja.po
+===================================================================
+--- shadow-4.0.3.orig/po/ja.po	2005-05-12 11:01:53.246388149 +0200
++++ shadow-4.0.3/po/ja.po	2005-05-12 11:02:24.742682195 +0200
+@@ -1274,9 +1274,9 @@ msgstr " •∞•Î°º•◊="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"ª»Õ—À°: %s [<-u|--login> •Ì•∞•§•ÛÃæ] [<-t|--time> ∆¸§À§¡] [<-h|--help]\n"
++"ª»Õ—À°: %s [<-u|--user> •Ì•∞•§•ÛÃæ] [<-t|--time> ∆¸§À§¡] [<-h|--help]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/ko.po
+===================================================================
+--- shadow-4.0.3.orig/po/ko.po	2005-05-12 11:01:53.297380530 +0200
++++ shadow-4.0.3/po/ko.po	2005-05-12 11:02:24.743682045 +0200
+@@ -1271,9 +1271,9 @@ msgstr " ±◊∑ÏµÈ="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"ªÁøÎπ˝: %s [<-u|--login> ∑Œ±◊¿Œ-¿Ã∏ß] [<-t|--time> ∏Áƒ•] [<-h|--help>]\n"
++"ªÁøÎπ˝: %s [<-u|--user> ∑Œ±◊¿Œ-¿Ã∏ß] [<-t|--time> ∏Áƒ•] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/nb.po
+===================================================================
+--- shadow-4.0.3.orig/po/nb.po	2005-05-12 11:01:53.808304191 +0200
++++ shadow-4.0.3/po/nb.po	2005-05-12 11:02:24.745681746 +0200
+@@ -1273,8 +1273,8 @@ msgstr " groups="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Bruk: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Bruk: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/nn.po
+===================================================================
+--- shadow-4.0.3.orig/po/nn.po	2005-05-12 11:01:53.904289850 +0200
++++ shadow-4.0.3/po/nn.po	2005-05-12 11:02:24.749681149 +0200
+@@ -1270,8 +1270,8 @@ msgstr " grupper="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Bruk: %s [<-u|--login> brukarnamn] [<-t|--time> dagar] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Bruk: %s [<-u|--user> brukarnamn] [<-t|--time> dagar] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/pl.po
+===================================================================
+--- shadow-4.0.3.orig/po/pl.po	2005-05-12 11:01:53.359371267 +0200
++++ shadow-4.0.3/po/pl.po	2005-05-12 11:02:24.750680999 +0200
+@@ -1275,8 +1275,8 @@ msgstr " grupy="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Uøycie: %s [<-u|--login> login] [<-t|--time> dni] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Uøycie: %s [<-u|--user> login] [<-t|--time> dni] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/pt_BR.po
+===================================================================
+--- shadow-4.0.3.orig/po/pt_BR.po	2005-05-12 11:01:53.941284322 +0200
++++ shadow-4.0.3/po/pt_BR.po	2005-05-12 11:02:24.752680701 +0200
+@@ -1276,8 +1276,8 @@ msgstr " grupos="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Uso : %s [<-u|--login> nome-login] [<-t|--time> dias] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Uso : %s [<-u|--user> nome-login] [<-t|--time> dias] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/pt.po
+===================================================================
+--- shadow-4.0.3.orig/po/pt.po	2005-05-12 11:01:53.920287459 +0200
++++ shadow-4.0.3/po/pt.po	2005-05-12 11:02:24.754680402 +0200
+@@ -1280,9 +1280,9 @@ msgstr " grupos="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Utiliza√ß√£o: %s [<-u|--login> login-name] [<-t|--time> dias] [<-h|--help>]\n"
++"Utiliza√ß√£o: %s [<-u|--user> login-name] [<-t|--time> dias] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/shadow.pot
+===================================================================
+--- shadow-4.0.3.orig/po/shadow.pot	2005-05-11 22:25:23.000000000 +0200
++++ shadow-4.0.3/po/shadow.pot	2005-05-12 11:02:24.758679804 +0200
+@@ -1249,7 +1249,7 @@ msgstr ""
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+ 
+ #: src/lastlog.c:181
+Index: shadow-4.0.3/po/sk.po
+===================================================================
+--- shadow-4.0.3.orig/po/sk.po	2005-05-12 11:01:53.970279990 +0200
++++ shadow-4.0.3/po/sk.po	2005-05-12 11:02:24.760679506 +0200
+@@ -1280,9 +1280,9 @@ msgstr " skupiny="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+-"Pou≈æitie: %s [<-u|--login> n√°zov_√∫ƒçtu] [<-t|--time> dn√≠] [<-h|--help>]\n"
++"Pou≈æitie: %s [<-u|--user> n√°zov_√∫ƒçtu] [<-t|--time> dn√≠] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/sq.po
+===================================================================
+--- shadow-4.0.3.orig/po/sq.po	2005-05-12 11:01:54.039269682 +0200
++++ shadow-4.0.3/po/sq.po	2005-05-12 11:02:24.761679356 +0200
+@@ -1255,7 +1255,7 @@ msgstr ""
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
+ msgstr ""
+ 
+ #: src/lastlog.c:181
+Index: shadow-4.0.3/po/tr.po
+===================================================================
+--- shadow-4.0.3.orig/po/tr.po	2005-05-12 11:01:53.985277749 +0200
++++ shadow-4.0.3/po/tr.po	2005-05-12 11:02:24.766678609 +0200
+@@ -1268,8 +1268,8 @@ msgstr ".gruplar="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Kullanƒ±m: %s [<-u|--login> giri≈ü-adƒ±] [<-t|--time> g√ºn] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Kullanƒ±m: %s [<-u|--user> giri≈ü-adƒ±] [<-t|--time> g√ºn] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/po/zh_CN.po
+===================================================================
+--- shadow-4.0.3.orig/po/zh_CN.po	2005-05-12 11:01:54.004274911 +0200
++++ shadow-4.0.3/po/zh_CN.po	2005-05-12 11:02:24.771677862 +0200
+@@ -1265,8 +1265,8 @@ msgstr " ÁªÑ="
+ 
+ #: src/lastlog.c:110 src/lastlog.c:116
+ #, c-format
+-msgid "Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"
+-msgstr "Áî®Ê≥ïÔºö%s [<-u|--login> ÁôªÂΩïÂêç] [<-t|--time> Â§©Êï∞] [<-h|--help>]\n"
++msgid "Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"
++msgstr "Áî®Ê≥ïÔºö%s [<-u|--user> ÁôªÂΩïÂêç] [<-t|--time> Â§©Êï∞] [<-h|--help>]\n"
+ 
+ #: src/lastlog.c:181
+ #, c-format
+Index: shadow-4.0.3/src/lastlog.c
+===================================================================
+--- shadow-4.0.3.orig/src/lastlog.c	2005-05-11 22:03:39.000000000 +0200
++++ shadow-4.0.3/src/lastlog.c	2005-05-12 11:02:24.773677563 +0200
+@@ -107,13 +107,13 @@ int main (int argc, char **argv)
+ 		case 'h':
+ 			fprintf (stdout,
+ 				 _
+-				 ("Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"),
++				 ("Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"),
+ 				 argv[0]);
+ 			exit (0);
+ 		default:
+ 			fprintf (stdout,
+ 				 _
+-				 ("Usage: %s [<-u|--login> login-name] [<-t|--time> days] [<-h|--help>]\n"),
++				 ("Usage: %s [<-u|--user> login-name] [<-t|--time> days] [<-h|--help>]\n"),
+ 				 argv[0]);
+ 			exit (1);
+ 		}

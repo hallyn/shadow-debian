@@ -1,0 +1,79 @@
+Goal: Document the -f option
+      Document the group removal behavior.
+
+Status wrt upstream: Fixed in 4.0.14
+
+Index: shadow-4.0.13/man/userdel.8.xml
+===================================================================
+--- shadow-4.0.13.orig/man/userdel.8.xml	2005-09-30 18:16:21.000000000 +0200
++++ shadow-4.0.13/man/userdel.8.xml	2005-10-12 01:16:05.000000000 +0200
+@@ -15,6 +15,7 @@
+     <cmdsynopsis>
+       <command>userdel</command>
+       <arg choice='opt'>-r </arg>
++      <arg choice='opt'>-f </arg>
+       <arg choice='plain'>
+ 	<replaceable>login_name</replaceable>
+       </arg>
+@@ -47,6 +48,34 @@
+ 	    located in other file systems will have to be searched for and
+ 	    deleted manually.
+ 	  </para>
++	  <para>
++	    The mail spool is defined by the <emphasis>MAIL_DIR</emphasis>
++	    variable in the <filename>login.defs</filename> file.
++	  </para>
++	</listitem>
++      </varlistentry>
++      <varlistentry>
++	<term>
++	  <option>-f</option>
++	</term>
++	<listitem>
++	  <para>
++	    This option forces the removal of the user, even if she is
++	    still logged in.
++	    It also forces <command>userdel</command> to remove the user's
++	    home directory or her mail spool, even if another user uses
++	    the same home directory or if the mail spool is not owned by
++	    the specified user.
++	    If <emphasis>USERGROUPS_ENAB</emphasis> is defined to
++	    <emphasis remap='I'>yes</emphasis> in
++	    <filename>/etc/login.defs</filename> and if a group exists
++	    with the same name as the deleted user, then this group will
++	    be removed, even if it is still the primary group of another
++	    user.
++	  </para>
++	  <para><emphasis>Note:</emphasis> This option is dangerous and may
++	    let your system in an inconsistent state.
++	  </para>
+ 	</listitem>
+       </varlistentry>
+     </variablelist>
+@@ -135,12 +164,21 @@
+ 
+   <refsect1 id='caveats'>
+     <title>CAVEATS</title>
+-    <para>
+-      <command>userdel</command> will not allow you to remove an account if
++    <para><command>userdel</command> will not allow you to remove an account if
+       the user is currently logged in. You must kill any running processes
+-      which belong to an account that you are deleting. You may not remove
+-      any NIS attributes on a NIS client. This must be performed on the NIS
+-      server.
++      which belong to an account that you are deleting.
++    </para>
++    <para>You may not remove any NIS attributes on a NIS client. This must
++      be performed on the NIS server.
++    </para>
++    <para>If <emphasis>USERGROUPS_ENAB</emphasis> is defined to <emphasis
++      remap='I'>yes</emphasis> in <filename>/etc/login.defs</filename>,
++      <command>userdel</command> will delete the group with the same name
++      as the user. To avoid inconsistencies in the passwd and group
++      databases, <command>userdel</command> will check that this group is
++      not used as a primary group for another user, and will just warn
++      without deleting the user otherwise. The <option>-f</option> option
++      can force the deletion of this group.
+     </para>
+   </refsect1>
+ 

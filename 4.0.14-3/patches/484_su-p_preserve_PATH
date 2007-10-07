@@ -1,0 +1,156 @@
+Goal: preserve the environment when -p is used and su starts a shell
+Fixes: #347935
+
+When su -p started a shell, some environment variables were not preserved
+(e.g. PATH). Problem was caused by shell() function from libmisc/shell.c
+using global variable "newenvp" for passing environment, while in other
+places global variable "environ" is used/assumed.
+
+Patch makes several calls to pass environment explicitly.
+
+Status wrt upstream: reported, but not yet accepted.
+
+Note: On Linux, shell() doesn't provide anything. Just an execv would be
+simplier.
+
+Index: shadow-4.0.14/src/su.c
+===================================================================
+--- shadow-4.0.14.orig/src/su.c	2006-01-15 11:14:14.000000000 +0200
++++ shadow-4.0.14/src/su.c	2006-01-15 11:14:14.000000000 +0200
+@@ -174,7 +174,8 @@
+  * have been applied.  Some work was needed to get it integrated into
+  * su.c from shadow.
+  */
+-static void run_shell (const char *shellstr, char *args[], int doshell)
++static void run_shell (const char *shellstr, char *args[], int doshell,
++		const char *envp)
+ {
+ 	int child;
+ 	sigset_t ourset;
+@@ -186,9 +187,9 @@
+ 		pam_end (pamh, PAM_SUCCESS);
+ 
+ 		if (doshell)
+-			shell (shellstr, (char *) args[0]);
++			shelle (shellstr, (char *) args[0], envp);
+ 		else
+-			(void) execv (shellstr, (char **) args);
++			(void) execve (shellstr, (char **) args, envp);
+ 		{
+ 			int exit_status = (errno == ENOENT ? 127 : 126);
+ 
+@@ -307,6 +308,7 @@
+ 	char **envp = environ;
+ 	char *command = 0, *shellstr = 0;
+ 	char *tmp_name;
++	int exit_status = 0;
+ 
+ #ifdef USE_PAM
+ 	int ret;
+@@ -904,19 +906,22 @@
+ 		 */
+ 		argv[-1] = cp;
+ #ifndef USE_PAM
+-		(void) execv (shellstr, &argv[-1]);
+-#else
+-		run_shell (shellstr, &argv[-1], 0);
+-#endif
++		(void) execve (shellstr, &argv[-1], environ);
++		exit_status = errno == ENOENT ? 127 : 126;
+ 		(void) fprintf (stderr, _("No shell\n"));
+ 		SYSLOG ((LOG_WARN, "Cannot execute %s", shellstr));
+ 		closelog ();
+-		exit (1);
++		exit (exit_status);
++#else
++		run_shell (shellstr, &argv[-1], 0, environ); /* no return */
++#endif
+ 	}
+ #ifndef USE_PAM
+-	shell (shellstr, cp);
++	exit_status = shelle (shellstr, cp, environ);
++	exit_status = exit_status == ENOENT ? 127 : 126;
++	exit (exit_status);
+ #else
+-	run_shell (shellstr, &cp, 1);
++	run_shell (shellstr, &cp, 1, environ);
+ #endif
+ 	/* NOT REACHED */
+ 	exit (1);
+Index: shadow-4.0.14/lib/prototypes.h
+===================================================================
+--- shadow-4.0.14.orig/lib/prototypes.h	2006-01-15 11:13:45.000000000 +0200
++++ shadow-4.0.14/lib/prototypes.h	2006-01-15 11:14:14.000000000 +0200
+@@ -150,6 +150,7 @@
+ 
+ /* shell.c */
+ extern void shell (const char *, const char *);
++extern int shelle (const char *, const char *, const char *);
+ 
+ /* strtoday.c */
+ extern long strtoday (const char *);
+Index: shadow-4.0.14/libmisc/shell.c
+===================================================================
+--- shadow-4.0.14.orig/libmisc/shell.c	2006-01-15 11:13:45.000000000 +0200
++++ shadow-4.0.14/libmisc/shell.c	2006-01-15 11:16:47.000000000 +0200
+@@ -38,8 +38,15 @@
+ extern char **newenvp;
+ extern size_t newenvc;
+ 
++/* shell - left here for compatibility (actually being frontend to shelle) */
++void shell (const char *file, const char *arg) {
++	int err;
++	err = shelle (file, arg, (const char *)newenvp);
++	if (err) exit (1);
++}
++
+ /*
+- * shell - execute the named program
++ * shelle - execute the named program
+  *
+  *	shell begins by trying to figure out what argv[0] is going to
+  *	be for the named process.  The user may pass in that argument,
+@@ -51,13 +58,15 @@
+  *	the file.  If all that fails, give up in disgust ...
+  */
+ 
+-void shell (const char *file, const char *arg)
++int shelle (const char *file, const char *arg, const char *envp)
+ {
+ 	char arg0[1024];
+ 	int err;
+ 
+-	if (file == (char *) 0)
+-		exit (1);
++	if (file == (char *) 0) {
++		errno = EINVAL;
++		return errno;
++	}
+ 
+ 	/*
+ 	 * The argv[0]'th entry is usually the path name, but
+@@ -80,7 +89,7 @@
+ 	 * grief.
+ 	 */
+ 
+-	execle (file, arg, (char *) 0, newenvp);
++	execle (file, arg, (char *) 0, envp);
+ 	err = errno;
+ 
+ 	/* Linux handles #! in the kernel, and bash doesn't make
+@@ -100,7 +109,7 @@
+ 			if (getc (fp) == '#' && getc (fp) == '!') {
+ 				fclose (fp);
+ 				execle ("/bin/sh", "sh",
+-					file, (char *) 0, newenvp);
++					file, (char *) 0, envp);
+ 				err = errno;
+ 			} else {
+ 				fclose (fp);
+@@ -118,5 +127,5 @@
+ 	snprintf (arg0, sizeof arg0, _("Cannot execute %s"), file);
+ 	errno = err;
+ 	perror (arg0);
+-	exit (1);
++	return err;
+ }

@@ -1,0 +1,23 @@
+Status wrt upstream: Fixed in 4.0.14
+
+Index: shadow-4.0.13/man/pt_BR/gpasswd.1
+===================================================================
+--- shadow-4.0.13.orig/man/pt_BR/gpasswd.1	2005-04-05 21:08:56.000000000 +0200
++++ shadow-4.0.13/man/pt_BR/gpasswd.1	2005-10-09 18:20:53.000000000 +0200
+@@ -28,7 +28,7 @@
+ .SH NOME
+ gpasswd \- administra o arquivo \fI/etc/group\fR
+ .br
+-.SH SINOSPE
++.SH SINOPSE
+ \fBgpasswd\fR \fIgrupo\fR
+ .br
+ \fBgpasswd \-a\fR \fIusuário\fR \fIgrupo\fR
+@@ -87,4 +87,7 @@
+ .BR grpck (8)
+ .SH TRADUÇÃO E REVISÃO PARA A LÍNGUA PORTUGUESA
+ Sandro Nunes Henrique <sandro@conectiva.com.br> (tradução)
++.br
+ Rodrigo Stulzer Lopes <rodrigo@conectiva.com.br> (revisão)
++.br
++Guilherme de S. Pastore <gpastore@colband.com.br> (revisão)

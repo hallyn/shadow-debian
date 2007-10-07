@@ -1,0 +1,108 @@
+Goal: Allow login PAM service name to be configurable
+
+Fixes: #187921
+
+Status wrt upstream: Forwarded but not applied yet
+
+Index: shadow-4.0.13/src/login.c
+===================================================================
+--- shadow-4.0.13.orig/src/login.c	2005-10-27 16:18:17.602543936 +0200
++++ shadow-4.0.13/src/login.c	2005-10-27 16:50:28.978930096 +0200
+@@ -64,6 +64,8 @@
+ #define PAM_END { retcode = pam_close_session(pamh,0); \
+ 		pam_end(pamh,retcode); }
+ 
++static const char* pam_service = "login";
++
+ #endif				/* USE_PAM */
+ 
+ /*
+@@ -97,6 +99,12 @@
+ #else
+ #define rflg 0
+ #endif
++#ifdef USE_PAM
++static int sflg = 0;
++#else
++#define sflg 0
++#endif
++
+ static int hflg = 0;
+ static int preauth_flag = 0;
+ 
+@@ -153,15 +161,34 @@
+  * login -h hostname	(for telnetd, etc.)
+  * login -f name	(for pre-authenticated login: datakit, xterm, etc.)
+  */
+-static void usage (void)
+-{
++#ifdef USE_PAM
++static void usage_nonroot (void) {
++	fprintf (stderr, _("usage: %s [-p] [-s pam_service ] [name]\n"), Prog);
++}
++
++static void usage_root (void) {
++	fprintf (stderr, _("       %s [-p] [-s pam_service ] [-h host] [-f name]\n"), Prog);
++#ifdef RLOGIN
++	fprintf (stderr, _("       %s [-p] [-s pam_service ] -r host\n"), Prog);
++#endif
++}
++#else /* USE_PAM */
++static void usage_nonroot (void) {
+ 	fprintf (stderr, _("Usage: %s [-p] [name]\n"), Prog);
+-	if (!amroot)
+-		exit (1);
++}
++static void usage_root (void) {
+ 	fprintf (stderr, _("       %s [-p] [-h host] [-f name]\n"), Prog);
+ #ifdef RLOGIN
+ 	fprintf (stderr, _("       %s [-p] -r host\n"), Prog);
+ #endif
++}
++#endif /* USE_PAM */
++
++static void usage (void)
++{
++	usage_nonroot();
++	if (amroot)
++		usage_root();
+ 	exit (1);
+ }
+ 
+@@ -370,11 +397,17 @@
+ 
+ 	check_flags (argc, argv);
+ 
+-	while ((flag = getopt (argc, argv, "d:f::h:pr:")) != EOF) {
++	while ((flag = getopt (argc, argv, "d:f::h:pr:s:")) != EOF) {
+ 		switch (flag) {
+ 		case 'd':
+ 			/* "-d device" ignored for compatibility */
+ 			break;
++#ifdef USE_PAM
++		case 's':
++			pam_service = optarg;
++			sflg++;
++			break;
++#endif
+ 		case 'f':
+ 			/*
+ 			 * username must be a separate token
+@@ -423,7 +456,7 @@
+ 	 * Allow authentication bypass only if real UID is zero.
+ 	 */
+ 
+-	if ((rflg || fflg || hflg) && !amroot) {
++	if ((rflg || fflg || hflg || sflg) && !amroot) {
+ 		fprintf (stderr, _("%s: Permission denied.\n"), Prog);
+ 		exit (1);
+ 	}
+@@ -576,7 +609,7 @@
+ 		retries = getdef_num ("LOGIN_RETRIES", RETRIES);
+ 
+ #ifdef USE_PAM
+-		retcode = pam_start ("login", username, &conv, &pamh);
++		retcode = pam_start (pam_service, username, &conv, &pamh);
+ 		if (retcode != PAM_SUCCESS) {
+ 			fprintf (stderr,
+ 				 _("login: PAM Failure, aborting: %s\n"),

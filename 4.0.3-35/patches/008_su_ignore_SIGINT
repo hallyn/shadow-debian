@@ -1,0 +1,21 @@
+Goal: Ignore SIGINT while authenticating. A ^C could defeat the waiting
+      period and permit brute-force attacks.
+Fixes: 52372
+
+Status wrt upstream: It should be forwarded to upstream.
+
+Note: Even with a waiting period, a brute-force attack can be performed
+      by parralelizing attacks.  The gain in security is minor.
+
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-05-30 22:57:55.776974000 +0200
++++ shadow-4.0.3/src/su.c	2005-05-30 22:58:36.326974000 +0200
+@@ -538,6 +538,7 @@
+ 	if (shell == 0)
+ 		shell = (char *) strdup (pwent.pw_shell);
+ 
++	signal(SIGINT, SIG_IGN);
+ #ifdef USE_PAM
+ 	ret = pam_authenticate (pamh, 0);
+ 	if (ret != PAM_SUCCESS) {

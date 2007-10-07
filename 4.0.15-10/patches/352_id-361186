@@ -1,0 +1,137 @@
+Goal: Complete Indonesian translation
+
+Fix: #361186
+
+Author: Parlin Imanuel <pimanuel@gmail.com>
+
+Status wrt upstream: Will be in 4.0.16
+
+Index: shadow-4.0.15/po/id.po
+===================================================================
+--- shadow-4.0.15.orig/po/id.po	2006-05-04 18:34:19.302129952 +0200
++++ shadow-4.0.15/po/id.po	2006-05-04 18:35:09.088561264 +0200
+@@ -6,8 +6,8 @@
+ "Project-Id-Version: shadow 4.0.14\n"
+ "Report-Msgid-Bugs-To: kloczek@pld.org.pl\n"
+ "POT-Creation-Date: 2006-03-05 23:11+0100\n"
+-"PO-Revision-Date: 2005-12-26 02:12+0700\n"
+-"Last-Translator: Parlin Imanuel Toh <pt@samip-online.com>\n"
++"PO-Revision-Date: 2006-04-07 11:45+0700\n"
++"Last-Translator: Parlin Imanuel Toh <parlin_i@yahoo.com>\n"
+ "Language-Team: Debian Indonesia <debid@yahoogroups.com>\n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=UTF-8\n"
+@@ -82,7 +82,7 @@
+ "Last was %s on %s.\n"
+ msgstr[0] ""
+ "%d sejak login terakhir.\n"
+-"Terakhir di %s pada %s.\n"
++"Terakhir %s pada %s.\n"
+ 
+ #, c-format
+ msgid "Too many logins.\n"
+@@ -438,7 +438,7 @@
+ msgid "Cannot unlock the password file.\n"
+ msgstr "Tidak dapat membuka kunci berkas kata sandi.\n"
+ 
+-#, fuzzy, c-format
++#, c-format
+ msgid ""
+ "Usage: chgpasswd [options]\n"
+ "\n"
+@@ -448,7 +448,7 @@
+ "  -m, --md5\t\tuse MD5 encryption instead DES when the supplied\n"
+ "\t\t\tpasswords are not encrypted\n"
+ msgstr ""
+-"Penggunaan: chpasswd [pilihan-pilihan]\n"
++"Penggunaan: chgpasswd [pilihan-pilihan]\n"
+ "\n"
+ "Pilihan-pilihan:\n"
+ "  -e, --encrypted\tkata sandi yang diberikan telah terenkripsi\n"
+@@ -464,9 +464,9 @@
+ msgid "%s: can't open group file\n"
+ msgstr "%s: tidak dapat membuka berkas grup\n"
+ 
+-#, fuzzy, c-format
++#, c-format
+ msgid "%s: can't lock gshadow file\n"
+-msgstr "%s: tidak dapat mengunci berkas kata sandi bayangan\n"
++msgstr "%s: tidak dapat mengunci berkas gshadow\n"
+ 
+ #, c-format
+ msgid "%s: can't open shadow file\n"
+@@ -480,9 +480,9 @@
+ msgid "%s: line %d: missing new password\n"
+ msgstr "%s: baris %d: kata sandi baru hilang\n"
+ 
+-#, fuzzy, c-format
++#, c-format
+ msgid "%s: line %d: unknown group %s\n"
+-msgstr "%s: baris %d: pengguna %s tak dikenal\n"
++msgstr "%s: baris %d: grup %s tak dikenal\n"
+ 
+ #, c-format
+ msgid "%s: line %d: cannot update password entry\n"
+@@ -985,7 +985,7 @@
+ 
+ #, c-format
+ msgid "lastlog: unexpected argument: %s\n"
+-msgstr ""
++msgstr "lastlog: argumen tak terduga: %s\n"
+ 
+ #, c-format
+ msgid "Usage: %s [-p] [name]\n"
+@@ -1039,25 +1039,21 @@
+ msgid "login: PAM Failure, aborting: %s\n"
+ msgstr "login: Kegagalan PAM, berhenti: %s\n"
+ 
+-#, fuzzy, c-format
++#, c-format
+ msgid "%s login: "
+-msgstr ""
+-"\n"
+-"%s login: "
++msgstr "%s login: "
+ 
+-#, fuzzy, c-format
++#, c-format
+ msgid "login: "
+-msgstr ""
+-"\n"
+-"%s login: "
++msgstr "login: "
+ 
+-#, fuzzy, c-format
++#, c-format
+ msgid "Maximum number of tries exceeded (%d)\n"
+-msgstr "Jumlah hari maksimum antara penggantian password\t\t: %ld\n"
++msgstr "Jumlah pengulangan maksimum terlampaui (%d)\n"
+ 
+ #, c-format
+ msgid "login: abort requested by PAM\n"
+-msgstr ""
++msgstr "login: penghentian diminta oleh PAM\n"
+ 
+ #, c-format
+ msgid ""
+@@ -1376,7 +1372,7 @@
+ msgid "%s: %s\n"
+ msgstr "%s: %s\n"
+ 
+-#, fuzzy, c-format
++#, c-format
+ msgid ""
+ "Usage: su [options] [login]\n"
+ "\n"
+@@ -1389,9 +1385,10 @@
+ "\t\t\t\tthe same shell\n"
+ "  -s, --shell SHELL\t\tuse SHELL instead of the default in passwd\n"
+ msgstr ""
+-"Penggunaan: su [pilihan-pilihan] [nama-pengguna]\n"
++"Penggunaan: su [pilihan-pilihan] [login]\n"
+ "\n"
+ "Pilihan-pilihan:\n"
++"  -c, --command PERINTAH\t\tberikan PERINTAH yang akan diberikan pada shell\n"
+ "  -h, --help\t\t\ttampilkan pesan bantuan ini dan keluar\n"
+ "  -, -l, --login\t\tbuat shell menjadi shell login\n"
+ "  -m, -p,\n"

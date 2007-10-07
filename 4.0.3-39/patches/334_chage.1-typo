@@ -1,0 +1,17 @@
+Goal: fix a typo
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/chage.1
+===================================================================
+--- shadow-4.0.3.orig/man/chage.1	2005-05-12 12:12:08.887059874 +0200
++++ shadow-4.0.3/man/chage.1	2005-05-12 12:12:18.801578516 +0200
+@@ -57,7 +57,7 @@ of days during which a password is valid
+ When \fImaxdays\fR plus \fIlastday\fR is less than the current day,
+ the user will be required to change her password before being
+ able to use her account.
+-This occurance can be planned for in advance by use of the \fB-W\fR option,
++This occurrence can be planned for in advance by use of the \fB-W\fR option,
+ which provides the user with advance warning.
+ .PP
+ With the \fB-d\fR option, the value of \fIlastday\fR is the number of days

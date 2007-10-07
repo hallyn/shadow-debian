@@ -1,0 +1,54 @@
+Goal: grpck now has an (otherwise undocumented) -p option, so that
+      shadowconfig can clean up the results of the above, so the config
+      script will fail randomly less often.
+Fixes: #103385
+
+Status wrt upstream: It could certainly be submitted to upstream.
+
+Index: shadow-4.0.3/src/grpck.c
+===================================================================
+--- shadow-4.0.3.orig/src/grpck.c	2005-05-23 01:08:35.567167000 +0200
++++ shadow-4.0.3/src/grpck.c	2005-05-23 01:09:33.657167000 +0200
+@@ -146,6 +146,7 @@
+ 	int errors = 0;
+ 	int deleted = 0;
+ 	int i;
++	int prune = 0;
+ 	struct commonio_entry *gre, *tgre;
+ 	struct group *grp;
+ 	int sort_mode = 0;
+@@ -172,7 +173,7 @@
+ 	 * Parse the command line arguments
+ 	 */
+ 
+-	while ((arg = getopt (argc, argv, "qrs")) != EOF) {
++	while ((arg = getopt (argc, argv, "qprs")) != EOF) {
+ 		switch (arg) {
+ 		case 'q':
+ 			/* quiet - ignored for now */
+@@ -183,6 +184,9 @@
+ 		case 's':
+ 			sort_mode = 1;
+ 			break;
++		case 'p':
++			prune = 1;
++			break;
+ 		default:
+ 			usage ();
+ 		}
+@@ -315,9 +319,13 @@
+ 			/*
+ 			 * prompt the user to delete the entry or not
+ 			 */
+-
+-			if (!yes_or_no ())
++			if (!prune) {
++			        if (!yes_or_no ())
++				        continue;
++			} else {
++			        puts("Yes");
+ 				continue;
++			}
+ 
+ 			/*
+ 			 * All group file deletions wind up here. This code

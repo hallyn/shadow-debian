@@ -1,0 +1,31 @@
+Goal: Better explain the respective roles of login, init and getty with regards
+      to the utmp file
+
+Status wrt upstream: Forwarded.
+
+Note:
+    * Is it still the case if the pam session is closed?
+
+Index: shadow-4.0.12/man/login.1.xml
+===================================================================
+--- shadow-4.0.12.orig/man/login.1.xml	2005-08-17 11:49:22.000000000 +0200
++++ shadow-4.0.12/man/login.1.xml	2005-08-17 11:50:35.000000000 +0200
+@@ -163,6 +163,18 @@
+     <para>The location of files is subject to differences in system
+       configuration.
+     </para>
++
++    <para>The <command>login</command> program is NOT responsible for removing
++      users from the utmp file. It is the responsibility of <citerefentry>
++      <refentrytitle>getty</refentrytitle><manvolnum>8</manvolnum>
++      </citerefentry> and <citerefentry>
++      <refentrytitle>init</refentrytitle><manvolnum>8</manvolnum>
++      </citerefentry> to clean up apparent ownership of a terminal session.
++      If you use <command>login</command>
++      from the shell prompt without <command>exec</command>, the user you use
++      will continue to appear to be logged in even after you log out of the
++      "subsession".
++    </para>
+   </refsect1>
+   
+   <refsect1 id='files'>

@@ -1,0 +1,201 @@
+#!/usr/bin/make -f
+
+# This is the debhelper compatibility version to use.
+export DH_COMPAT=4
+ 
+CFLAGS = -g -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+  CFLAGS += -O0
+else
+  CFLAGS += -O2
+endif
+export CFLAGS
+
+config_options := --disable-shared --without-libcrack --mandir=/usr/share/man --with-libpam --enable-shadowgrp --enable-man
+
+DEB_HOST_ARCH_OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_BUILD_GNU_TYPE = $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_HOST_GNU_TYPE = $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ifneq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
+  config_options += --host=$(DEB_HOST_GNU_TYPE)
+endif
+
+# see /usr/share/doc/autotools-dev/README.Debian.gz
+export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+# FOR AUTOCONF 2.52 AND NEWER ONLY
+ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+  confflags += --build $(DEB_HOST_GNU_TYPE)
+else
+  confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+endif
+
+export DH_COMPAT=3
+
+# The autotools target adds forced build-time dependencies on
+# autotools-dev (for /usr/share/misc/config.*) and devscripts (for dch)
+# It's also a .PHONY make target.
+autotools:
+	chmod u+x config.sub
+	chmod u+x config.guess
+	OLDDATESUB=`./config.sub -t | tr -d -` ;\
+	OLDDATEGUESS=`./config.guess -t | tr -d -` ;\
+	NEWDATESUB=`/usr/share/misc/config.sub -t | tr -d -` ;\
+	NEWDATEGUESS=`/usr/share/misc/config.guess -t | tr -d -` ;\
+	if [ $$OLDDATESUB -lt $$NEWDATESUB -o \
+	     $$OLDDATEGUESS -lt $$NEWDATEGUESS ]; then \
+	   cp -f /usr/share/misc/config.sub config.sub ;\
+	   cp -f /usr/share/misc/config.guess config.guess ;\
+	   echo WARNING: GNU config scripts updated from master copies 1>&2 ;\
+	fi
+
+configure-stamp:	patch autotools
+	dh_testdir
+	touch configure-stamp
+
+
+build: configure-stamp build-stamp
+build-stamp:
+	dh_testdir
+	aclocal-1.7
+	autoconf
+	automake-1.7
+	./configure $(config_options)
+	$(MAKE)
+	touch build-stamp
+
+install: install-stamp
+install-stamp: build-stamp
+	dh_testdir
+	dh_testroot
+	rm -rf debian/tmp
+	mkdir debian/tmp
+	$(MAKE) DESTDIR=$$(pwd)/debian/tmp install
+	touch install-stamp
+
+clean:	clean-patched unpatch
+
+clean-patched:	autotools
+	rm -f build-stamp install-stamp configure-stamp
+	$(checkdir)
+	-$(MAKE) distclean
+	dh_clean
+	rm -rf debian/tmp debian/login debian/passwd
+	rm -f build install debian/*~ debian/substvars # debian/files*
+	# Thanks, lintian
+	rm -f config.log
+
+binary-indep:
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_movefiles
+	dh_installdirs
+	ln -sf vipw debian/passwd/usr/sbin/vigr
+	ln -sf cppw debian/passwd/usr/sbin/cpgr
+	ln -sf newgrp debian/login/usr/bin/sg
+	# Bug #288106. This used to be renamed to limits.conf.5
+	# but does not reflect what we do in Debian
+	# so we'd better forget about that man page
+	rm -f debian/passwd/usr/share/man/man5/limits.5 || true
+	install -c -m 444 man/shadowconfig.8 debian/passwd/usr/share/man/man8
+	install -c -m 444 man/ja/shadowconfig.8 debian/passwd/usr/share/man/ja/man8
+	install -c -m 444 man/pl/shadowconfig.8 debian/passwd/usr/share/man/pl/man8
+	install -c -m 444 man/fr/shadowconfig.8 debian/passwd/usr/share/man/fr/man8
+	dh_installpam -p passwd --name=passwd
+	dh_installpam -p passwd --name=chage
+	dh_installpam -p passwd --name=chfn
+	dh_installpam -p passwd --name=chsh
+	dh_installpam -p passwd --name=useradd
+	dh_installpam -p passwd --name=userdel
+	dh_installpam -p passwd --name=usermod
+	dh_installpam -p passwd --name=groupadd
+	dh_installpam -p passwd --name=groupdel
+	dh_installpam -p passwd --name=groupmod
+	dh_installpam -p passwd --name=newusers
+	dh_installpam -p login
+	dh_installpam -p login --name=su
+	install -c -m 444 debian/login.defs debian/login/etc/login.defs
+	install -c -m 444 debian/securetty.$(DEB_HOST_ARCH_OS) debian/login/etc/securetty
+	install -d debian/passwd/usr/share/passwd
+	install -c -m 644 debian/useradd.default debian/passwd/etc/default/useradd
+	install -c -m 444 debian/shells debian/passwd/usr/share/passwd/shells
+	install -d debian/passwd/sbin
+	install -c -m 555 debian/shadowconfig.sh debian/passwd/sbin/shadowconfig
+	install -c -m 555 debian/add-shell.sh debian/passwd/usr/sbin/add-shell
+	install -c -m 555 debian/remove-shell.sh debian/passwd/usr/sbin/remove-shell
+	install -c -m 444 debian/add-shell.8 debian/passwd/usr/share/man/man8
+	install -c -m 444 debian/remove-shell.8 debian/passwd/usr/share/man/man8
+	install -c -m 444 debian/cpgr.8 debian/passwd/usr/share/man/man8
+	install -c -m 444 debian/cppw.8 debian/passwd/usr/share/man/man8
+	# Lintian overrides files
+	install -c -m 444  debian/login.lintian-overrides debian/login/usr/share/lintian/overrides/login
+	install -c -m 444  debian/passwd.lintian-overrides debian/passwd/usr/share/lintian/overrides/passwd
+	# Linda overrides files
+	install -c -m 444  debian/login.linda-overrides debian/login/usr/share/linda/overrides/login
+	install -c -m 444  debian/passwd.linda-overrides debian/passwd/usr/share/linda/overrides/passwd
+
+	dh_installdocs
+	dh_installexamples
+	dh_compress
+	dh_installchangelogs
+	dh_fixperms
+	chmod u+s debian/passwd/usr/bin/chfn
+	chmod u+s debian/passwd/usr/bin/chsh
+	chmod u+s debian/passwd/usr/bin/gpasswd
+	chmod u+s debian/passwd/usr/bin/passwd
+	# No real need for login to be setuid root
+	# chmod u+s debian/login/bin/login
+	chmod u+s debian/login/bin/su
+	chmod u+s debian/login/usr/bin/newgrp
+	chgrp shadow debian/passwd/usr/bin/chage
+	chgrp shadow debian/passwd/usr/bin/expiry
+	chmod g+s debian/passwd/usr/bin/chage
+	chmod g+s debian/passwd/usr/bin/expiry
+	dh_strip
+	dh_compress
+	dh_shlibdeps
+	dh_installdebconf
+ifneq ($(DEB_HOST_ARCH_OS),hurd)
+	echo "loginpam=login (>= 970502-1), libpam-modules (>= 0.72-5)" >> debian/passwd.substvars
+else
+	echo "loginpam=login, libpam-modules (>= 0.72-5)" >> debian/passwd.substvars
+endif
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+.PHONY: autotools build clean checkroot binary-indep binary-arch patch unpatch
+
+
+
+####
+#### The following is the exact content of /usr/share/quilt/quilt.make
+#### but this file was added only in "quilt (<= 0.40)", which is not in sarge.
+#### If we do build-dep on this version one day, we could remplace this by:
+####    include /usr/share/quilt/quilt.make
+#### But I prefer to keep buildable in sarge for now.
+####
+
+# QUILT_STAMPFN: stamp file to use
+QUILT_STAMPFN	?= stamp-patched
+
+# QUILT_PATCH_DIR: where the patches live
+QUILT_PATCH_DIR ?= debian/patches
+
+patch: $(QUILT_STAMPFN)
+$(QUILT_STAMPFN):
+	# quilt exits with 2 as return when there was nothing to do. 
+	# That's not an error here (but it's usefull to break loops in crude scripts)
+	QUILT_PATCHES=$(QUILT_PATCH_DIR) quilt push -a || test $$? = 2
+	touch debian/$(QUILT_STAMPFN)
+
+unpatch:
+	QUILT_PATCHES=$(QUILT_PATCH_DIR) quilt pop -a -R || test $$? = 2 
+	rm -rf .pc debian/$(QUILT_STAMPFN)
+

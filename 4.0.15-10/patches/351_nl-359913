@@ -1,0 +1,21 @@
+Goal: Fix typo in Dutch translation
+
+Fix: #359913
+
+Author: Wim De Smet <wdesmet@yucom.be>
+
+Status wrt upstream: Will be in 4.0.16
+
+Index: shadow-4.0.15/po/nl.po
+===================================================================
+--- shadow-4.0.15.orig/po/nl.po	2006-05-04 18:31:51.706567888 +0200
++++ shadow-4.0.15/po/nl.po	2006-05-04 18:32:15.635930072 +0200
+@@ -134,7 +134,7 @@
+ msgstr "passwd: %s\n"
+ 
+ msgid "passwd: password updated successfully\n"
+-msgstr "passwd: wachtwoord is mes succes aangepast\n"
++msgstr "passwd: wachtwoord is met succes aangepast\n"
+ 
+ #, c-format
+ msgid "Incorrect password for %s.\n"

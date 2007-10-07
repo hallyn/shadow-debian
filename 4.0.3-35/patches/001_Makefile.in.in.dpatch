@@ -1,0 +1,60 @@
+#! /bin/sh -e
+## 001_Makefile.in.in.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+--- shadow-4.0.3.orig/po/Makefile.in.in
++++ shadow-4.0.3/po/Makefile.in.in
+@@ -94,7 +94,7 @@
+ install-exec:
+ install-data: install-data-@USE_NLS@
+ 	if test "$(PACKAGE)" = "gettext"; then \
+-	  $(mkinstalldirs) $(DESTDIR)$(gettextsrcdir); \
++	  $(MKINSTALLDIRS) $(DESTDIR)$(gettextsrcdir); \
+ 	  $(INSTALL_DATA) $(srcdir)/Makefile.in.in \
+ 			  $(DESTDIR)$(gettextsrcdir)/Makefile.in.in; \
+ 	else \
+@@ -102,13 +102,13 @@
+ 	fi
+ install-data-no: all
+ install-data-yes: all
+-	$(mkinstalldirs) $(DESTDIR)$(datadir)
++	$(MKINSTALLDIRS) $(DESTDIR)$(datadir)
+ 	@catalogs='$(CATALOGS)'; \
+ 	for cat in $$catalogs; do \
+ 	  cat=`basename $$cat`; \
+ 	  lang=`echo $$cat | sed 's/\.gmo$$//'`; \
+ 	  dir=$(localedir)/$$lang/LC_MESSAGES; \
+-	  $(mkinstalldirs) $(DESTDIR)$$dir; \
++	  $(MKINSTALLDIRS) $(DESTDIR)$$dir; \
+ 	  if test -r $$cat; then \
+ 	    $(INSTALL_DATA) $$cat $(DESTDIR)$$dir/$(PACKAGE).mo; \
+ 	    echo "installing $$cat as $(DESTDIR)$$dir/$(PACKAGE).mo"; \
+@@ -142,6 +142,7 @@
+ mostlyclean:
+ 	rm -f core core.* *.pox $(PACKAGE).po *.new.po
+ 	rm -fr *.o
++	rm -f $(GMOFILES)
+ 
+ clean: mostlyclean
+ 

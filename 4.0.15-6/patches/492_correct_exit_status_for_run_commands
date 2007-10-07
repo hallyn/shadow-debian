@@ -1,0 +1,24 @@
+Goal: Do not exit with a status 0 when the invoked command is terminated
+      by a signal which was not catched
+
+Fix: #360276
+
+Author: Eero Häkkinen <eero17@bigfoot.com>
+
+Status wrt upstream: will be in 4.0.16
+
+Index: shadow-4.0.15/src/su.c
+===================================================================
+--- shadow-4.0.15.orig/src/su.c	2006-04-01 12:31:34.000000000 +0200
++++ shadow-4.0.15/src/su.c	2006-04-01 12:38:15.680753816 +0200
+@@ -272,7 +272,9 @@
+ 		exit (-1);
+ 	}
+ 
+-	exit (WEXITSTATUS (status));
++	exit (WIFEXITED (status)
++	      ? WEXITSTATUS (status)
++	      : WTERMSIG (status) + 128);
+ }
+ #endif
+ 

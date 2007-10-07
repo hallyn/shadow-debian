@@ -1,0 +1,44 @@
+Goal: Do not hardcode pam_fail_delay and let pam_unix do its
+      job to set a delay...or not
+
+Fixes: #87648
+
+Status wrt upstream: Forwarded but not applied yet
+
+Index: shadow-4.0.13/src/login.c
+===================================================================
+--- shadow-4.0.13.orig/src/login.c	2005-10-27 16:10:53.130114016 +0200
++++ shadow-4.0.13/src/login.c	2005-10-27 16:18:17.602543936 +0200
+@@ -595,10 +595,6 @@
+ 		PAM_FAIL_CHECK;
+ 		retcode = pam_set_item (pamh, PAM_TTY, tty);
+ 		PAM_FAIL_CHECK;
+-#ifdef HAVE_PAM_FAIL_DELAY
+-		retcode = pam_fail_delay (pamh, 1000000 * delay);
+-		PAM_FAIL_CHECK;
+-#endif
+ 		/* if fflg == 1, then the user has already been authenticated */
+ 		if (!fflg || (getuid () != 0)) {
+ 			int failcount = 0;
+@@ -639,8 +635,6 @@
+ 			  failed = 0;
+ 			  
+ 			  failcount++;
+-			  if (delay > 0)
+-			    retcode = pam_fail_delay(pamh, 1000000*delay);
+ 
+ 			  retcode = pam_authenticate (pamh, 0);
+ 			  
+@@ -915,10 +909,9 @@
+ 		 * before the sleep() below completes, login will exit.
+ 		 */
+ #ifndef USE_PAM
+-		if (delay > 0)
+-			sleep (delay);
++ 		if (delay > 0)
++		   sleep (delay); */
+ #endif
+-
+ 		puts (_("Login incorrect"));
+ 
+ 		/* allow only one attempt with -r or -f */

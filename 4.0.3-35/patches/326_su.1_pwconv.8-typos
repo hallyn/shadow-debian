@@ -1,0 +1,33 @@
+Goal: Correct a typo in su.1 and pwconv.8 man pages and avoid a repetition of "user" in su.1
+Fixes: #309666
+
+Status wrt upstream: forwarded but not applied yet
+
+Index: shadow-4.0.3/man/su.1
+===================================================================
+--- /dev/null	2005-05-19 06:55:18.880057250 +0200
++++ shadow-4.0.3/man/su.1	2005-05-19 06:56:12.782824877 +0200
+@@ -38,8 +38,8 @@
+ Invoked without a username, \fBsu\fR defaults to becoming
+ the super user.
+ The optional argument \fB\-\fR may be used to provide an
+-environment similiar to what the user would expect had
+-the user logged in directly.
++environment similar to what the user would expect had
++(s)he logged in directly.
+ .PP
+ The user will be prompted for a password, if appropriate.  Invalid
+ passwords will produce an error message.  All attempts, both valid and
+Index: shadow-4.0.3/man/pwconv.8
+===================================================================
+--- /dev/null	2005-05-19 06:55:18.880057250 +0200
++++ shadow-4.0.3/man/pwconv.8	2005-05-19 14:50:29.577115349 +0200
+@@ -44,7 +44,7 @@
+ .IR /etc/shadow .
+ 
+ .RB "Likewise, " pwunconv " and " grpunconv
+-are similiar.  Passwords in the main file are updated from the
++are similar.  Passwords in the main file are updated from the
+ shadowed file.  Entries which exist in the main file but not in the
+ shadowed file are left alone.  Finally, the shadowed file is removed.
+ 

@@ -1,0 +1,1354 @@
+#! /bin/sh -e
+## 008_src.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Various patches in src for the Debian package (before switch to dpatch)
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+diff -Nru shadow-4.0.3/src/chage.c shadow-4.0.3_30.4/src/chage.c
+--- shadow-4.0.3/src/chage.c	2002-01-05 16:41:43.000000000 +0100
++++ shadow-4.0.3_30.4/src/chage.c	2004-11-02 22:17:38.000000000 +0100
+@@ -29,6 +29,8 @@
+ 
+ #include <config.h>
+ 
++#undef USE_PAM
++
+ #include "rcsid.h"
+ RCSID (PKG_VER "$Id$")
+ #include <sys/types.h>
+diff -Nru shadow-4.0.3/src/cppw.c shadow-4.0.3_30.4/src/cppw.c
+--- shadow-4.0.3/src/cppw.c	1970-01-01 01:00:00.000000000 +0100
++++ shadow-4.0.3_30.4/src/cppw.c	2004-11-02 22:17:39.000000000 +0100
+@@ -0,0 +1,200 @@
++/*
++  cppw, cpgr  copy with locking given file over the password or group file
++  with -s will copy with locking given file over shadow or gshadow file
++ 
++  Copyright (C) 1999 Stephen Frost <sfrost@snowman.net>
++
++  Based on vipw, vigr by:
++  Copyright (C) 1997 Guy Maor <maor@ece.utexas.edu>
++
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of the GNU General Public License as published by
++  the Free Software Foundation; either version 2 of the License, or
++  (at your option) any later version.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  You should have received a copy of the GNU General Public License
++  along with this program; if not, write to the Free Software
++  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++
++  */
++
++#include <config.h>
++#include "defines.h"
++
++#include <errno.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <sys/types.h>
++#include <signal.h>
++#include <utime.h>
++#include "prototypes.h"
++#include "pwio.h"
++#include "shadowio.h"
++#include "groupio.h"
++#include "sgroupio.h"
++
++
++static const char *progname, *filename, *filenewname;
++static int filelocked = 0;
++static int (*unlock)();
++
++/* local function prototypes */
++static int create_backup_file (FILE *, const char *, struct stat *);
++static void cppwexit (const char *, int, int);
++static void cppwcopy (const char *, const char *, int (*) (void), int (*) (void));
++int main (int, char **);
++
++static int
++create_backup_file(FILE *fp, const char *backup, struct stat *sb)
++{
++  struct utimbuf ub;
++  FILE *bkfp;
++  int c;
++  mode_t mask;
++
++  mask = umask(077);
++  bkfp = fopen(backup, "w");
++  umask(mask);
++  if (!bkfp) return -1;
++
++  rewind(fp);
++  while ((c = getc(fp)) != EOF) {
++    if (putc(c, bkfp) == EOF) break;
++  }
++
++  if (c != EOF || fflush(bkfp)) {
++    fclose(bkfp);
++    unlink(backup);
++    return -1;
++  }
++  if (fclose(bkfp)) {
++    unlink(backup);
++    return -1;
++  }
++
++  ub.actime = sb->st_atime;
++  ub.modtime = sb->st_mtime;
++  if (utime(backup, &ub) ||
++      chmod(backup, sb->st_mode) ||
++      chown(backup, sb->st_uid, sb->st_gid)) {
++    unlink(backup);
++    return -1;
++  }
++  return 0;
++}
++
++static void
++cppwexit(const char *msg, int syserr, int ret)
++{
++  int err = errno;
++  if (filelocked) (*unlock)();
++  if (msg) fprintf(stderr, "%s: %s", progname, msg);
++  if (syserr) fprintf(stderr, ": %s", strerror(err));
++  fprintf(stderr, "\n%s: %s is unchanged\n", progname, filename);
++  exit(ret);
++}
++
++static void
++cppwcopy(const char *file, const char *in_file, int (*file_lock) (void), int (*file_unlock) (void))
++{
++  struct stat st1;
++  FILE *f;
++  char filenew[1024];
++
++  snprintf(filenew, sizeof filenew, "%s.new", file);
++  unlock = file_unlock;
++  filename = file;
++  filenewname = filenew;
++  
++  if (access(file, F_OK)) cppwexit(file, 1, 1);
++  if (!file_lock()) cppwexit("Couldn't lock file", errno, 5);
++  filelocked = 1;
++
++  /* file to copy has same owners, perm */
++  if (stat(file, &st1)) cppwexit(file, 1, 1);
++  if (!(f = fopen(in_file, "r"))) cppwexit(file, 1, 1);
++  if (create_backup_file(f, filenew, &st1))
++    cppwexit("Couldn't make backup", errno, 1);
++  
++  /* XXX - here we should check filenew for errors; if there are any,
++     fail w/ an appropriate error code and let the user manually fix
++     it. Use pwck or grpck to do the check.  - Stephen (Shamelessly
++     stolen from '--marekm's comment) */
++
++  if (rename(filenew, file) == -1) {
++    fprintf(stderr, "%s: can't copy %s: %s)\n",
++	    progname, filenew, strerror(errno));
++    cppwexit(0,0,1);
++  }
++
++  (*file_unlock)();
++}
++
++
++int
++main(int argc, char **argv)
++{
++  int flag;
++  int cpshadow = 0;
++  char *in_file;
++  char *c;
++  int e = 1;
++  int do_cppw;
++
++  progname = ((c = strrchr(*argv, '/')) ? c+1 : *argv);
++  do_cppw = (strcmp(progname, "cpgr") != 0);
++
++  while ((flag = getopt(argc, argv, "ghps")) != EOF) {
++    switch (flag) {
++    case 'p':
++      do_cppw = 1;
++      break;
++    case 'g':
++      do_cppw = 0;
++      break;
++    case 's':
++      cpshadow = 1;
++      break;
++    case 'h':
++      e = 0;
++    default:
++      printf("Usage:\n\
++`cppw <file>' copys over /etc/passwd   `cppw -s <file>' copys over /etc/shadow\n\
++`cpgr <file>' copys over /etc/group    `cpgr -s <file>' copys over /etc/gshadow\n\
++");
++      exit(e);
++    }
++  }
++
++  if (optind >= argc) {
++    cppwexit ("missing file argument, -h for usage",0,1);
++  }
++
++  in_file = argv[argc - 1];
++
++  if (do_cppw) {
++#ifdef SHADOWPWD
++    if (cpshadow)
++      cppwcopy(SHADOW_FILE, in_file, spw_lock, spw_unlock);
++    else
++#endif
++      cppwcopy(PASSWD_FILE, in_file, pw_lock, pw_unlock);
++  }
++  else {
++#ifdef SHADOWGRP
++    if (cpshadow)
++      cppwcopy(SGROUP_FILE, in_file, sgr_lock, sgr_unlock);
++    else
++#endif
++      cppwcopy(GROUP_FILE, in_file, gr_lock, gr_unlock);
++  }
++
++  return 0;
++}
+diff -Nru shadow-4.0.3/src/groupadd.c shadow-4.0.3_30.4/src/groupadd.c
+--- shadow-4.0.3/src/groupadd.c	2002-01-06 15:09:07.000000000 +0100
++++ shadow-4.0.3_30.4/src/groupadd.c	2004-11-02 22:17:38.000000000 +0100
+@@ -29,6 +29,8 @@
+ 
+ #include <config.h>
+ 
++#undef USE_PAM
++
+ #include "rcsid.h"
+ RCSID (PKG_VER "$Id$")
+ #include <sys/types.h>
+diff -Nru shadow-4.0.3/src/groupdel.c shadow-4.0.3_30.4/src/groupdel.c
+--- shadow-4.0.3/src/groupdel.c	2000-10-09 21:02:20.000000000 +0200
++++ shadow-4.0.3_30.4/src/groupdel.c	2004-11-02 22:17:38.000000000 +0100
+@@ -29,6 +29,8 @@
+ 
+ #include <config.h>
+ 
++#undef USE_PAM
++
+ #include "rcsid.h"
+ RCSID(PKG_VER "$Id$")
+ 
+diff -Nru shadow-4.0.3/src/groupmod.c shadow-4.0.3_30.4/src/groupmod.c
+--- shadow-4.0.3/src/groupmod.c	2002-01-05 16:41:43.000000000 +0100
++++ shadow-4.0.3_30.4/src/groupmod.c	2004-11-02 22:17:38.000000000 +0100
+@@ -29,6 +29,8 @@
+ 
+ #include <config.h>
+ 
++#undef USE_PAM
++
+ #include "rcsid.h"
+ RCSID (PKG_VER "$Id$")
+ #include <sys/types.h>
+diff -Nru shadow-4.0.3/src/grpck.c shadow-4.0.3_30.4/src/grpck.c
+--- shadow-4.0.3/src/grpck.c	2002-01-05 16:41:43.000000000 +0100
++++ shadow-4.0.3_30.4/src/grpck.c	2004-11-02 22:17:38.000000000 +0100
+@@ -146,6 +146,7 @@
+ 	int errors = 0;
+ 	int deleted = 0;
+ 	int i;
++	int prune = 0;
+ 	struct commonio_entry *gre, *tgre;
+ 	struct group *grp;
+ 	int sort_mode = 0;
+@@ -172,7 +173,7 @@
+ 	 * Parse the command line arguments
+ 	 */
+ 
+-	while ((arg = getopt (argc, argv, "qrs")) != EOF) {
++	while ((arg = getopt (argc, argv, "qprs")) != EOF) {
+ 		switch (arg) {
+ 		case 'q':
+ 			/* quiet - ignored for now */
+@@ -183,6 +184,9 @@
+ 		case 's':
+ 			sort_mode = 1;
+ 			break;
++		case 'p':
++			prune = 1;
++			break;
+ 		default:
+ 			usage ();
+ 		}
+@@ -315,9 +319,13 @@
+ 			/*
+ 			 * prompt the user to delete the entry or not
+ 			 */
+-
+-			if (!yes_or_no ())
++			if (!prune) {
++			        if (!yes_or_no ())
++				        continue;
++			} else {
++			        puts("Yes");
+ 				continue;
++			}
+ 
+ 			/*
+ 			 * All group file deletions wind up here. This code
+diff -Nru shadow-4.0.3/src/lastlog.c shadow-4.0.3_30.4/src/lastlog.c
+--- shadow-4.0.3/src/lastlog.c	2002-01-05 16:41:43.000000000 +0100
++++ shadow-4.0.3_30.4/src/lastlog.c	2004-11-02 22:17:38.000000000 +0100
+@@ -184,7 +184,13 @@
+ #endif
+ 		once++;
+ 	}
+-	tm = localtime (&lastlog.ll_time);
++	/* don't assume lastlog.ll_time is a time_t */
++	{
++	    time_t when;
++
++	    when = lastlog.ll_time;
++	    tm = localtime (&when);
++	}
+ #ifdef HAVE_STRFTIME
+ 	strftime (ptime, sizeof (ptime), "%a %b %e %H:%M:%S %z %Y", tm);
+ 	cp = ptime;
+@@ -193,7 +199,7 @@
+ 	cp[24] = '\0';
+ #endif
+ 
+-	if (lastlog.ll_time == (time_t) 0)
++	if (lastlog.ll_time == 0)
+ 		cp = _("**Never logged in**\0");
+ 
+ #ifdef HAVE_LL_HOST
+diff -Nru shadow-4.0.3/src/login.c shadow-4.0.3_30.4/src/login.c
+--- shadow-4.0.3/src/login.c	2002-03-08 05:30:28.000000000 +0100
++++ shadow-4.0.3_30.4/src/login.c	2004-11-02 22:17:38.000000000 +0100
+@@ -58,6 +58,11 @@
+ #include <sys/proc.h>
+ #include <sys/sysi86.h>
+ #endif
++
++#ifndef MAXHOSTNAMELEN
++#define MAXHOSTNAMELEN 64
++#endif
++
+ #ifdef RADIUS
+ /*
+  * Support for RADIUS authentication based on a hacked util-linux login
+@@ -289,6 +294,8 @@
+ 	for (arg = 1; arg < argc; arg++) {
+ 		if (argv[arg][0] == '-' && strlen (argv[arg]) > 2)
+ 			usage ();
++		if (!strcmp(argv[arg], "--"))
++			break; /* stop checking on a "--" */
+ 	}
+ }
+ 
+@@ -466,7 +473,7 @@
+ 
+ 	check_flags (argc, argv);
+ 
+-	while ((flag = getopt (argc, argv, "d:f:h:pr:")) != EOF) {
++	while ((flag = getopt (argc, argv, "d:f::h:pr:")) != EOF) {
+ 		switch (flag) {
+ 		case 'p':
+ 			pflg++;
+@@ -475,11 +482,16 @@
+ 			/*
+ 			 * username must be a separate token
+ 			 * (-f root, *not* -froot).  --marekm
++ 			 *
++ 			 * if -f has an arg, use that, else use the
++ 			 * normal user name passed after all options
++ 			 * --benc
+ 			 */
+-			if (optarg != argv[optind - 1])
++			if (optarg != NULL && optarg != argv[optind - 1])
+ 				usage ();
+ 			fflg++;
+-			STRFCPY (username, optarg);
++			if (optarg)
++			  STRFCPY (username, optarg);
+ 			break;
+ #ifdef	RLOGIN
+ 		case 'r':
+@@ -633,7 +645,7 @@
+ 		init_env ();
+ 
+ 		if (optind < argc) {	/* get the user name */
+-			if (rflg || fflg)
++			if (rflg || (fflg && username[0]))
+ 				usage ();
+ 
+ #ifdef SVR4
+@@ -763,49 +775,106 @@
+ 			 * MAX_LOGIN_TRIES?
+ 			 */
+ 
+-			retcode = pam_authenticate (pamh, 0);
+-			while ((failcount++ < retries) &&
+-			       ((retcode == PAM_AUTH_ERR) ||
+-				(retcode == PAM_USER_UNKNOWN) ||
+-				(retcode == PAM_CRED_INSUFFICIENT) ||
+-				(retcode == PAM_AUTHINFO_UNAVAIL))) {
+-				pam_get_item (pamh, PAM_USER,
+-					      (const void **) &pam_user);
+-				syslog (LOG_NOTICE,
+-					"FAILED LOGIN %d FROM %s FOR %s, %s",
+-					failcount, hostname, pam_user,
+-					pam_strerror (pamh, retcode));
+-#ifdef HAVE_PAM_FAIL_DELAY
+-				pam_fail_delay (pamh, 1000000 * delay);
++			failcount = 0;
++			while (1) {
++			  const char *failent_user;
++			  failed = 0;
++			  
++			  failcount++;
++			  if (delay > 0)
++			    retcode = pam_fail_delay(pamh, 1000000*delay);
++			  
++			  retcode = pam_authenticate (pamh, 0);
++			  
++			  pam_get_item (pamh, PAM_USER,
++					(const void **) &pam_user);
++			  
++			  if (pam_user && pam_user[0]) {
++			    pwd = getpwnam(pam_user);
++			    if (pwd) {
++			      pwent = *pwd;
++			      failent_user = pwent.pw_name;
++			    } else {
++			      if (getdef_bool("LOG_UNKFAIL_ENAB") && pam_user)
++				failent_user = pam_user;
++			      else
++				failent_user = "UNKNOWN";
++			    }
++			  } else {
++			    pwd = NULL;
++			    failent_user = "UNKNOWN";
++			  }
++			  
++			  if (retcode == PAM_MAXTRIES || failcount >= retries) {
++			    syslog (LOG_NOTICE,
++				    _("TOO MANY LOGIN TRIES (%d)%s FOR `%s'"),
++				    failcount, fromhost, failent_user);
++#ifndef USE_PAM
++			    if (pwd && getdef_bool("FAILLOG_ENAB"))
++			      failure (pwent.pw_uid, tty, &faillog);
++#endif
++			    fprintf(stderr,
++				    _("Maximum number of tries exceeded (%d)\n"),
++				    failcount);
++			    PAM_END;
++			    exit(0);
++			  } else if (retcode == PAM_ABORT) {
++			    /* Serious problems, quit now */
++			    fprintf(stderr,_("login: abort requested by PAM\n"));
++			    syslog(LOG_ERR,_("PAM_ABORT returned from pam_authenticate()"));
++			    PAM_END;
++			    exit(99);
++			  } else if (retcode != PAM_SUCCESS) {
++			    syslog(LOG_NOTICE,_("FAILED LOGIN (%d)%s FOR `%s', %s"),
++				   failcount, fromhost, failent_user,
++				   pam_strerror (pamh, retcode));
++			    failed = 1;
++			  }
++#ifndef USE_PAM
++			  if (pwd && getdef_bool("FAILLOG_ENAB") &&
++			      ! failcheck (pwent.pw_uid, &faillog, failed)) {
++			    SYSLOG((LOG_CRIT, FAILURE_CNT, failent_user, fromhost));
++			    failed = 1;
++			  }
+ #endif
+-				fprintf (stderr, "Login incorrect\n\n");
+-				pam_set_item (pamh, PAM_USER, NULL);
+-				retcode = pam_authenticate (pamh, 0);
+-			}
+ 
+-			if (retcode != PAM_SUCCESS) {
+-				pam_get_item (pamh, PAM_USER,
+-					      (const void **) &pam_user);
+-
+-				if (retcode == PAM_MAXTRIES)
+-					syslog (LOG_NOTICE,
+-						"TOO MANY LOGIN TRIES (%d) FROM %s FOR %s, %s",
+-						failcount, hostname,
+-						pam_user,
+-						pam_strerror (pamh,
+-							      retcode));
+-				else
+-					syslog (LOG_NOTICE,
+-						"FAILED LOGIN SESSION FROM %s FOR %s, %s",
+-						hostname, pam_user,
+-						pam_strerror (pamh,
+-							      retcode));
+-
+-				fprintf (stderr, "\nLogin incorrect\n");
+-				pam_end (pamh, retcode);
+-				exit (0);
++			  if (!failed)
++			    break;
++			  
++			  fprintf(stderr,"Login incorrect\n\n");
++#ifndef USE_PAM
++			  if (pwd && getdef_bool("FAILLOG_ENAB"))
++			    failure (pwent.pw_uid, tty, &faillog);
++#endif
++			  if (getdef_str("FTMP_FILE") != NULL) {
++#if HAVE_UTMPX_H
++			    failent = utxent;
++			    /* don't assume that utmpx.ut_tv is a struct
++			       timeval */
++			    {
++				struct timeval tv;
++
++				gettimeofday(&tv, NULL);
++				failent.ut_tv.tv_sec = tv.tv_sec;
++				failent.ut_tv.tv_usec = tv.tv_usec;
++			    }
++#else
++			    failent = utent;
++			    failent.ut_time = time(0);
++#endif
++			    strncpy(failent.ut_user, failent_user, sizeof(failent.ut_user));
++#ifdef USER_PROCESS
++			    failent.ut_type = USER_PROCESS;
++#endif
++			    failtmp(&failent);
++			  }
++			  
++			  /* Let's give it another go around */
++			  pam_set_item(pamh,PAM_USER,NULL);
+ 			}
+ 
++			/* We don't get here unless they were authenticated above */
++			alarm(0);
+ 			retcode = pam_acct_mgmt (pamh, 0);
+ 
+ 			if (retcode == PAM_NEW_AUTHTOK_REQD) {
+@@ -828,11 +897,14 @@
+ 
+ 		if (!pwd || setup_groups (pwd))
+ 			exit (1);
++		else
++		        pwent = *pwd;
+ 
+ 		retcode = pam_setcred (pamh, PAM_ESTABLISH_CRED);
+ 		PAM_FAIL_CHECK;
+ 
+-		retcode = pam_open_session (pamh, 0);
++		retcode = pam_open_session (pamh,
++					    hushed(&pwent) ? PAM_SILENT : 0);
+ 		PAM_FAIL_CHECK;
+ 
+ #else				/* ! USE_PAM */
+@@ -1002,6 +1074,7 @@
+ 			failed = 1;
+ 		}
+ #endif
++#ifndef USE_PAM
+ 		if (pwd && getdef_bool ("FAILLOG_ENAB") &&
+ 		    !failcheck (pwent.pw_uid, &faillog, failed)) {
+ 			SYSLOG ((LOG_CRIT, 
+@@ -1009,21 +1082,31 @@
+ 				 username, fromhost));
+ 			failed = 1;
+ 		}
++#endif
+ 		if (!failed)
+ 			break;
+ 
++#ifndef USE_PAM
+ 		/* don't log non-existent users */
+ 		if (pwd && getdef_bool ("FAILLOG_ENAB"))
+ 			failure (pwent.pw_uid, tty, &faillog);
++#endif
+ 		if (getdef_str ("FTMP_FILE") != NULL) {
+ 			const char *failent_user;
+ 
+ #if HAVE_UTMPX_H
+ 			failent = utxent;
+-			gettimeofday (&(failent.ut_tv), NULL);
++			/* don't assume that utmpx.ut_tv is a struct timeval */
++			{
++			    struct timeval tv;
++			    
++			    gettimeofday(&tv, NULL);
++			    failent.ut_tv.tv_sec = tv.tv_sec;
++			    failent.ut_tv.tv_usec = tv.tv_usec;
++			}
+ #else
+ 			failent = utent;
+-			time (&failent.ut_time);
++			failent.ut_time = time(0);
+ #endif
+ 			if (pwd) {
+ 				failent_user = pwent.pw_name;
+@@ -1208,6 +1291,40 @@
+ 	login_fbtab (tty, pwent.pw_uid, pwent.pw_gid);
+ #endif
+ 
++#ifdef USE_PAM
++	/*
++	 * We must fork before setuid() because we need to call
++	 * pam_close_session() as root.
++	 *
++	 * Note: not true in other (non-Linux) PAM implementations, where
++	 * the parent process of login (init, telnetd, ...) is responsible
++	 * for calling pam_close_session(). This avoids an extra process for
++	 * each login. Maybe we should do this on Linux too? We let the
++	 * admin configure whether they need to keep login around to close
++	 * sessions.
++	 */
++	if (getdef_bool ("CLOSE_SESSIONS")) {
++		signal (SIGINT, SIG_IGN);
++		child = fork ();
++		if (child < 0) {
++			/* error in fork() */
++			fprintf (stderr,
++				 "login: failure forking: %s",
++				 strerror (errno));
++			PAM_END;
++			exit (0);
++		} else if (child) {
++			/*
++			 * parent - wait for child to finish, then cleanup
++			 * session
++			 */
++			wait (NULL);
++			PAM_END;
++			exit (0);
++		}
++		/* child */
++	}
++#endif
+ 	/* We call set_groups() above because this clobbers pam_groups.so */
+ #ifndef USE_PAM
+ 	if (setup_uid_gid (&pwent, is_console))
+@@ -1271,15 +1388,16 @@
+ 		}
+ 		if (getdef_bool ("LASTLOG_ENAB")
+ 		    && lastlog.ll_time != 0) {
++		        time_t when = lastlog.ll_time; /* may not be a time_t */
+ #ifdef HAVE_STRFTIME
+ 			strftime (ptime, sizeof (ptime),
+ 				  "%a %b %e %H:%M:%S %z %Y",
+-				  localtime (&lastlog.ll_time));
++				  localtime (&when));
+ 			printf (_("Last login: %s on %s"),
+ 				ptime, lastlog.ll_line);
+ #else
+ 			printf (_("Last login: %.19s on %s"),
+-				ctime (&lastlog.ll_time),
++				ctime (&when),
+ 				lastlog.ll_line);
+ #endif
+ #ifdef HAVE_LL_HOST		/* SVR4 || __linux__ || SUN4 */
+@@ -1309,41 +1427,6 @@
+ 	signal (SIGTERM, SIG_DFL);	/* default terminate signal */
+ 	signal (SIGALRM, SIG_DFL);	/* default alarm signal */
+ 	signal (SIGHUP, SIG_DFL);	/* added this.  --marekm */
+-
+-#ifdef USE_PAM
+-	/*
+-	 * We must fork before setuid() because we need to call
+-	 * pam_close_session() as root.
+-	 *
+-	 * Note: not true in other (non-Linux) PAM implementations, where
+-	 * the parent process of login (init, telnetd, ...) is responsible
+-	 * for calling pam_close_session(). This avoids an extra process for
+-	 * each login. Maybe we should do this on Linux too? We let the
+-	 * admin configure whether they need to keep login around to close
+-	 * sessions.
+-	 */
+-	if (getdef_bool ("CLOSE_SESSIONS")) {
+-		signal (SIGINT, SIG_IGN);
+-		child = fork ();
+-		if (child < 0) {
+-			/* error in fork() */
+-			fprintf (stderr,
+-				 "login: failure forking: %s",
+-				 strerror (errno));
+-			PAM_END;
+-			exit (0);
+-		} else if (child) {
+-			/*
+-			 * parent - wait for child to finish, then cleanup
+-			 * session
+-			 */
+-			wait (NULL);
+-			PAM_END;
+-			exit (0);
+-		}
+-		/* child */
+-	}
+-#endif
+ 	signal (SIGINT, SIG_DFL);	/* default interrupt signal */
+ 
+ 	endpwent ();	/* stop access to password file */
+@@ -1357,7 +1440,11 @@
+ 	if (pwent.pw_uid == 0)
+ 		SYSLOG ((LOG_NOTICE, "ROOT LOGIN %s", fromhost));
+ 	else if (getdef_bool ("LOG_OK_LOGINS"))
++#ifdef USE_PAM
++		SYSLOG ((LOG_INFO, "`%s' logged in %s", pam_user, fromhost));
++#else
+ 		SYSLOG ((LOG_INFO, "`%s' logged in %s", username, fromhost));
++#endif
+ 	closelog ();
+ #ifdef RADIUS
+ 	if (is_rad_login) {
+diff -Nru shadow-4.0.3/src/Makefile.am shadow-4.0.3_30.4/src/Makefile.am
+--- shadow-4.0.3/src/Makefile.am	2002-03-10 08:12:52.000000000 +0100
++++ shadow-4.0.3_30.4/src/Makefile.am	2004-11-02 22:17:37.000000000 +0100
+@@ -25,7 +25,7 @@
+ ubin_PROGRAMS = faillog lastlog chage chfn chsh expiry gpasswd newgrp passwd
+ usbin_PROGRAMS = chpasswd dpasswd groupadd groupdel groupmod \
+ 	logoutd mkpasswd newusers useradd userdel usermod grpck \
+-	pwck vipw grpconv grpunconv pwconv pwunconv
++	pwck vipw grpconv grpunconv pwconv pwunconv cppw
+ 
+ noinst_PROGRAMS = id sulogin
+ 
+@@ -54,7 +54,6 @@
+ usermod_LDADD  = $(LDADD) $(LIBPAM)
+ 
+ install-exec-hook:
+-	ln -sf newgrp	$(DESTDIR)$(bindir)/sg
+ 	ln -sf vigr	$(DESTDIR)$(bindir)/vipw
+ 	for i in $(suidbins); do \
+ 		chmod 4755 $(DESTDIR)$(bindir)/$$i; \
+diff -Nru shadow-4.0.3/src/newusers.c shadow-4.0.3_30.4/src/newusers.c
+--- shadow-4.0.3/src/newusers.c	2002-01-05 16:41:43.000000000 +0100
++++ shadow-4.0.3_30.4/src/newusers.c	2004-11-02 22:17:38.000000000 +0100
+@@ -35,6 +35,8 @@
+ 
+ #include <config.h>
+ 
++#undef USE_PAM
++
+ #include "rcsid.h"
+ RCSID (PKG_VER "$Id$")
+ #include <sys/types.h>
+diff -Nru shadow-4.0.3/src/passwd.c shadow-4.0.3_30.4/src/passwd.c
+--- shadow-4.0.3/src/passwd.c	2002-01-05 16:41:43.000000000 +0100
++++ shadow-4.0.3_30.4/src/passwd.c	2004-11-02 22:17:38.000000000 +0100
+@@ -1173,8 +1173,8 @@
+ 
+ 	if (!amroot && pw->pw_uid != getuid ()) {
+ 		fprintf (stderr,
+-			 _("You may not change the password for %s.\n"),
+-			 name);
++			 _("%s: You may not view or modify password information for %s.\n"),
++			 Prog, name);
+ 		SYSLOG ((LOG_WARN, "can't change pwd for `%s'", name));
+ 		closelog ();
+ 		exit (E_NOPERM);
+diff -Nru shadow-4.0.3/src/su.c shadow-4.0.3_30.4/src/su.c
+--- shadow-4.0.3/src/su.c	2002-03-08 05:30:28.000000000 +0100
++++ shadow-4.0.3_30.4/src/su.c	2004-11-02 22:17:38.000000000 +0100
+@@ -26,6 +26,24 @@
+  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  * SUCH DAMAGE.
+  */
++/* Some parts substantially derived from an ancestor of: */
++/* su for GNU.  Run a shell with substitute user and group IDs.
++   Copyright (C) 1992-2003 Free Software Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2, or (at your option)
++   any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software Foundation,
++   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
++
+ 
+ #include <config.h>
+ 
+@@ -49,6 +67,7 @@
+ #include <grp.h>
+ #include <signal.h>
+ #include <pwd.h>
++#include <getopt.h>
+ #include "pwauth.h"
+ #include "getdef.h"
+ 
+@@ -79,6 +98,18 @@
+ 
+ /* local function prototypes */
+ 
++/* If nonzero, change some environment vars to indicate the user su'd to.  */
++static int change_environment;
++
++static struct option const longopts[] =
++{
++  {"command", required_argument, 0, 'c'},
++  {"preserve-environment", no_argument, 0, 'p'},
++  {"shell", required_argument, 0, 's'},
++  {"help", no_argument, 0, 'h'},
++  {0, 0, 0, 0}
++};
++
+ #ifndef USE_PAM
+ 
+ static RETSIGTYPE die (int);
+@@ -118,6 +149,96 @@
+ }
+ #endif				/* !USE_PAM */
+ 
++/* borrowed from GNU sh-utils' "su.c" */
++static int
++restricted_shell (const char *shell)
++{
++       char *line;
++
++       setusershell ();
++       while ((line = getusershell ()) != NULL) {
++               if (*line != '#' && strcmp (line, shell) == 0) {
++                       endusershell ();
++                       return 0;
++               }
++       }
++       endusershell ();
++       return 1;
++}
++
++/* borrowed from GNU sh-utils' "su.c" */
++static int
++elements (char **arr)
++{
++  int n = 0;
++
++  for (n = 0; *arr; ++arr)
++    ++n;
++  return n;
++}
++
++/* borrowed from GNU sh-utils' "su.c" */
++static void
++run_shell (char *shell, const char *command, char **additional_args, int login)
++{
++  const char **args;
++  int argno = 1;
++  char cmd[BUFSIZ];
++  int cmd_len_left = sizeof(cmd) - 1;
++
++  cmd[0] = '\0';
++
++  if (additional_args)
++    args = (const char **) xmalloc (sizeof (char *)
++                                    * (10 + elements (additional_args)));
++  else
++    args = (const char **) xmalloc (sizeof (char *) * 10);
++
++  if (login)
++    {
++      char *arg0;
++      char *shell_basename;
++
++      shell_basename = getdef_str("SU_NAME");
++      if (!shell_basename)
++       shell_basename = Basename(shell);
++
++      arg0 = xmalloc (strlen (shell_basename) + 2);
++      arg0[0] = '-';
++      strcpy (arg0 + 1, shell_basename);
++      args[0] = arg0;
++    }
++  else
++    args[0] = Basename(shell);
++  if (command || additional_args)
++    args[argno++] = "-c";
++  if (command) {
++    if (strlen(command) > cmd_len_left) {
++      fprintf(stderr, _("Command line args too long\n"));
++      exit(1);
++    }
++    strcat(cmd, command);
++    cmd_len_left -= strlen(command);
++  }
++  if (additional_args)
++    for (; *additional_args; ++additional_args) {
++      if ((strlen(*additional_args) + 1) > cmd_len_left) {
++	fprintf(stderr, _("Command line args too long\n"));
++	exit(1);
++      }
++      if (cmd[0]) {
++	strcat(cmd, " ");
++	cmd_len_left--;
++      }
++      strcat(cmd, *additional_args);
++      cmd_len_left -= strlen(*additional_args);
++    }
++  if (cmd[0]) args[argno++] = cmd;
++  args[argno] = NULL;
++  execv (shell, (char **) args);
++  fprintf (stderr, _("No shell\n"));
++  SYSLOG((LOG_WARN, "Cannot execute %s\n", shell));
++}
+ 
+ static void su_failure (const char *tty)
+ {
+@@ -125,7 +246,7 @@
+ #ifdef USE_SYSLOG
+ 	if (getdef_bool ("SYSLOG_SU_ENAB"))
+ 		SYSLOG ((pwent.pw_uid ? LOG_INFO : LOG_NOTICE,
+-			 "- %s %s-%s", tty,
++			 "- %s %s:%s", tty,
+ 			 oldname[0] ? oldname : "???",
+ 			 name[0] ? name : "???"));
+ 	closelog ();
+@@ -153,13 +274,14 @@
+ {
+ 	char *cp;
+ 	const char *tty = 0;	/* Name of tty SU is run from        */
+-	int doshell = 0;
+ 	int fakelogin = 0;
+ 	int amroot = 0;
+ 	uid_t my_uid;
+ 	struct passwd *pw = 0;
+ 	char **envp = environ;
+-
++	char *command = 0, *shell = 0, **additional_args = 0;
++	int optc;
++	char *tmp_name;
+ #ifdef USE_PAM
+ 	int ret;
+ #else				/* !USE_PAM */
+@@ -174,12 +296,14 @@
+ #endif
+ #endif				/* !USE_PAM */
+ 
+-	sanitize_env ();
++	/* sanitize_env (); */
+ 
+ 	setlocale (LC_ALL, "");
+ 	bindtextdomain (PACKAGE, LOCALEDIR);
+ 	textdomain (PACKAGE);
+ 
++	change_environment = 1;
++
+ 	/*
+ 	 * Get the program name. The program name is used as a prefix to
+ 	 * most error messages.
+@@ -224,15 +348,67 @@
+ 	 * Process the command line arguments. 
+ 	 */
+ 
+-	argc--;
+-	argv++;			/* shift out command name */
+-
+-	if (argc > 0 && strcmp (argv[0], "-") == 0) {
++	while ((optc = getopt_long (argc, argv, "c:mps:h", longopts, NULL)) != -1) {
++		switch (optc) {
++		    case 0:
++			break;
++		    case 'c':
++			command = optarg;
++			break;
++		    case 'm':
++		    case 'p':
++			change_environment = 0;
++			break;
++		    case 's':
++			shell = optarg;
++			break;
++		    default:
++			fprintf(stderr, _("\
++Usage: su [OPTS] [-] [username [ARGS]]\n\
++	-	make this a login shell\n\
++	-c, --command=<command>\n\
++		pass command to the invoked shell using its -c\n\
++		option\n\
++       -m, -p, --preserve-environment\n\
++		do not reset environment variables, and keep the\n\
++		same shell\n\
++       -s, --shell=<shell>\n\
++		use shell instead of the default in /etc/passwd\n"));
++			exit(1);
++		}
++	}
++	
++        if (optind < argc && !strcmp (argv[optind], "-")) {
+ 		fakelogin = 1;
+-		argc--;
+-		argv++;		/* shift ... */
++		++optind;
+ 	}
+ 
++	if (optind < argc)
++		strncpy(name, argv[optind++], sizeof(name) - 1);
++	else {
++	        struct passwd *root_pw = getpwuid(0);
++		if (root_pw == NULL) {
++		  SYSLOG((LOG_CRIT, "There is no UID 0 user."));
++		  su_failure(tty);
++		}
++                strcpy(name, root_pw->pw_name);
++	}
++
++	if (optind < argc)
++		additional_args = argv + optind;
++
++	/*
++	 * Get the user's real name.  The current UID is used to determine
++	 * who has executed su.  That user ID must exist.
++	 */
++
++	pw = get_my_pwent();
++	if (!pw) {
++		SYSLOG((LOG_CRIT, "Unknown UID: %d\n", (int) my_uid));
++		su_failure(tty);
++	}
++	STRFCPY(oldname, pw->pw_name);
++
+ 	/*
+ 	 * If a new login is being set up, the old environment will be
+ 	 * ignored and a new one created later on.
+@@ -257,35 +433,6 @@
+ 			addenv (*envp++, NULL);
+ 	}
+ 
+-	/*
+-	 * The next argument must be either a user ID, or some flag to a
+-	 * subshell. Pretty sticky since you can't have an argument which
+-	 * doesn't start with a "-" unless you specify the new user name.
+-	 * Any remaining arguments will be passed to the user's login shell.
+-	 */
+-
+-	if (argc > 0 && argv[0][0] != '-') {
+-		STRFCPY (name, argv[0]);	/* use this login id */
+-		argc--;
+-		argv++;		/* shift ... */
+-	}
+-	if (!name[0])		/* use default user ID */
+-		(void) strcpy (name, "root");
+-
+-	doshell = argc == 0;	/* any arguments remaining? */
+-
+-	/*
+-	 * Get the user's real name. The current UID is used to determine
+-	 * who has executed su. That user ID must exist.
+-	 */
+-
+-	pw = get_my_pwent ();
+-	if (!pw) {
+-		SYSLOG ((LOG_CRIT, "Unknown UID: %u", my_uid));
+-		su_failure (tty);
+-	}
+-	STRFCPY (oldname, pw->pw_name);
+-
+ #ifndef USE_PAM
+ #ifdef SU_ACCESS
+ 	/*
+@@ -399,9 +546,17 @@
+ 	 * Set the default shell.
+ 	 */
+ 
+-	if (pwent.pw_shell[0] == '\0')
+-		pwent.pw_shell = "/bin/sh";	/* XXX warning: const */
++	if (pwent.pw_shell == NULL || pwent.pw_shell[0] == '\0')
++		pwent.pw_shell = (char *) "/bin/sh";
++
++	if (shell == 0 && change_environment == 0)
++		shell = getenv ("SHELL");
++	if (shell != 0 && getuid () && restricted_shell (pwent.pw_shell))
++		shell = 0;
++	if (shell == 0)
++	shell = (char *) strdup (pwent.pw_shell);
+ 
++	signal(SIGINT, SIG_IGN);
+ #ifdef USE_PAM
+ 	ret = pam_authenticate (pamh, 0);
+ 	if (ret != PAM_SUCCESS) {
+@@ -427,6 +582,14 @@
+ 			su_failure (tty);
+ 		}
+ 	}
++	ret = pam_get_item(pamh, PAM_USER, (const void **) &tmp_name);
++	if (ret != PAM_SUCCESS) {
++		SYSLOG((LOG_ERR, "pam_get_item: internal PAM error\n"));
++		fprintf(stderr, "%s: Internal PAM error retrieving username\n", Prog);
++		pam_end(pamh, ret);
++		su_failure(tty);
++	}
++	strncpy(name, tmp_name, sizeof(name) - 1);
+ #else				/* !USE_PAM */
+ 	/*
+ 	 * Set up a signal handler in case the user types QUIT.
+@@ -507,10 +670,14 @@
+ 	}
+ #endif
+ 
+-	environ = newenvp;	/* make new environment active */
+-
+-	if (getenv ("IFS"))	/* don't export user IFS ... */
+-		addenv ("IFS= \t\n", NULL);	/* ... instead, set a safe IFS */
++	if (change_environment || restricted_shell(pwent.pw_shell)) {
++		environ = newenvp;			/* make new environment active */
++		if (getenv ("IFS"))			/* don't export user IFS ... */
++			addenv("IFS= \t\n", NULL);	/* ... instead, set a safe IFS */
++	} else {
++		if (getenv ("IFS"))
++			putenv("IFS= \t\n");
++	}
+ 
+ 	if (pwent.pw_shell[0] == '*') {	/* subsystem root required */
+ 		pwent.pw_shell++;	/* skip the '*' */
+@@ -529,7 +696,7 @@
+ #endif
+ #ifdef USE_SYSLOG
+ 	if (getdef_bool ("SYSLOG_SU_ENAB"))
+-		SYSLOG ((LOG_INFO, "+ %s %s-%s", tty,
++		SYSLOG ((LOG_INFO, "+ %s %s:%s", tty,
+ 			 oldname[0] ? oldname : "???",
+ 			 name[0] ? name : "???"));
+ #endif
+@@ -554,17 +721,56 @@
+ 		pam_end (pamh, ret);
+ 		exit (1);
+ 	}
++	ret = pam_open_session(pamh, 0);
++	if (ret != PAM_SUCCESS) {
++		SYSLOG((LOG_ERR, "pam_open_session: %s\n", pam_strerror(pamh, ret)));
++		fprintf(stderr, "%s: %s\n", Prog, pam_strerror(pamh, ret));
++		pam_setcred(pamh, PAM_DELETE_CRED);
++		pam_end(pamh, ret);
++		exit(1);
++	}
++	/* We must fork before setuid() because we need to call
++	 * pam_close_session() as root.
++	 */
++
++	/* We let the admin configure whether they need to keep login
++	   around to close sessions */
++	if (getdef_bool("CLOSE_SESSIONS")) {
++		pid_t pid;
++		int status;
++
++		signal(SIGINT, SIG_IGN);
++		pid = fork();
++
++		switch(pid) {
++		case -1:
++			SYSLOG((LOG_ERR, "su: fork failure: %m"));
++			perror("su: fork failure");
++			pam_setcred(pamh, PAM_DELETE_CRED);
++			pam_close_session(pamh, 0);
++			pam_end(pamh, PAM_ABORT);
++			exit(1);
++		case 0: /* child */
++			signal(SIGINT, SIG_DFL);
++			break;
++		default: /* parent */
++			waitpid(pid, &status, 0);
++			/* now we are done using PAM */
++			pam_setcred(pamh, PAM_DELETE_CRED);
++			ret = pam_close_session(pamh, 0);
++			pam_end(pamh, ret);
++			exit(WEXITSTATUS(status));
++		}
++	}
+ 
+ 	/* become the new user */
+ 	if (change_uid (&pwent)) {
++		pam_close_session(pamh, 0);
+ 		pam_setcred (pamh, PAM_DELETE_CRED);
+ 		pam_end (pamh, PAM_ABORT);
+ 		exit (1);
+ 	}
+ 
+-	/* now we are done using PAM */
+-	pam_end (pamh, PAM_SUCCESS);
+-
+ #else				/* !USE_PAM */
+ 	if (!amroot)		/* no limits if su from root */
+ 		setup_limits (&pwent);
+@@ -573,11 +779,14 @@
+ 		exit (1);
+ #endif				/* !USE_PAM */
+ 
+-	if (fakelogin)
+-		setup_env (&pwent);
++	if (fakelogin && (change_environment || restricted_shell(pwent.pw_shell)))
++		setup_env(&pwent);
+ #if 1				/* Suggested by Joey Hess. XXX - is this right?  */
+-	else
+-		addenv ("HOME", pwent.pw_dir);
++	else if (change_environment || restricted_shell(pwent.pw_shell)) {
++		addenv("HOME", pwent.pw_dir);
++		addenv("USER", pwent.pw_name);
++		addenv("SHELL", shell);
++	}
+ #endif
+ 
+ 	/*
+@@ -589,46 +798,6 @@
+ 	 */
+ 	closelog ();
+ 
+-	/*
+-	 * See if the user has extra arguments on the command line. In that
+-	 * case they will be provided to the new user's shell as arguments.
+-	 */
+-
+-	if (fakelogin) {
+-		char *arg0;
+-
+-#if 0				/* XXX - GNU su doesn't do this.  --marekm */
+-		if (!hushed (&pwent)) {
+-			motd ();
+-			mailcheck ();
+-		}
+-#endif
+-		cp = getdef_str ("SU_NAME");
+-		if (!cp)
+-			cp = Basename (pwent.pw_shell);
+-
+-		arg0 = xmalloc (strlen (cp) + 2);
+-		arg0[0] = '-';
+-		strcpy (arg0 + 1, cp);
+-		cp = arg0;
+-	} else
+-		cp = Basename (pwent.pw_shell);
+-
+-	if (!doshell) {
+-
+-		/*
+-		 * Use new user's shell from /etc/passwd and create an argv
+-		 * with the rest of the command line included.
+-		 */
+-
+-		argv[-1] = pwent.pw_shell;
+-		(void) execv (pwent.pw_shell, &argv[-1]);
+-		(void) fprintf (stderr, _("No shell\n"));
+-		SYSLOG ((LOG_WARN, "Cannot execute %s", pwent.pw_shell));
+-		closelog ();
+-		exit (1);
+-	}
+-
+-	shell (pwent.pw_shell, cp);
++	run_shell (shell, command, additional_args, fakelogin);
+ 	 /*NOTREACHED*/ exit (1);
+ }
+diff -Nru shadow-4.0.3/src/useradd.c shadow-4.0.3_30.4/src/useradd.c
+--- shadow-4.0.3/src/useradd.c	2002-01-10 14:01:28.000000000 +0100
++++ shadow-4.0.3_30.4/src/useradd.c	2004-11-02 22:17:38.000000000 +0100
+@@ -29,6 +29,8 @@
+ 
+ #include <config.h>
+ 
++#undef USE_PAM
++
+ #include "rcsid.h"
+ RCSID (PKG_VER "$Id$")
+ #include "prototypes.h"
+diff -Nru shadow-4.0.3/src/userdel.c shadow-4.0.3_30.4/src/userdel.c
+--- shadow-4.0.3/src/userdel.c	2002-01-05 16:41:44.000000000 +0100
++++ shadow-4.0.3_30.4/src/userdel.c	2004-11-02 22:17:38.000000000 +0100
+@@ -29,6 +29,8 @@
+ 
+ #include <config.h>
+ 
++#undef USE_PAM
++
+ #include "rcsid.h"
+ RCSID (PKG_VER "$Id$")
+ #include <sys/stat.h>
+@@ -147,6 +149,7 @@
+ 	struct group *ngrp;
+ 
+ #ifdef	SHADOWGRP
++	int deleted_user_group = 0;
+ 	const struct sgrp *sgrp;
+ 	struct sgrp *nsgrp;
+ #endif				/* SHADOWGRP */
+@@ -209,6 +212,10 @@
+ 
+ 		gr_remove (grp->gr_name);
+ 
++#ifdef SHADOWGRP
++		deleted_user_group = 1;
++#endif
++
+ 		/*
+ 		 * Update the DBM group file with the new entry as well.
+ 		 */
+@@ -279,6 +286,10 @@
+ 		SYSLOG ((LOG_INFO, "delete `%s' from shadow group `%s'\n",
+ 			 user_name, nsgrp->sg_name));
+ 	}
++
++	if (deleted_user_group)
++		sgr_remove(user_name);
++
+ #ifdef	NDBM
+ 	endsgent ();
+ #endif				/* NDBM */
+diff -Nru shadow-4.0.3/src/usermod.c shadow-4.0.3_30.4/src/usermod.c
+--- shadow-4.0.3/src/usermod.c	2002-01-05 16:41:44.000000000 +0100
++++ shadow-4.0.3_30.4/src/usermod.c	2004-11-02 22:17:38.000000000 +0100
+@@ -29,6 +29,8 @@
+ 
+ #include <config.h>
+ 
++#undef USE_PAM
++
+ #include "rcsid.h"
+ RCSID (PKG_VER "$Id$")
+ #include <sys/types.h>
+@@ -1544,9 +1546,14 @@
+ 				if (copy_tree (user_home, user_newhome,
+ 					       uflg ? user_newid : -1,
+ 					       gflg ? user_newgid : -1) ==
+-				    0 && remove_tree (user_home) == 0
+-				    && rmdir (user_home) == 0)
+-					return;
++				    0) {
++				  if (remove_tree (user_home) != 0 ||
++				    rmdir (user_home) != 0)
++				    fprintf (stderr,
++					     _("%s: warning: failed to completely remove old home directory %s"),
++					     Prog, user_home);
++				  return;
++				}
+ 
+ 				(void) remove_tree (user_newhome);
+ 				(void) rmdir (user_newhome);

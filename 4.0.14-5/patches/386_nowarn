@@ -1,0 +1,280 @@
+Goal: make possible compilation of shadow with -Wall -Werror
+
+Eliminates several reasons for warnings:
+* unused variables
+* non-declared static functions
+* missing extern declarations like nscd_flush_cache ("nscd.h")
+* ambiguaos "else"
+* ??? (what else I forgot)
+
+Status wrt upstream: will be in 4.0.15
+
+Index: shadow-4.0.14/libmisc/setupenv.c
+===================================================================
+--- shadow-4.0.14.orig/libmisc/setupenv.c	2006-01-16 18:12:10.862077290 +0200
++++ shadow-4.0.14/libmisc/setupenv.c	2006-01-16 18:18:17.185919272 +0200
+@@ -43,6 +43,8 @@
+ #include "defines.h"
+ #include <pwd.h>
+ #include "getdef.h"
++
++#ifndef USE_PAM
+ static void
+ addenv_path (const char *varname, const char *dirname, const char *filename)
+ {
+@@ -54,8 +56,6 @@
+ 	free (buf);
+ }
+ 
+-
+-#ifndef USE_PAM
+ static void read_env_file (const char *filename)
+ {
+ 	FILE *fp;
+Index: shadow-4.0.14/src/login.c
+===================================================================
+--- shadow-4.0.14.orig/src/login.c	2006-01-16 18:12:11.252045186 +0200
++++ shadow-4.0.14/src/login.c	2006-01-16 18:19:31.372811754 +0200
+@@ -261,7 +261,10 @@
+ 
+ static void init_env (void)
+ {
+-	char *cp, *tmp;
++#ifndef USE_PAM
++	char *cp;
++#endif
++	char *tmp;
+ 
+ 	if ((tmp = getenv ("LANG"))) {
+ 		addenv ("LANG", tmp);
+Index: shadow-4.0.14/src/chage.c
+===================================================================
+--- shadow-4.0.14.orig/src/chage.c	2006-01-16 18:12:10.735087745 +0200
++++ shadow-4.0.14/src/chage.c	2006-01-16 18:21:42.643004789 +0200
+@@ -338,7 +338,6 @@
+ 
+ int main (int argc, char **argv)
+ {
+-	int flag;
+ 	const struct spwd *sp;
+ 	struct spwd spwd;
+ 	uid_t ruid;
+Index: shadow-4.0.14/src/chsh.c
+===================================================================
+--- shadow-4.0.14.orig/src/chsh.c	2006-01-16 18:12:11.025063872 +0200
++++ shadow-4.0.14/src/chsh.c	2006-01-16 18:23:17.887163708 +0200
+@@ -68,6 +68,7 @@
+ /* local function prototypes */
+ static void usage (void);
+ static void new_fields (void);
++static int check_shell (const char *);
+ static int restricted_shell (const char *);
+ 
+ /*
+@@ -117,7 +118,7 @@
+  * If getusershell() is available (Linux, *BSD, possibly others), use it
+  * instead of re-implementing it.
+  */
+-int check_shell (const char *sh)
++static int check_shell (const char *sh)
+ {
+ 	char *cp;
+ 	int found = 0;
+Index: shadow-4.0.14/src/gpasswd.c
+===================================================================
+--- shadow-4.0.14.orig/src/gpasswd.c	2005-12-06 23:24:59.000000000 +0200
++++ shadow-4.0.14/src/gpasswd.c	2006-01-16 18:24:46.917834159 +0200
+@@ -45,6 +45,7 @@
+ #ifdef	SHADOWGRP
+ #include "sgroupio.h"
+ #endif
++#include "nscd.h"
+ /*
+  * Global variables
+  */
+Index: shadow-4.0.14/src/newgrp.c
+===================================================================
+--- shadow-4.0.14.orig/src/newgrp.c	2006-01-16 18:12:11.253045104 +0200
++++ shadow-4.0.14/src/newgrp.c	2006-01-16 18:25:52.712417546 +0200
+@@ -485,8 +485,8 @@
+ 					/* wake child when resumed */
+ 					kill (child, SIGCONT);
+ 				}
+-			} while (pid == child && WIFSTOPPED (cst) ||
+-				 pid != child && errno == EINTR);
++			} while ((pid == child && WIFSTOPPED (cst)) ||
++				 (pid != child && errno == EINTR));
+ 			SYSLOG ((LOG_INFO,
+ 				 "user `%s' (login `%s' on %s) returned to group `%s'",
+ 				 name, loginname, tty,
+Index: shadow-4.0.14/src/passwd.c
+===================================================================
+--- shadow-4.0.14.orig/src/passwd.c	2005-12-06 23:25:00.000000000 +0200
++++ shadow-4.0.14/src/passwd.c	2006-01-16 18:26:49.170769550 +0200
+@@ -603,7 +603,6 @@
+  */
+ int main (int argc, char **argv)
+ {
+-	int flag;		/* Current option to process     */
+ 	const struct passwd *pw;	/* Password file entry for user      */
+ 
+ #ifndef USE_PAM
+@@ -898,11 +897,12 @@
+ 
+ 	SYSLOG ((LOG_INFO, "password for `%s' changed by `%s'", name, myname));
+ 	closelog ();
+-	if (!qflg)
++	if (!qflg) {
+ 		if (!eflg)
+ 			printf (_("Password changed.\n"));
+ 		else
+ 			printf (_("Password set to expire.\n"));
++	}
+ 	exit (E_SUCCESS);
+ 	/* NOT REACHED */
+ }
+Index: shadow-4.0.14/src/groupadd.c
+===================================================================
+--- shadow-4.0.14.orig/src/groupadd.c	2006-01-16 18:12:10.736087663 +0200
++++ shadow-4.0.14/src/groupadd.c	2006-01-16 18:27:32.077237227 +0200
+@@ -86,7 +86,6 @@
+ static void grp_update (void);
+ static void find_new_gid (void);
+ static void check_new_name (void);
+-static void process_flags (int, char **);
+ static void close_files (void);
+ static void open_files (void);
+ static void fail_exit (int);
+Index: shadow-4.0.14/src/groupdel.c
+===================================================================
+--- shadow-4.0.14.orig/src/groupdel.c	2006-01-16 18:12:10.736087663 +0200
++++ shadow-4.0.14/src/groupdel.c	2006-01-16 18:28:08.534235864 +0200
+@@ -346,4 +346,5 @@
+ #endif
+ 	exit (errors == 0 ? E_SUCCESS : E_GRP_UPDATE);
+ 	/* NOT REACHED */
++	return 0;
+ }
+Index: shadow-4.0.14/src/grpck.c
+===================================================================
+--- shadow-4.0.14.orig/src/grpck.c	2006-01-16 18:12:11.004065601 +0200
++++ shadow-4.0.14/src/grpck.c	2006-01-16 18:29:36.566988470 +0200
+@@ -40,6 +40,7 @@
+ #include "defines.h"
+ #include "groupio.h"
+ #include "prototypes.h"
++#include "nscd.h"
+ extern void __gr_del_entry (const struct commonio_entry *);
+ extern struct commonio_entry *__gr_get_head (void);
+ 
+Index: shadow-4.0.14/src/grpconv.c
+===================================================================
+--- shadow-4.0.14.orig/src/grpconv.c	2005-12-06 23:25:00.000000000 +0200
++++ shadow-4.0.14/src/grpconv.c	2006-01-16 18:30:05.539603267 +0200
+@@ -20,6 +20,7 @@
+ #include <time.h>
+ #include <unistd.h>
+ #include "prototypes.h"
++#include "nscd.h"
+ #ifdef SHADOWGRP
+ #include "groupio.h"
+ #include "sgroupio.h"
+Index: shadow-4.0.14/src/grpunconv.c
+===================================================================
+--- shadow-4.0.14.orig/src/grpunconv.c	2005-12-06 23:25:00.000000000 +0200
++++ shadow-4.0.14/src/grpunconv.c	2006-01-16 18:30:19.012494096 +0200
+@@ -20,6 +20,7 @@
+ #include <unistd.h>
+ #include <grp.h>
+ #include "prototypes.h"
++#include "nscd.h"
+ #ifdef SHADOWGRP
+ #include "groupio.h"
+ #include "sgroupio.h"
+Index: shadow-4.0.14/src/newusers.c
+===================================================================
+--- shadow-4.0.14.orig/src/newusers.c	2006-01-16 18:12:10.738087498 +0200
++++ shadow-4.0.14/src/newusers.c	2006-01-16 18:30:47.998107823 +0200
+@@ -53,6 +53,7 @@
+ #include "pwio.h"
+ #include "groupio.h"
+ #include "shadowio.h"
++#include "nscd.h"
+ /*
+  * Global variables
+  */
+Index: shadow-4.0.14/src/pwck.c
+===================================================================
+--- shadow-4.0.14.orig/src/pwck.c	2006-01-16 18:12:11.004065601 +0200
++++ shadow-4.0.14/src/pwck.c	2006-01-16 18:31:19.454518139 +0200
+@@ -42,6 +42,7 @@
+ #include "pwio.h"
+ #include "shadowio.h"
+ #include "getdef.h"
++#include "nscd.h"
+ extern void __pw_del_entry (const struct commonio_entry *);
+ extern struct commonio_entry *__pw_get_head (void);
+ 
+Index: shadow-4.0.14/src/pwconv.c
+===================================================================
+--- shadow-4.0.14.orig/src/pwconv.c	2005-12-06 23:25:00.000000000 +0200
++++ shadow-4.0.14/src/pwconv.c	2006-01-16 18:31:41.501703080 +0200
+@@ -43,6 +43,7 @@
+ #include "prototypes.h"
+ #include "pwio.h"
+ #include "shadowio.h"
++#include "nscd.h"
+ /*
+  * exit status values
+  */
+Index: shadow-4.0.14/src/usermod.c
+===================================================================
+--- shadow-4.0.14.orig/src/usermod.c	2006-01-16 18:12:10.741087251 +0200
++++ shadow-4.0.14/src/usermod.c	2006-01-16 18:34:40.291983971 +0200
+@@ -88,19 +88,21 @@
+ static gid_t user_gid;
+ static gid_t user_newgid;
+ static char *user_comment;
+-static char *user_newcomment;	/* Audit */
+ static char *user_home;
+ static char *user_newhome;
+ static char *user_shell;
+-static char *user_newshell;	/* Audit */
+-
+ static long user_expire;
+-static long user_newexpire;	/* Audit */
+ static long user_inactive;
+-static long user_newinactive;	/* Audit */
+ static long sys_ngroups;
+ static char **user_groups;	/* NULL-terminated list */
+ 
++#ifdef WITH_AUDIT
++static char *user_newcomment;	/* Audit */
++static char *user_newshell;	/* Audit */
++static long user_newexpire;	/* Audit */
++static long user_newinactive;	/* Audit */
++#endif
++
+ static char *Prog;
+ 
+ static int
+@@ -841,7 +843,6 @@
+ 
+ 	const struct spwd *spwd = NULL;
+ 	int anyflag = 0;
+-	int arg;
+ 
+ 	if (argc == 1 || argv[argc - 1][0] == '-')
+ 		usage ();
+Index: shadow-4.0.14/src/vipw.c
+===================================================================
+--- shadow-4.0.14.orig/src/vipw.c	2006-01-16 18:12:10.982067412 +0200
++++ shadow-4.0.14/src/vipw.c	2006-01-16 18:34:58.995444188 +0200
+@@ -241,7 +241,6 @@
+ 
+ int main (int argc, char **argv)
+ {
+-	int flag;
+ 	int editshadow = 0;
+ 	char *a;
+ 	int do_vipw;

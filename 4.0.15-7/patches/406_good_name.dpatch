@@ -1,0 +1,94 @@
+#! /bin/sh -e
+## 406_good_name.dpatch by xrgtn
+##
+## All lines beginning with `## DP:' are a description of the patch.
+##
+## DP: Relaxed usernames/groupnames checking patch.
+## DP: Allows any non-empty user/grounames that don't contain ':' and '\n'
+## DP: characters and don't start with '-'. This patch is more restrictive
+## DP: than original Karl's version. closes: #264879
+## DP: 
+## DP: Comments from Karl Ramm (shadow 1:4.0.3-9, 20 Aug 2003 02:06:50 -0400):
+## DP: 
+## DP: I can't come up with a good justification as to why characters other
+## DP: than ':'s and '\0's should be disallowed in group and usernames (other
+## DP: than '-' as the leading character).  Thus, the maintenance tools don't
+## DP: anymore.  closes: #79682, #166798, #171179
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+Index: shadow-4.0.15/libmisc/chkname.c
+===================================================================
+--- shadow-4.0.15.orig/libmisc/chkname.c	2006-03-08 19:32:11.412980911 +0100
++++ shadow-4.0.15/libmisc/chkname.c	2006-03-08 19:33:33.777296244 +0100
+@@ -17,6 +17,7 @@
+ #endif
+ static int good_name (const char *name)
+ {
++#if 0
+ 	/*
+ 	 * User/group names must match [a-z_][a-z0-9_-]*[$]
+ 	 */
+@@ -30,6 +31,16 @@
+ 		      (*name == '$' && *(name + 1) == '\0')))
+ 			return 0;
+ 	}
++#endif
++	/*
++	 * Allow more relaxed user/group names in Debian -- ^[^-:\n][^:\n]*$
++	 */
++	if (!*name || *name == '-')
++		return 0;
++	do
++		if (*name == ':' || *name == '\n')
++			return 0;
++	while (*++name);
+ 
+ 	return 1;
+ }
+Index: shadow-4.0.15/man/useradd.8.xml
+===================================================================
+--- shadow-4.0.15.orig/man/useradd.8.xml	2006-03-08 19:32:11.414980506 +0100
++++ shadow-4.0.15/man/useradd.8.xml	2006-03-08 19:33:33.780295636 +0100
+@@ -174,6 +174,7 @@
+ 	    valid in conjunction with the <option>-m</option> option. The
+ 	    default is to not create the directory and to not copy any
+ 	    files.
++	    This option may not function correctly if the username has a / in it.
+ 	  </para>
+ 	</listitem>
+       </varlistentry>
+@@ -352,9 +353,13 @@
+     </para>
+ 
+     <para>
+-      Usernames must begin with a lower case letter or an underscore, and
+-      only lower case letters, underscores, dashes, and dollar signs may
+-      follow. In regular expression terms: [a-z_][a-z0-9_-]*[$]
++      It is usually recommended to only use usernames that begin with
++      a lower case letter or an underscore, and are only followed by lower
++      case letters, digits, underscores, dashes, and optionally terminated by
++      a dollar sign. In regular expression terms: ^[a-z_][a-z0-9_-]*[$]?$
++      On Debian, the constraints on the username are loosened:
++      Usernames must neither start by a dash ('-') nor contain a colon (':')
++      or an end of line ('\n').
+     </para>
+   </refsect1>
+ 

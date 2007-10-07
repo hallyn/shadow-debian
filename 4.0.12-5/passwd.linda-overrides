@@ -1,0 +1,2 @@
+Tag: incorrect-file-perms
+Data: /usr/bin/(chage|chfn|chsh|expiry|gpasswd|passwd)

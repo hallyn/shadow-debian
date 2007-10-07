@@ -1,0 +1,60 @@
+Goal: Fix the man pages generation on Debian
+      The occurences "’" generated some "&#8217;"
+
+Fixes: #341489
+
+Status wrt upstream: will be in 4.0.15 (committed at 2006-01-07)
+
+Note: this could probably be removed if docbook-xsl was updated (1.69.1
+      IIRC)
+
+Index: shadow-4.0.14/man/passwd.1.xml
+===================================================================
+--- shadow-4.0.14.orig/man/passwd.1.xml	2006-01-03 08:25:06.786563200 +0100
++++ shadow-4.0.14/man/passwd.1.xml	2006-01-03 08:25:08.843145652 +0100
+@@ -185,8 +185,8 @@
+ 	</term>
+ 	<listitem>
+ 	  <para>
+-	    Immediately expire an account’s password. This in effect can
+-	    force a user to change his/her password at the user’s next login.
++	    Immediately expire an account's password. This in effect can
++	    force a user to change his/her password at the user's next login.
+ 	  </para>
+ 	</listitem>
+       </varlistentry>
+@@ -271,7 +271,7 @@
+ 	<listitem>
+ 	  <para>
+ 	    Display account status information. The status information
+-	    consists of 7 fields. The first field is the user’s login name. 
++	    consists of 7 fields. The first field is the user's login name. 
+ 	    The second field indicates if the user account is locked (L),
+ 	    has no password (NP), or has a usable password (P). The third
+ 	    field gives the date of the last password change. The next four
+Index: shadow-4.0.14/man/login.1.xml
+===================================================================
+--- shadow-4.0.14.orig/man/login.1.xml	2006-01-03 08:23:47.177723987 +0100
++++ shadow-4.0.14/man/login.1.xml	2006-01-03 08:25:08.843145652 +0100
+@@ -39,7 +39,7 @@
+     <para>
+       <command>login</command> is used to establish a new session with the
+       system. It is normally invoked automatically by responding to the
+-      <emphasis remap='I'>login:</emphasis> prompt on the user&acute;s
++      <emphasis remap='I'>login:</emphasis> prompt on the user's
+       terminal. <command>login</command> may be special to the shell and may
+       not be invoked as a sub-process. Typically, <command>login</command>
+       is treated by the shell as <emphasis remap='B'>exec login</emphasis>
+Index: shadow-4.0.14/man/su.1.xml
+===================================================================
+--- shadow-4.0.14.orig/man/su.1.xml	2006-01-03 08:23:47.178723784 +0100
++++ shadow-4.0.14/man/su.1.xml	2006-01-03 08:25:08.844145449 +0100
+@@ -42,7 +42,7 @@
+ 
+     <para>
+       Additional arguments may be provided after the username, in which case
+-      they are supplied to the user&acute;s login shell. In particular, an
++      they are supplied to the user's login shell. In particular, an
+       argument of <option>-c</option> will cause the next argument to be
+       treated as a command by most command interpreters. The command will be
+       executed by the shell specified in <filename>/etc/passwd</filename>

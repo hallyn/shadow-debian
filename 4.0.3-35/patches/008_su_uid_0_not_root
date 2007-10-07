@@ -1,0 +1,25 @@
+Goal: don't assume uid 0 == "root", use getpwuid to fetch it
+Fixes: #81924
+
+Status wrt upstream: It should be forwarded to upstream.
+
+Index: shadow-4.0.3/src/su.c
+===================================================================
+--- shadow-4.0.3.orig/src/su.c	2005-05-30 23:07:20.196974000 +0200
++++ shadow-4.0.3/src/su.c	2005-05-30 23:13:57.716974000 +0200
+@@ -270,7 +270,14 @@
+ 		argv++;		/* shift ... */
+ 	}
+ 	if (!name[0])		/* use default user ID */
+-		(void) strcpy (name, "root");
++	{
++		struct passwd *root_pw = getpwuid(0);
++		if (root_pw == NULL) {
++			SYSLOG((LOG_CRIT, "There is no UID 0 user."));
++			su_failure(tty)
++		}
++		strcpy(name, root_pw->pw_name);
++	}
+ 
+ 	doshell = argc == 0;	/* any arguments remaining? */
+ 

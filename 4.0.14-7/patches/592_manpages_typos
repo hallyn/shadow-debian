@@ -1,0 +1,21 @@
+Goal: fix some typos in the XML manpages.
+
+Fixes: #352135
+
+Status wrt upstream: not reported yet
+
+Index: shadow-4.0.14/man/passwd.1.xml
+===================================================================
+--- shadow-4.0.14.orig/man/passwd.1.xml	2006-02-09 21:55:37.000000000 +0100
++++ shadow-4.0.14/man/passwd.1.xml	2006-02-10 00:14:44.000000000 +0100
+@@ -101,8 +101,8 @@
+       <title>Hints for user passwords</title>
+       <para>
+         The security of a password depends upon the strength of the
+-	encryption algorithm and the size of the key space. The
+-	<emphasis>UNIX</emphasis> System encryption method is based on the
++	encryption algorithm and the size of the key space.
++	The <emphasis>UNIX</emphasis> System encryption method is based on the
+ 	NBS DES algorithm and is very secure. The size of the key space
+ 	depends upon the randomness of the password which is selected.
+       </para>

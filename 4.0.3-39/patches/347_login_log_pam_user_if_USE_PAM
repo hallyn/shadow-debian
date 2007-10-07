@@ -1,0 +1,22 @@
+Goal: fixed loggin of username on succesful login (was using
+      the normal username, when it should have used pam_user)
+Fixes: #47819
+
+Status wrt upstream: Applied upstream.
+
+Index: shadow-4.0.3/src/login.c
+===================================================================
+--- shadow-4.0.3.orig/src/login.c	2005-05-28 22:21:25.134189000 +0200
++++ shadow-4.0.3/src/login.c	2005-05-28 22:21:29.434189000 +0200
+@@ -1421,7 +1421,11 @@
+ 	if (pwent.pw_uid == 0)
+ 		SYSLOG ((LOG_NOTICE, "ROOT LOGIN %s", fromhost));
+ 	else if (getdef_bool ("LOG_OK_LOGINS"))
++#ifdef USE_PAM
++		SYSLOG ((LOG_INFO, "`%s' logged in %s", pam_user, fromhost));
++#else
+ 		SYSLOG ((LOG_INFO, "`%s' logged in %s", username, fromhost));
++#endif
+ 	closelog ();
+ #ifdef RADIUS
+ 	if (is_rad_login) {

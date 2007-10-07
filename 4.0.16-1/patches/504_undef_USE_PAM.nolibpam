@@ -1,0 +1,49 @@
+Index: shadow-4.0.16/src/Makefile.am
+===================================================================
+--- shadow-4.0.16.orig/src/Makefile.am	2006-05-31 23:24:49.895951584 +0700
++++ shadow-4.0.16/src/Makefile.am	2006-05-31 23:24:52.308584808 +0700
+@@ -53,16 +53,16 @@
+ 		 $(top_builddir)/lib/libshadow.la
+ AM_CPPFLAGS    = -DLOCALEDIR=\"$(datadir)/locale\"
+ 
+-chage_LDADD    = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX)
++chage_LDADD    = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
+ chfn_LDADD     = $(LDADD) $(LIBPAM) $(LIBSELINUX)
+-chgpasswd_LDADD = $(LDADD) $(LIBPAM) $(LIBSELINUX)
++chgpasswd_LDADD = $(LDADD) $(LIBSELINUX)
+ chsh_LDADD     = $(LDADD) $(LIBPAM) $(LIBSELINUX)
+-chpasswd_LDADD = $(LDADD) $(LIBPAM) $(LIBSELINUX)
++chpasswd_LDADD = $(LDADD) $(LIBSELINUX)
+ cppw_LDADD     = $(LDADD) $(LIBSELINUX)
+ gpasswd_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
+-groupadd_LDADD = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX)
+-groupdel_LDADD = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX)
+-groupmod_LDADD = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX)
++groupadd_LDADD = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++groupdel_LDADD = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++groupmod_LDADD = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
+ grpck_LDADD    = $(LDADD) $(LIBSELINUX)
+ grpconv_LDADD  = $(LDADD) $(LIBSELINUX)
+ grpunconv_LDADD = $(LDADD) $(LIBSELINUX)
+@@ -71,7 +71,7 @@
+ 	login_nopam.c
+ login_LDADD    = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+ newgrp_LDADD   = $(LDADD) $(LIBPAM) $(LIBAUDIT)
+-newusers_LDADD = $(LDADD) $(LIBPAM) $(LIBSELINUX)
++newusers_LDADD = $(LDADD) $(LIBSELINUX)
+ nologin_LDADD  =
+ passwd_LDADD   = $(LDADD) $(LIBPAM) $(LIBCRACK) $(LIBAUDIT) $(LIBSELINUX)
+ pwck_LDADD     = $(LDADD) $(LIBSELINUX)
+@@ -81,9 +81,9 @@
+ 	su.c \
+ 	suauth.c
+ su_LDADD       = $(LDADD) $(LIBPAM)
+-useradd_LDADD  = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX)
+-userdel_LDADD  = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX)
+-usermod_LDADD  = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX)
++useradd_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++userdel_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
++usermod_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX)
+ vipw_LDADD     = $(LDADD) $(LIBSELINUX)
+ 
+ install-am: all-am

@@ -1,0 +1,27 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 316_vipw-race-242407.dpatch by  <Alexander Gattin <arg@online.com.ua>>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: The patch fixes bug #242407 - race condition in vipw.
+## DP: The fix make vipw to remove /etc/{passwd|shadow|group|gshadow}.edit
+## DP: temporary file first, and only then unlock. Previously here was a
+## DP: common flaw in sync design -- some parts of "transaction"
+## DP: (namely tmpfile) not covered by sync.
+
+@DPATCH@
+diff -urNad shadow-4.0.3/src/vipw.c /tmp/dpep.TLLFxC/shadow-4.0.3/src/vipw.c
+--- shadow-4.0.3/src/vipw.c	2002-01-05 17:41:44.000000000 +0200
++++ /tmp/dpep.TLLFxC/shadow-4.0.3/src/vipw.c	2005-04-14 23:47:33.000000000 +0300
+@@ -93,10 +93,10 @@
+ {
+ 	int err = errno;
+ 
+-	if (filelocked)
+-		(*unlock) ();
+ 	if (createedit)
+ 		unlink (fileeditname);
++	if (filelocked)
++		(*unlock) ();
+ 	if (msg)
+ 		fprintf (stderr, "%s: %s", progname, msg);
+ 	if (syserr)

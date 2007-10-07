@@ -1,0 +1,20 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 323_passwd.1-typo.dpatch by Christian Perrier <bubulle@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Correct typo in passwd.1. Closes: #302740
+
+@DPATCH@
+Index: shadow-4.0.3/man/passwd.1
+===================================================================
+--- shadow-4.0.3.orig/man/passwd.1	2005-05-12 21:58:56.126019802 +0200
++++ shadow-4.0.3/man/passwd.1	2005-05-12 22:00:12.205652520 +0200
+@@ -47,7 +47,7 @@ of the user, user's login shell, or pass
+ .PP
+ The \fB-s\fR option makes \fBpasswd\fR call \fBchsh\fR to change the user's shell.  The
+ \fB-f\fR option makes \fBpasswd\fR call \fBchfn\fR to change the user's gecos
+-information.  These two options are only meant for compatiblity, since the
++information.  These two options are only meant for compatibility, since the
+ other programs can be called directly.
+ .SS Password Changes
+ The user is first prompted for his/her old password, if one is present.

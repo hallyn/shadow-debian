@@ -1,0 +1,241 @@
+Goal: permit the man pages generation from the XML files.
+
+Status wrt upstream: comes from upstream CVS (will be in 4.0.13)
+                     CLEANFILES is commented. This is Debian specific.
+                     (to avoid problems when debuild is used twice in the
+                     same directory, or debuild then debclean then
+                     debuild)
+
+Note: man pages are better with docbook-xsl 1.69.1
+The current version in Debian is 1.68.1. I noticed these differences:
+  * The extra inforamtion (date and User Commands) are not displayed in
+    the headers and footers.
+
+Index: shadow-4.0.12/configure.in
+===================================================================
+--- shadow-4.0.12.orig/configure.in	2005-09-01 11:14:57.000000000 +0200
++++ shadow-4.0.12/configure.in	2005-09-01 11:14:59.000000000 +0200
+@@ -211,6 +211,13 @@
+ 	[enable_shadowgrp="yes"]
+ )
+ 
++AC_ARG_ENABLE(man,
++	[AC_HELP_STRING([--enable-man],
++		[regenerate roff man pages from Docbook (default=no)])],
++	[enable_man=yes],
++        [enable_man=no]
++)
++
+ AC_ARG_WITH(libcrack, [  --with-libcrack         try to use libcrack (default if found)])
+ AC_ARG_WITH(libpam,   [  --with-libpam           use libpam for PAM support])
+ AC_ARG_WITH(selinux,  [  --with-selinux          use SELinux support])
+@@ -228,6 +235,23 @@
+ 	AC_DEFINE(SHADOWGRP, 1, [Define to support the shadow group file.])
+ fi
+ 
++if test "$enable_man" = "yes"; then
++	dnl
++	dnl Check for xsltproc
++	dnl
++	AC_PATH_PROG([XSLTPROC], [xsltproc])
++	if test -z "$XSLTPROC"; then
++		enable_man=no
++	fi
++
++	dnl check for DocBook DTD and stylesheets in the local catalog.
++	JH_CHECK_XML_CATALOG([-//OASIS//DTD DocBook XML V4.1.2//EN],
++		[DocBook XML DTD V4.1.2], [], enable_man=no)
++	JH_CHECK_XML_CATALOG([http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl],
++		[DocBook XSL Stylesheets], [], enable_man=no)
++fi
++AM_CONDITIONAL(ENABLE_REGENERATE_MAN, test x$enable_man != xno)
++
+ AC_SUBST(LIBCRYPT)
+ AC_CHECK_LIB(crypt, crypt, [LIBCRYPT=-lcrypt],
+ 	[AC_MSG_ERROR([crypt() not found])])
+Index: shadow-4.0.12/man/Makefile.am
+===================================================================
+--- shadow-4.0.12.orig/man/Makefile.am	2005-07-10 20:03:57.000000000 +0200
++++ shadow-4.0.12/man/Makefile.am	2005-09-01 11:24:04.000000000 +0200
+@@ -94,6 +94,121 @@
+ 
+ all:
+ 
+-shadow-man-pages.pot:
++shadow-man-pages.pot: $(man_XMANS)
+ 	xml2po -o $@ $(man_XMANS)
+ 
++if ENABLE_REGENERATE_MAN
++
++chage.1: chage.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++chfn.1: chfn.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++chpasswd.8: chpasswd.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++chsh.1: chsh.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++expiry.1: expiry.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++faillog.5: faillog.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++faillog.8: faillog.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++gpasswd.1: gpasswd.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++groupadd.8: groupadd.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++groupdel.8: groupdel.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++groupmems.8: groupmems.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++groupmod.8: groupmod.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++groups.1: groups.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++grpck.8: grpck.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++gshadow.5: gshadow.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++lastlog.8: lastlog.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++limits.5: limits.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++login.1: login.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++login.access.5: login.access.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++login.defs.5: login.defs.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++logoutd.8: logoutd.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++#newgrp.1: newgrp.1.xml
++#	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++newusers.8: newusers.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++passwd.1: passwd.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++passwd.5: passwd.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++porttime.5: porttime.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++pwck.8: pwck.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++grpconv.8 grpunconv.8 pwconv.8 pwunconv.8: pwconv.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++shadow.3 getspnam.3: shadow.3.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++shadow.5: shadow.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++su.1: su.1.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++suauth.5: suauth.5.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++useradd.8: useradd.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++userdel.8: userdel.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++usermod.8: usermod.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++vigr.8 vipw.8: vipw.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
++# shadow is distributed with the groff man pages generated. We do not
++# remove them to avoid problems when the packages are built twice
++#CLEANFILES = $(man_MANS)
++
++endif
+Index: shadow-4.0.12/acinclude.m4
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ shadow-4.0.12/acinclude.m4	2005-09-01 11:14:59.000000000 +0200
+@@ -0,0 +1,54 @@
++# Checks the location of the XML Catalog
++# Usage:
++#   JH_PATH_XML_CATALOG([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
++# Defines XMLCATALOG and XML_CATALOG_FILE substitutions
++AC_DEFUN([JH_PATH_XML_CATALOG],
++[
++  # check for the presence of the XML catalog
++  AC_ARG_WITH([xml-catalog],
++              AC_HELP_STRING([--with-xml-catalog=CATALOG],
++                             [path to xml catalog to use]),,
++              [with_xml_catalog=/etc/xml/catalog])
++  jh_found_xmlcatalog=true
++  XML_CATALOG_FILE="$with_xml_catalog"
++  AC_SUBST([XML_CATALOG_FILE])
++  AC_MSG_CHECKING([for XML catalog ($XML_CATALOG_FILE)])
++  if test -f "$XML_CATALOG_FILE"; then
++    AC_MSG_RESULT([found])
++  else
++    jh_found_xmlcatalog=false
++    AC_MSG_RESULT([not found])
++  fi
++
++  # check for the xmlcatalog program
++  AC_PATH_PROG(XMLCATALOG, xmlcatalog, no)
++  if test "x$XMLCATALOG" = xno; then
++    jh_found_xmlcatalog=false
++  fi
++
++  if $jh_found_xmlcatalog; then
++    ifelse([$1],,[:],[$1])
++  else
++    ifelse([$2],,[AC_MSG_ERROR([could not find XML catalog])],[$2])
++  fi
++])
++
++# Checks if a particular URI appears in the XML catalog
++# Usage:
++#   JH_CHECK_XML_CATALOG(URI, [FRIENDLY-NAME], [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
++AC_DEFUN([JH_CHECK_XML_CATALOG],
++[
++  AC_REQUIRE([JH_PATH_XML_CATALOG],[JH_PATH_XML_CATALOG(,[:])])dnl
++  AC_MSG_CHECKING([for ifelse([$2],,[$1],[$2]) in XML catalog])
++  if $jh_found_xmlcatalog && \
++     AC_RUN_LOG([$XMLCATALOG --noout "$XML_CATALOG_FILE" "$1" >&2]); then
++    AC_MSG_RESULT([found])
++    ifelse([$3],,,[$3
++])dnl
++  else
++    AC_MSG_RESULT([not found])
++    ifelse([$4],,
++       [AC_MSG_ERROR([could not find ifelse([$2],,[$1],[$2]) in XML catalog])],
++       [$4])
++  fi
++])

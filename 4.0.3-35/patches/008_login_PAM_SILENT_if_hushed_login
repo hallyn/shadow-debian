@@ -1,0 +1,25 @@
+Goal: check for hushed login and pass PAM_SILENT if true,
+Fixes: #48002
+
+Status wrt upstream: It should be forwarded to upstream.
+
+Index: shadow-4.0.3/src/login.c
+===================================================================
+--- shadow-4.0.3.orig/src/login.c	2005-05-28 22:21:29.434189000 +0200
++++ shadow-4.0.3/src/login.c	2005-05-28 22:21:32.774189000 +0200
+@@ -889,11 +889,14 @@
+ 
+ 		if (!pwd || setup_groups (pwd))
+ 			exit (1);
++		else
++		        pwent = *pwd;
+ 
+ 		retcode = pam_setcred (pamh, PAM_ESTABLISH_CRED);
+ 		PAM_FAIL_CHECK;
+ 
+-		retcode = pam_open_session (pamh, 0);
++		retcode = pam_open_session (pamh,
++					    hushed(&pwent) ? PAM_SILENT : 0);
+ 		PAM_FAIL_CHECK;
+ 
+ #else				/* ! USE_PAM */

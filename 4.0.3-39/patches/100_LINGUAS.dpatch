@@ -1,0 +1,38 @@
+#! /bin/sh -e
+## 100_LINGUAS.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add new languages to LINGUAS in configure.in
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+Index: shadow-4.0.3/configure.in
+===================================================================
+--- shadow-4.0.3.orig/configure.in	2005-05-12 12:12:17.828723873 +0200
++++ shadow-4.0.3/configure.in	2005-05-12 13:44:52.390800390 +0200
+@@ -283,7 +283,7 @@ else
+ 	AC_MSG_RESULT(yes)
+ fi
+ 
+-ALL_LINGUAS="cs de el fr ja ko pl sv uk"
++ALL_LINGUAS="bs ca cs da de el es eu fi fr id it ja ko nb nn nl pl pt_BR pt ro ru sk sq sv tl tr uk vi zh_CN zh_TW"
+ AM_GNU_GETTEXT
+ 
+ AC_OUTPUT([

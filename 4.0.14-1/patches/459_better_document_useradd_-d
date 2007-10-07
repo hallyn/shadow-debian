@@ -1,0 +1,32 @@
+Goal: Better document that -d will not add the user's home directory
+      if it does not already exist
+
+Status wrt upstream: forwarded but not applied yet
+
+Fixes: #154996
+
+Index: shadow-4.0.14/man/useradd.8.xml
+===================================================================
+--- shadow-4.0.14.orig/man/useradd.8.xml	2006-01-03 08:25:06.117698998 +0100
++++ shadow-4.0.14/man/useradd.8.xml	2006-01-03 08:25:07.784360617 +0100
+@@ -73,8 +73,8 @@
+ 	    The default base directory for the system if <option>-d</option>
+ 	    dir is not specified. <replaceable>BASE_DIR</replaceable> is
+ 	    concatenated with the account name to define the home directory. 
+-	    If the <option>-m</option> option is not used, base_dir must
+-	    exist.
++	    If the <option>-m</option> option is not used,
++            <replaceable>BASE_DIR</replaceable> must exist.
+ 	  </para>
+ 	</listitem>
+       </varlistentry>
+@@ -90,7 +90,8 @@
+ 	    login directory. The default is to append the
+ 	    <replaceable>LOGIN</replaceable> name to
+ 	    <replaceable>BASE_DIR</replaceable> and use that as the login
+-	    directory name.
++	    directory name. The directory <replaceable>HOME_DIR</replaceable>
++            does not have to exist but will not be created if it is missing.
+ 	  </para>
+ 	</listitem>
+       </varlistentry>

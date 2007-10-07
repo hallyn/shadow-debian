@@ -1,0 +1,118 @@
+Index: shadow-4.0.14/man/Makefile.am
+===================================================================
+--- shadow-4.0.14.orig/man/Makefile.am	2006-01-03 08:23:46.980763965 +0100
++++ shadow-4.0.14/man/Makefile.am	2006-01-03 08:25:10.219866135 +0100
+@@ -26,6 +26,7 @@
+ 	logoutd.8.xml \
+ 	newgrp.1.xml \
+ 	newusers.8.xml \
++	nologin.8.xml \
+ 	passwd.1.xml \
+ 	passwd.5.xml \
+ 	porttime.5.xml \
+@@ -67,6 +68,7 @@
+ 	logoutd.8 \
+ 	newgrp.1 \
+ 	newusers.8 \
++	nologin.8 \
+ 	passwd.1 \
+ 	passwd.5 \
+ 	porttime.5 \
+@@ -175,6 +177,9 @@
+ newusers.8: newusers.8.xml
+ 	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
+ 
++nologin.8: nologin.8.xml
++	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
++
+ passwd.1: passwd.1.xml
+ 	$(XSLTPROC) -nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $<
+ 
+Index: shadow-4.0.14/man/nologin.8.xml
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ shadow-4.0.14/man/nologin.8.xml	2006-01-03 08:25:10.219866135 +0100
+@@ -0,0 +1,83 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
++		"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
++<refentry id='newusers.8'>
++  <!-- $Id: $ -->
++  <!--
++    Conversion to XML from the nologin.8 man page distributed by FreeBSD:
++
++    Copyright (c) 1993
++    The Regents of the University of California.  All rights reserved.
++
++    Redistribution and use in source and binary forms, with or without
++    modification, are permitted provided that the following conditions
++    are met:
++    1. Redistributions of source code must retain the above copyright
++       notice, this list of conditions and the following disclaimer.
++    2. Redistributions in binary form must reproduce the above copyright
++       notice, this list of conditions and the following disclaimer in the
++       documentation and/or other materials provided with the distribution.
++    4. Neither the name of the University nor the names of its contributors
++       may be used to endorse or promote products derived from this software
++       without specific prior written permission.
++
++    THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++    ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++    SUCH DAMAGE.-->
++  <refmeta>
++    <refentrytitle>nologin</refentrytitle>
++    <manvolnum>8</manvolnum>
++    <refmiscinfo class="sectdesc">System Management Commands</refmiscinfo>
++  </refmeta>
++  <refnamediv id='name'>
++    <refname>nologin</refname>
++    <refpurpose>politely refuse a login</refpurpose>
++  </refnamediv>
++  <!-- body begins here -->
++  <refsynopsisdiv id='synopsis'>
++    <cmdsynopsis>
++      <command>nologin</command>
++    </cmdsynopsis>
++  </refsynopsisdiv>
++
++  <refsect1 id='description'>
++    <title>DESCRIPTION</title>
++    <para>
++      <command>nologin</command> displays a message that an account is not
++      available and exits non-zero. It is intended as a replacement shell field
++      for accounts that have been disabled.
++    </para>
++    <para>
++      To disable all logins, investigate
++      <citerefentry><refentrytitle>nologin</refentrytitle><manvolnum>5</manvolnum>
++      </citerefentry>.
++    </para>
++  </refsect1>
++
++  <refsect1 id='see_also'>
++    <title>SEE ALSO</title>
++    <para>
++      <citerefentry>
++	<refentrytitle>login</refentrytitle><manvolnum>1</manvolnum>
++      </citerefentry>,
++      <citerefentry>
++	<refentrytitle>nologin</refentrytitle><manvolnum>5</manvolnum>
++      </citerefentry>.
++    </para>
++  </refsect1>
++
++  <refsect1 id='history'>
++    <title>HYSTORY</title>
++    <para>
++      The <command>nologin</command> command appeared in BSD 4.4.
++    </para>
++  </refsect1>
++</refentry>

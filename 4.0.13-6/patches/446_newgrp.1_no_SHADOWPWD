@@ -1,0 +1,23 @@
+Goal: With 4.0.12, SHADOWPWD was removed (always enabled)
+
+Status wrt upstream:
+
+Index: shadow-4.0.12/man/newgrp.1
+===================================================================
+--- shadow-4.0.12.orig/man/newgrp.1	2005-08-10 10:43:38.000000000 +0200
++++ shadow-4.0.12/man/newgrp.1	2005-08-12 14:15:48.000000000 +0200
+@@ -47,10 +47,10 @@
+ the group does, or if the user is not listed as a member and the group has
+ a password. The user will be denied access if the group password is empty
+ and the user is not listed as a member.
+-If compiled with SHADOWPWD (respectively SHADOWGRP) defined, the password
+-of the user (respectively, the password and the members of the group) will
+-be overwritten by the value defined in \fI/etc/shadow\fR (respectively in
+-\fI/etc/gshadow\fR) if an entry exists for this user (resp. group).
++The password of the user (and respectively, if compiled with SHADOWGRP, the
++password and the members of the group) will be overwritten by the value defined
++in \fI/etc/shadow\fR (respectively in \fI/etc/gshadow\fR) if an entry exists
++for this user (resp. group).
+ .PP
+ The \fBsg\fR command works similar to \fBnewgrp\fR but accepts a command.
+ The command will be executed with the \fB/bin/sh\fR shell. With most shells you

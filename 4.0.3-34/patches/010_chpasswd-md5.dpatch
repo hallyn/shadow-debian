@@ -1,0 +1,108 @@
+#! /bin/sh -e
+## 010_chpasswd-md5.patch by Ian Gulliver <ian@penguinhosting.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add MD5 support to chpasswd. Debian bug #283961
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+--- shadow-4.0.3_31/src/chpasswd.c	2005-01-07 19:10:02.000000000 +0100
++++ shadow-4.0.3_30.7/src/chpasswd.c	2004-12-23 21:49:26.000000000 +0100
+@@ -38,6 +38,7 @@
+ #include "defines.h"
+ #include <pwd.h>
+ #include <fcntl.h>
++#include <getopt.h>
+ #include "pwio.h"
+ #ifdef	SHADOWPWD
+ #include "shadowio.h"
+@@ -49,6 +50,7 @@
+ #endif				/* USE_PAM */
+ static char *Prog;
+ static int eflg = 0;
++static int md5flg = 0;
+ 
+ #ifdef SHADOWPWD
+ static int is_shadow_pwd;
+@@ -65,7 +67,7 @@
+ 
+ static void usage (void)
+ {
+-	fprintf (stderr, _("usage: %s [-e]\n"), Prog);
++	fprintf (stderr, _("usage: %s [--encrypted] [--md5]\n"), Prog);
+ 	exit (1);
+ }
+ 
+@@ -144,11 +146,32 @@
+ 	}
+ #endif				/* USE_PAM */
+ 
+-	/* XXX - use getopt() */
+-	if (!(argc == 1 || (argc == 2 && !strcmp (argv[1], "-e"))))
+-		usage ();
+-	if (argc == 2)
+-		eflg = 1;
++	{
++		int option_index = 0;
++		int c;
++		static struct option long_options[] = {
++			{ "encrypted",	no_argument,	&eflg,	1 },
++			{ "md5",	no_argument,	&md5flg,	1 },
++			{ 0 }
++		};
++
++		while ((c = getopt_long(argc,argv,"em",long_options,&option_index)) != -1) {
++			switch (c) {
++				case 'e':
++					eflg = 1;
++					break;
++				case 'm':
++					md5flg = 1;
++					break;
++				case 0:
++					/* long option */
++					break;
++				default:
++					usage();
++					break;
++			}
++		}
++	}
+ 
+ 	/*
+ 	 * Lock the password file and open it for reading. This will bring
+@@ -225,8 +248,14 @@
+ 			continue;
+ 		}
+ 		newpwd = cp;
+-		if (!eflg)
+-			cp = pw_encrypt (newpwd, crypt_make_salt ());
++		if (!eflg) {
++			if (md5flg) {
++				char salt[12] = "$1$";
++				strcat(salt,crypt_make_salt());
++				cp = pw_encrypt (newpwd, salt);
++			} else
++				cp = pw_encrypt (newpwd, crypt_make_salt());
++		}
+ 
+ 		/*
+ 		 * Get the password file entry for this user. The user must

@@ -1,0 +1,46 @@
+#! /bin/sh -e
+## 204_pt_BR-manpages.dpatch by <unknown>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Brazilian Portuguese man pages corrections/additions
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+
+diff -Nru --exclude=Makefile.in shadow-4.0.3/man/pt_BR/gpasswd.1 shadow-4.0.3_30.4/man/pt_BR/gpasswd.1
+--- shadow-4.0.3/man/pt_BR/gpasswd.1	2001-01-31 08:06:23.000000000 +0100
++++ shadow-4.0.3_30.4/man/pt_BR/gpasswd.1	2004-11-02 22:17:35.000000000 +0100
+@@ -28,7 +28,7 @@
+ .SH NOME
+ gpasswd \- administra o arquivo /etc/group
+ .br
+-.SH SINOSPE
++.SH SINOPSE
+ .B gpasswd \fIgrupo\fR
+ .br
+ .B gpasswd
+@@ -92,4 +92,7 @@
+ .BR grpck (8)
+ .SH TRADUÇÃO E REVISÃO PARA A LÍNGUA PORTUGUESA
+ Sandro Nunes Henrique <sandro@conectiva.com.br> (tradução)
++.br
+ Rodrigo Stulzer Lopes <rodrigo@conectiva.com.br> (revisão)
++.br
++Guilherme de S. Pastore <gpastore@colband.com.br> (revisão)

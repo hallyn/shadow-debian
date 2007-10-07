@@ -1,0 +1,237 @@
+Goal: eliminate usage of old shell() and introduce E_CMD_{NOEXEC|NOTFOUND}
+
+Status wrt upstream: discussed, but not explicitly reported or accepted yet.
+
+Index: shadow-4.0.14/src/sulogin.c
+===================================================================
+--- shadow-4.0.14.orig/src/sulogin.c	2006-01-16 03:17:34.000000000 +0200
++++ shadow-4.0.14/src/sulogin.c	2006-01-16 03:28:35.000000000 +0200
+@@ -39,6 +39,7 @@
+ #include "getdef.h"
+ #include "prototypes.h"
+ #include "pwauth.h"
++#include "exitcodes.h"
+ /*
+  * Global variables
+  */
+@@ -76,6 +77,7 @@
+ 	char *cp;
+ 	char **envp = environ;
+ 	TERMIO termio;
++	int err = 0;
+ 
+ #ifdef	USE_TERMIO
+ 	ioctl (0, TCGETA, &termio);
+@@ -220,6 +222,8 @@
+ #ifdef	USE_SYSLOG
+ 	closelog ();
+ #endif
+-	shell (pwent.pw_shell, (char *) 0);	/* exec the shell finally. */
+-	 /*NOTREACHED*/ return (0);
++	/* exec the shell finally. */
++	err = shelle (pwent.pw_shell, (char *) 0, environ);
++	exit (err == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
++	/*NOTREACHED*/ return (0);
+ }
+Index: shadow-4.0.14/lib/exitcodes.h
+===================================================================
+--- shadow-4.0.14.orig/lib/exitcodes.h	2006-01-16 03:17:34.000000000 +0200
++++ shadow-4.0.14/lib/exitcodes.h	2006-01-16 03:28:12.000000000 +0200
+@@ -11,3 +11,5 @@
+ #define E_SHADOW_NOTFOUND	15	/* not found shadow password file */
+ #define E_GROUP_NOTFOUND	16	/* not found group file */
+ #define E_GSHADOW_NOTFOUND	17	/* not found shadow group file */
++#define E_CMD_NOEXEC		126	/* can't run command/shell */
++#define E_CMD_NOTFOUND		127	/* can't find command/shell to run */
+Index: shadow-4.0.14/src/login.c
+===================================================================
+--- shadow-4.0.14.orig/src/login.c	2006-01-16 03:17:34.000000000 +0200
++++ shadow-4.0.14/src/login.c	2006-01-16 03:29:25.000000000 +0200
+@@ -47,6 +47,7 @@
+ #include "getdef.h"
+ #include "prototypes.h"
+ #include "pwauth.h"
++#include "exitcodes.h"
+ #ifdef USE_PAM
+ #include "pam_defs.h"
+ 
+@@ -333,6 +334,7 @@
+ 	int flag;
+ 	int subroot = 0;
+ 	int is_console;
++	int err;
+ 	const char *cp;
+ 	char *tmp;
+ 	char fromhost[512];
+@@ -1151,10 +1153,12 @@
+ 		SYSLOG ((LOG_INFO, "`%s' logged in %s", username, fromhost));
+ #endif
+ 	closelog ();
+-	if ((tmp = getdef_str ("FAKE_SHELL")) != NULL) {
+-		shell (tmp, pwent.pw_shell);	/* fake shell */
+-	}
+-	shell (pwent.pw_shell, (char *) 0);	/* exec the shell finally. */
++	if ((tmp = getdef_str ("FAKE_SHELL")) != NULL)
++		err = shelle (tmp, pwent.pw_shell, newenvp); /* fake shell */
++	else
++		/* exec the shell finally */
++		err = shelle (pwent.pw_shell, (char *) 0, newenvp);
++	exit (err == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
+ 	/* NOT REACHED */
+ 	return 0;
+ }
+Index: shadow-4.0.14/src/newgrp.c
+===================================================================
+--- shadow-4.0.14.orig/src/newgrp.c	2006-01-16 03:17:34.000000000 +0200
++++ shadow-4.0.14/src/newgrp.c	2006-01-16 03:29:52.000000000 +0200
+@@ -38,9 +38,11 @@
+ #include "defines.h"
+ #include "getdef.h"
+ #include "prototypes.h"
++#include "exitcodes.h"
+ /*
+  * Global variables
+  */
++extern char **newenvp;
+ extern char **environ;
+ 
+ #ifdef HAVE_SETGROUPS
+@@ -103,6 +105,7 @@
+ 	int needspasswd = 0;
+ 	int i;
+ 	int cflag = 0;
++	int err = 0;
+ 	gid_t gid;
+ 	char *cp;
+ 	const char *cpasswd, *name, *prog;
+@@ -556,13 +559,8 @@
+ 		audit_logger (AUDIT_USER_START, Prog, "changing",
+ 			      NULL, getuid (), 0);
+ #endif
+-		if (errno == ENOENT) {
+-			perror ("/bin/sh");
+-			exit (127);
+-		} else {
+-			perror ("/bin/sh");
+-			exit (126);
+-		}
++		perror ("/bin/sh");
++		exit (errno == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
+ 	}
+ 
+ 	/*
+@@ -631,7 +629,8 @@
+ 	 * Exec the login shell and go away. We are trying to get back to
+ 	 * the previous environment which should be the user's login shell.
+ 	 */
+-	shell (prog, initflag ? (char *) 0 : cp);
++	err = shelle (prog, initflag ? (char *) 0 : cp, newenvp);
++	exit (err == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
+ 	/* NOTREACHED */
+       failure:
+ 
+Index: shadow-4.0.14/src/su.c
+===================================================================
+--- shadow-4.0.14.orig/src/su.c	2006-01-16 03:23:07.000000000 +0200
++++ shadow-4.0.14/src/su.c	2006-01-16 03:30:33.000000000 +0200
+@@ -187,14 +187,10 @@
+ 		pam_end (pamh, PAM_SUCCESS);
+ 
+ 		if (doshell)
+-			shelle (shellstr, (char *) args[0], envp);
++			(void) shelle (shellstr, (char *) args[0], envp);
+ 		else
+ 			(void) execve (shellstr, (char **) args, envp);
+-		{
+-			int exit_status = (errno == ENOENT ? 127 : 126);
+-
+-			exit (exit_status);
+-		}
++		exit (errno == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
+ 	} else if (child == -1) {
+ 		(void) fprintf (stderr, "%s: Cannot fork user shell\n", Prog);
+ 		SYSLOG ((LOG_WARN, "Cannot execute %s", shellstr));
+@@ -308,7 +304,7 @@
+ 	char **envp = environ;
+ 	char *command = 0, *shellstr = 0;
+ 	char *tmp_name;
+-	int exit_status = 0;
++	int err = 0;
+ 
+ #ifdef USE_PAM
+ 	int ret;
+@@ -907,19 +903,19 @@
+ 		argv[-1] = cp;
+ #ifndef USE_PAM
+ 		(void) execve (shellstr, &argv[-1], environ);
+-		exit_status = errno == ENOENT ? 127 : 126;
++		err = errno;
+ 		(void) fprintf (stderr, _("No shell\n"));
+ 		SYSLOG ((LOG_WARN, "Cannot execute %s", shellstr));
+ 		closelog ();
+-		exit (exit_status);
++		exit (err == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
+ #else
+-		run_shell (shellstr, &argv[-1], 0, environ); /* no return */
++		run_shell (shellstr, &argv[-1], 0, environ);
++		/* no return */
+ #endif
+ 	}
+ #ifndef USE_PAM
+-	exit_status = shelle (shellstr, cp, environ);
+-	exit_status = exit_status == ENOENT ? 127 : 126;
+-	exit (exit_status);
++	err = shelle (shellstr, cp, environ);
++	exit (err == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
+ #else
+ 	run_shell (shellstr, &cp, 1, environ);
+ #endif
+Index: shadow-4.0.14/libmisc/age.c
+===================================================================
+--- shadow-4.0.14.orig/libmisc/age.c	2006-01-16 03:17:34.000000000 +0200
++++ shadow-4.0.14/libmisc/age.c	2006-01-16 03:28:12.000000000 +0200
+@@ -35,6 +35,7 @@
+ #include <errno.h>
+ #include "prototypes.h"
+ #include "defines.h"
++#include "exitcodes.h"
+ #include <pwd.h>
+ #include <grp.h>
+ 
+@@ -125,7 +126,7 @@
+ 		execl (PASSWD_PROGRAM, PASSWD_PROGRAM, pw->pw_name, (char *) 0);
+ 		err = errno;
+ 		perror ("Can't execute " PASSWD_PROGRAM);
+-		_exit ((err == ENOENT) ? 127 : 126);
++		_exit (err == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
+ 	} else if (pid == -1) {
+ 		perror ("fork");
+ 		exit (1);
+Index: shadow-4.0.14/src/userdel.c
+===================================================================
+--- shadow-4.0.14.orig/src/userdel.c	2006-01-16 03:17:34.000000000 +0200
++++ shadow-4.0.14/src/userdel.c	2006-01-16 03:28:12.000000000 +0200
+@@ -51,6 +51,7 @@
+ #include "pwauth.h"
+ #include "pwio.h"
+ #include "shadowio.h"
++#include "exitcodes.h"
+ #ifdef	SHADOWGRP
+ #include "sgroupio.h"
+ #endif
+@@ -512,13 +513,8 @@
+ 	pid = fork ();
+ 	if (pid == 0) {
+ 		execl (cmd, cmd, user, (char *) 0);
+-		if (errno == ENOENT) {
+-			perror (cmd);
+-			_exit (127);
+-		} else {
+-			perror (cmd);
+-			_exit (126);
+-		}
++		perror (cmd);
++		_exit (errno == ENOENT ? E_CMD_NOTFOUND : E_CMD_NOEXEC);
+ 	} else if (pid == -1) {
+ 		perror ("fork");
+ 		return;

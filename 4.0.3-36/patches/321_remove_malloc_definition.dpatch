@@ -1,0 +1,21 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 321_remove_malloc_definition.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Remove the malloc definition (which conflicts with libc).
+## DP: It fixed #259827.
+## DP: It is also applied upstream.
+
+@DPATCH@
+diff -urNad shadow-4.0.3/libmisc/xmalloc.c /tmp/dpep.KdKuFh/shadow-4.0.3/libmisc/xmalloc.c
+--- shadow-4.0.3/libmisc/xmalloc.c	2005-04-17 20:27:46.627048000 +0200
++++ /tmp/dpep.KdKuFh/shadow-4.0.3/libmisc/xmalloc.c	2005-04-17 20:29:36.977048000 +0200
+@@ -16,8 +16,6 @@
+ 
+ #include "defines.h"
+ 
+-extern char *malloc();
+-
+ char *
+ xmalloc(size_t size)
+ {

@@ -1,0 +1,22 @@
+Goal: use ngettext for the failure count (Danilo Piazzalunga, 27 May 2004)
+Fixes: #251317
+
+Status wrt upstream: Upstream string is a little bit different, but uses ngettext.
+
+Index: shadow-4.0.3/libmisc/failure.c
+===================================================================
+--- shadow-4.0.3.orig/libmisc/failure.c	2005-05-20 01:04:14.000000000 +0200
++++ shadow-4.0.3/libmisc/failure.c	2005-05-22 20:49:21.137167000 +0200
+@@ -239,9 +239,9 @@
+ 	if (*lasttime == ' ')
+ 		lasttime++;
+ #endif
+-	printf (_("%d %s since last login.  Last was %s on %s.\n"),
+-		fail->fail_cnt, fail->fail_cnt > 1 ? _("failures"):_("failure"),
+-		lasttime, fail->fail_line);
++	printf (ngettext("%d failure since last login.  Last was %s on %s.\n",
++		"%d failures since last login.  Last was %s on %s.\n",
++		fail->fail_cnt), fail->fail_cnt, lasttime, fail->fail_line);
+ }
+ 
+ /*

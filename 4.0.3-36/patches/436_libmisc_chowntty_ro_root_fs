@@ -1,0 +1,22 @@
+Goal: allow regular user to login on read-only root file system (not only for root).
+Fixes: #52069
+       (in fact, the patch proposed in the bug report has evolved a lot)
+
+Status wrt upstream: submitted upstream.
+                     We first need to check how an ordinary useris expected to
+                     work with a tty she doesn't own.
+http://lists.alioth.debian.org/pipermail/pkg-shadow-devel/2005-June/001397.html
+
+Index: shadow-4.0.3/libmisc/chowntty.c
+===================================================================
+--- shadow-4.0.3.orig/libmisc/chowntty.c	2005-06-10 01:16:39.262729000 +0200
++++ shadow-4.0.3/libmisc/chowntty.c	2005-06-10 01:17:42.422729000 +0200
+@@ -116,7 +116,7 @@
+ 			tty, info->pw_name));
+ 		closelog();
+ 
+-		if (!(err == EROFS && info->pw_uid == 0))
++		if (err != EROFS)
+ 			exit(1);
+ 	}
+ 

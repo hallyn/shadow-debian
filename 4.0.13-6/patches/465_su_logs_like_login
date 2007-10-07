@@ -1,0 +1,25 @@
+Goal: Log successful/failed su through syslog
+
+Fixes: #190215
+
+Status wrt upstream: Fixed in 4.0.14
+
+Index: shadow-4.0.13/libmisc/sulog.c
+===================================================================
+--- shadow-4.0.13.orig/libmisc/sulog.c	2005-08-31 19:24:58.000000000 +0200
++++ shadow-4.0.13/libmisc/sulog.c	2005-10-27 18:19:27.168072616 +0200
+@@ -49,6 +49,14 @@
+ 	FILE *fp;
+ 	mode_t oldmask;
+ 
++	if (success) {
++		SYSLOG ((LOG_INFO,
++			"Successful su for %s by %s",name,oldname));
++	} else {
++		SYSLOG ((LOG_NOTICE,
++			"FAILED su for %s by %s",name,oldname));
++	}
++
+ 	if ((sulog_file = getdef_str ("SULOG_FILE")) == (char *) 0)
+ 		return;
+ 

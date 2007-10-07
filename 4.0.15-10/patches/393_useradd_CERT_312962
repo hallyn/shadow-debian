@@ -1,0 +1,82 @@
+Goal:
+fixed useradd CERT VU#312962: fixed forgoten checking of the return
+value from fchown() before proceeding with the fchmod() (prepared
+based on OWL fix submited by Solar Designer <solar@openwall.com>),
+Use in userdel login.defs::MAIL_DIR instead hardcoded /var/mail on created
+mailbox path (based on OWL fixes submited by Solar Designer
+<solar@openwall.com>).
+
+Status wrt upstream: will be in 4.0.16
+
+Index: shadow-4.0.15/src/useradd.c
+===================================================================
+--- shadow-4.0.15.orig/src/useradd.c	2006-05-19 23:23:15.000000000 -0500
++++ shadow-4.0.15/src/useradd.c	2006-05-19 23:24:58.000000000 -0500
+@@ -1609,46 +1609,38 @@
+  */
+ static void create_mail (void)
+ {
+-	char *ms;
++	char *spool, *file;
+ 	int fd;
+-	struct group *mail;
+-	gid_t mail_gid;
++	struct group *gr;
++	gid_t gid;
+ 	mode_t mode;
+ 
++	spool = getdef_str ("MAIL_DIR") ? : "/var/mail";
++	file = alloca (strlen (spool) + strlen (user_name) + 2);
++	sprintf (file, "%s/%s", spool, user_name);
++	fd = open (file, O_CREAT | O_WRONLY | O_TRUNC | O_EXCL, 0);
++	if (fd < 0) {
++		perror (_("Creating mailbox"));
++		return;
++	}
++
+ 	if (strcasecmp (create_mail_spool, "yes") == 0) {
+-		mail = getgrnam ("mail");
+-		if (mail == NULL) {
++		gr = getgrnam ("mail");
++		if (!gr) {
+ 			fprintf (stderr,
+ 				 _
+-				 ("No group named \"mail\" exists, creating mail spool with mode 0600.\n"));
++				 ("Group 'mail' not found. Creating the mailbox with 0600 mode.\n"));
++			gid = user_gid;
+ 			mode = 0600;
+-			mail_gid = user_gid;
+ 		} else {
++			gid = gr->gr_gid;
+ 			mode = 0660;
+-			mail_gid = mail->gr_gid;
+ 		}
+ 
+-		ms = malloc (strlen (user_name) + 11);
+-		if (ms != NULL) {
+-			sprintf (ms, "/var/mail/%s", user_name);
+-			if (access (ms, R_OK) != 0) {
+-				fd = open (ms,
+-					   O_CREAT | O_EXCL |
+-					   O_WRONLY | O_TRUNC, 0);
+-				if (fd != -1) {
+-					fchown (fd, user_id, mail_gid);
+-					fchmod (fd, mode);
+-					close (fd);
+-				}
+-			} else {
+-				fprintf (stderr,
+-					 _
+-					 ("Can't create mail spool for user %s.\n"),
+-					 user_name);
+-				fail_exit (E_MAIL_SPOOL);
+-			}
+-		}
+-		free (ms);
++		if (fchown (fd, user_id, gid) || fchmod (fd, mode))
++			perror (_("Setting mailbox permissions"));
++
++		close (fd);
+ 	}
+ }
+ 

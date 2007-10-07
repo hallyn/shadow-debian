@@ -1,0 +1,17 @@
+Goal: Better example string for -f
+
+Status wrt upstream: Applied
+
+Index: shadow-4.0.3/man/usermod.8
+===================================================================
+--- shadow-4.0.3.orig/man/usermod.8	2005-05-12 12:12:08.931053300 +0200
++++ shadow-4.0.3/man/usermod.8	2005-05-12 12:12:18.807577620 +0200
+@@ -32,7 +32,7 @@ usermod \- Modify a user account
+ .TP 8
+ \fBusermod\fR [\fB-c\fR \fIcomment\fR] [\fB-d\fR \fIhome_dir\fR [\fB-m\fR]]
+ .br
+-[\fB-e\fR \fIexpire_date\fR] [\fB-f\fR \fIinactive_time\fR]
++[\fB-e\fR \fIexpire_date\fR] [\fB-f\fR \fIinactive_days\fR]
+ .br
+ [\fB-g\fR \fIinitial_group\fR] [\fB-G\fR \fIgroup\fR [,...]]
+ .br

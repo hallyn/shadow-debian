@@ -1,0 +1,30 @@
+Goal: Add missing -a to usermod man page
+
+Fix: #365091
+
+Author: Christian Perrier <bubulle@debian.org>
+
+Status wrt upstream: Will be in 4.0.16
+
+Index: shadow-4.0.15/man/usermod.8.xml
+===================================================================
+--- shadow-4.0.15.orig/man/usermod.8.xml	2006-04-28 06:56:11.914138840 +0200
++++ shadow-4.0.15/man/usermod.8.xml	2006-04-28 06:57:19.063930520 +0200
+@@ -40,6 +40,17 @@
+     <variablelist remap='IP'>
+       <varlistentry>
+ 	<term>
++	  <option>-a</option>, <option>--append</option>
++	  <replaceable>GROUP</replaceable>
++	</term>
++	<listitem>
++	  <para>
++	    Add the user to the supplemental group.
++	  </para>
++	</listitem>
++      </varlistentry>
++      <varlistentry>
++	<term>
+ 	  <option>-c</option>, <option>--comment</option>
+ 	  <replaceable>COMMENT</replaceable>
+ 	</term>

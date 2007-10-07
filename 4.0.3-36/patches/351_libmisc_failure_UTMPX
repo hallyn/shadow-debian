@@ -1,0 +1,65 @@
+Goal: Use UTMPX, if available, for the failure log.
+
+Status wrt upstream: Applied (2005 06 10, should enter 4.0.10)
+
+Upstream also noted that it affects login when compiled without PAM.
+
+Index: shadow-4.0.3/libmisc/failure.c
+===================================================================
+--- shadow-4.0.3.orig/libmisc/failure.c	2005-06-10 01:15:35.652729000 +0200
++++ shadow-4.0.3/libmisc/failure.c	2005-06-10 01:16:28.902729000 +0200
+@@ -39,7 +39,11 @@
+ #include "getdef.h"
+ #include "failure.h"
+ 
++#ifdef HAVE_UTMPX_H
++#include <utmpx.h>
++#else
+ #include <utmp.h>
++#endif
+ 
+ #define	YEAR	(365L*DAY)
+ 
+@@ -248,7 +252,13 @@
+  */
+ 
+ void
+-failtmp(const struct utmp *failent)
++failtmp(
++#ifdef HAVE_UTMPX_H
++	const struct utmpx *failent
++#else
++	const struct utmp *failent
++#endif
++)
+ {
+ 	char *ftmp;
+ 	int fd;
+Index: shadow-4.0.3/libmisc/failure.h
+===================================================================
+--- shadow-4.0.3.orig/libmisc/failure.h	2005-06-10 01:15:35.652729000 +0200
++++ shadow-4.0.3/libmisc/failure.h	2005-06-10 01:16:28.902729000 +0200
+@@ -4,7 +4,11 @@
+ 
+ #include "defines.h"
+ #include "faillog.h"
++#ifdef HAVE_UTMPX_H
++#include <utmpx.h>
++#else
+ #include <utmp.h>
++#endif
+ 
+ /*
+  * failure - make failure entry
+@@ -38,7 +42,11 @@
+  *	failtmp updates the (struct utmp) formatted failure log which
+  *	maintains a record of all login failures.
+  */
++#ifdef HAVE_UTMPX_H
++extern void failtmp(const struct utmpx *);
++#else
+ extern void failtmp(const struct utmp *);
++#endif
+ 
+ #endif
+ 

@@ -1,0 +1,31 @@
+Goal: Log login failures to the btmp file
+
+Notes:
+ * I'm not sure login should add an entry in the FTMP file when PAM is used.
+   (but nothing in /etc/login.defs indicates that the failure is not logged)
+
+Index: shadow-4.0.3/src/login.c
+===================================================================
+--- shadow-4.0.3.orig/src/login.c	2005-05-29 00:06:56.174189000 +0200
++++ shadow-4.0.3/src/login.c	2005-05-29 00:10:42.704189000 +0200
+@@ -831,6 +831,20 @@
+ 			    break;
+ 			  
+ 			  fprintf(stderr,"Login incorrect\n\n");
++			  if (getdef_str("FTMP_FILE") != NULL) {
++#if HAVE_UTMPX_H
++			    failent = utxent;
++			    gettimeofday(&(failent.ut_tv), NULL);
++#else
++			    failent = utent;
++			    time(&failent.ut_time);
++#endif
++			    strncpy(failent.ut_user, failent_user, sizeof(failent.ut_user));
++#ifdef USER_PROCESS
++			    failent.ut_type = USER_PROCESS;
++#endif
++			    failtmp(&failent);
++			  }
+ 			  
+ 			  /* Let's give it another go around */
+ 			  pam_set_item(pamh,PAM_USER,NULL);

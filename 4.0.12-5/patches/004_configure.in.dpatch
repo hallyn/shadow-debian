@@ -1,0 +1,17 @@
+Index: shadow-4.0.12/configure.in
+===================================================================
+--- shadow-4.0.12.orig/configure.in	2005-08-17 11:49:50.000000000 +0200
++++ shadow-4.0.12/configure.in	2005-08-17 11:50:32.000000000 +0200
+@@ -255,9 +255,10 @@
+ 	AC_CHECK_LIB(pam, pam_start,
+ 		[AC_DEFINE(USE_PAM, 1, [Define to support Pluggable Authentication Modules])
+ 		LIBPAM="-lpam"
+-		AC_CHECK_LIB(pam_misc, main,
++		AC_CHECK_LIB(pam_misc, misc_conv,
+ 			[LIBPAM="$LIBPAM -lpam_misc"],
+-			AC_MSG_ERROR(libpam_misc is missing)
++			AC_MSG_ERROR(libpam_misc is missing),
++			-lpam
+ 		)],
+ 		[AC_MSG_CHECKING(use login access checking if PAM not used)
+ 		AC_MSG_RESULT(yes)]

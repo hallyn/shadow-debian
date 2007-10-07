@@ -1,0 +1,62 @@
+PURPOSE: Close #200052, which was a FTBFS
+
+Quoting the bug submitter (Goswin Brederlow):
+<<<<<<<
+Making install in po
+make[2]: Entering directory /home/mrvn/shadow/shadow-4.0.3/po
+/bin/sh `case ".././mkinstalldirs" in /*) echo ".././mkinstalldirs" ;; *) echo "../.././mkinstalldirs" ;; esac` /home/mrvn/shadow/shadow-4.0.3/debian/tmp/usr/share
+../.././mkinstalldirs: ../.././mkinstalldirs: No such file or directory
+make[2]: *** [install-data-yes] Error 127
+make[2]: Leaving directory /home/mrvn/shadow/shadow-4.0.3/po'
+make[1]: *** [install-recursive] Error 1
+make[1]: Leaving directory /home/mrvn/shadow/shadow-4.0.3'
+make: *** [install] Error 2
+Build command 'cd shadow-4.0.3 && dpkg-buildpackage -b -uc' failed.
+
+Using the following in po/Makefile.ini.in builds but you should
+probably change your configure.in for and run autopoint:
+
+mkinstalldirs = $(SHELL) if [ -x "$(MKINSTALLDIRS)" ]; then echo "$(MKINSTALLDIRS)"; else echo "$(top_builddir)/$(MKINSTALLDIRS)"; fi
+>>>>>>>
+
+STATUS WRT UPSTREAM: Tomacz said that patching files of gettext that was was pure evil.
+
+I (Mt) agree and vote in favour of dropping it. If the bug comes back, we
+will reassign it to gettext and help Santiago fixing it. (IMHO)
+
+
+--- shadow-4.0.3.orig/po/Makefile.in.in
++++ shadow-4.0.3/po/Makefile.in.in
+@@ -94,7 +94,7 @@
+ install-exec:
+ install-data: install-data-@USE_NLS@
+ 	if test "$(PACKAGE)" = "gettext"; then \
+-	  $(mkinstalldirs) $(DESTDIR)$(gettextsrcdir); \
++	  $(MKINSTALLDIRS) $(DESTDIR)$(gettextsrcdir); \
+ 	  $(INSTALL_DATA) $(srcdir)/Makefile.in.in \
+ 			  $(DESTDIR)$(gettextsrcdir)/Makefile.in.in; \
+ 	else \
+@@ -102,13 +102,13 @@
+ 	fi
+ install-data-no: all
+ install-data-yes: all
+-	$(mkinstalldirs) $(DESTDIR)$(datadir)
++	$(MKINSTALLDIRS) $(DESTDIR)$(datadir)
+ 	@catalogs='$(CATALOGS)'; \
+ 	for cat in $$catalogs; do \
+ 	  cat=`basename $$cat`; \
+ 	  lang=`echo $$cat | sed 's/\.gmo$$//'`; \
+ 	  dir=$(localedir)/$$lang/LC_MESSAGES; \
+-	  $(mkinstalldirs) $(DESTDIR)$$dir; \
++	  $(MKINSTALLDIRS) $(DESTDIR)$$dir; \
+ 	  if test -r $$cat; then \
+ 	    $(INSTALL_DATA) $$cat $(DESTDIR)$$dir/$(PACKAGE).mo; \
+ 	    echo "installing $$cat as $(DESTDIR)$$dir/$(PACKAGE).mo"; \
+@@ -142,6 +142,7 @@
+ mostlyclean:
+ 	rm -f core core.* *.pox $(PACKAGE).po *.new.po
+ 	rm -fr *.o
++	rm -f $(GMOFILES)
+ 
+ clean: mostlyclean
+ 

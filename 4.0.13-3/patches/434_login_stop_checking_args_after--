@@ -1,0 +1,18 @@
+Goal: terminate argument validation in login when it hits a '--'.
+Fixes: #66368
+
+Status wrt upstream: It could certainly be submitted to upstream.
+
+Index: shadow-4.0.13/src/login.c
+===================================================================
+--- shadow-4.0.13.orig/src/login.c	2005-10-04 08:06:32.527928651 +0200
++++ shadow-4.0.13/src/login.c	2005-10-04 08:07:23.690503893 +0200
+@@ -256,6 +256,8 @@
+ 	for (arg = 1; arg < argc; arg++) {
+ 		if (argv[arg][0] == '-' && strlen (argv[arg]) > 2)
+ 			usage ();
++		if (!strcmp(argv[arg], "--"))
++			break; /* stop checking on a "--" */
+ 	}
+ }
+ 

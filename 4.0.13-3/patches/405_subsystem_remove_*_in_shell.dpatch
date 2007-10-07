@@ -1,0 +1,46 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 405_subsystem_remove_*_in_shell.dpatch by Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Remove the * at the beginning of the shell for subsystem logins.
+## DP: It fixed #82893
+## DP:
+## DP: This was fixed upstream by removing the * before calling subsystem.
+## DP: Thus, it is no more needed (but does not harm).
+
+@DPATCH@
+Index: shadow-4.0.13/lib/prototypes.h
+===================================================================
+--- shadow-4.0.13.orig/lib/prototypes.h	2005-10-04 08:06:31.175204282 +0200
++++ shadow-4.0.13/lib/prototypes.h	2005-10-04 08:07:31.522908001 +0200
+@@ -169,7 +169,7 @@
+ extern void sulog (const char *, int, const char *, const char *);
+ 
+ /* sub.c */
+-extern void subsystem (const struct passwd *);
++extern void subsystem (struct passwd *);
+ 
+ /* ttytype.c */
+ extern void ttytype (const char *);
+Index: shadow-4.0.13/libmisc/sub.c
+===================================================================
+--- shadow-4.0.13.orig/libmisc/sub.c	2005-10-04 08:06:31.175204282 +0200
++++ shadow-4.0.13/libmisc/sub.c	2005-10-04 08:07:31.522908001 +0200
+@@ -46,7 +46,7 @@
+  *	directory will be used as the root of a new filesystem which
+  *	the user is actually logged into.
+  */
+-void subsystem (const struct passwd *pw)
++void subsystem (struct passwd *pw)
+ {
+ 	/*
+ 	 * The new root directory must begin with a "/" character.
+@@ -71,4 +71,8 @@
+ 		closelog ();
+ 		exit (1);
+ 	}
++
++	/* Now fixup the shell to get rid of that '*' */
++	if (*pw->pw_shell == '*')
++		pw->pw_shell++;
+ }

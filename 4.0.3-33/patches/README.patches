@@ -1,0 +1,81 @@
+Small intro to the system for numbering the patches here...
+
+-The 0xx series of patches are patches isolated from the latest
+ version of the shadow Debian package not using dpatch in order to
+ separate upstream from Debian-specific stuff.
+
+ NO MORE PATCHES SHOULD BE ADDED IN THESE SERIES
+
+-The 1xx series are l10n patches to upstream 4.0.3. As upstream has
+ adopted Debian translations, it is very likely that these patches
+ will become useless when we will have synced with upstream
+
+-The 2xx series are patches for manual pages translations. These are
+ also very likely to have been used by upstream as well, but they may need
+ more careful examination later (for instance, the French man pages
+ translation which includes the use of po4a)
+
+-The 3xx series are patches which have been temporarily applied to 
+ Debian's shadow while we *know* they have been applied upstream as well
+ These patches should NOT be kept when we will sync with upstream
+
+-The 4xx series are patches which have been applied to Debian's shadow
+ and have NOT been accepted and/or applied upstream. These patches MUST be kept
+ even after resynced with upstream
+
+In short, while we are working towards synchronisation with upstream,
+our goal is to make 0xx patches disappear by moving them either to 3xx
+series (things already implemented upstream) or to 4xx series
+(Debian-specific patches).
+
+
+Short HOWTO for dpatch
+=======================
+
+Applying a patch
+----------------
+* dpatch apply <name>
+  <name> is the name of the patch without the .dpatch extension
+
+* dpatch apply-all
+  will apply allpatches from the debian/patches/00list file
+
+Creating a new patch
+--------------------
+Here is a way to create a new dpatch patch.
+ * extract the original archive (shadow_4.0.3.orig.tar.gz)
+ * put the debian directory from the sid branch inside the shadow-4.0.3
+   directory
+ * prepare the creation of the new patch (I assume you want to create
+   the 314_lastlog_usage_249611 dpatch):
+
+       dpatch-edit-patch patch 314_lastlog_usage_249611 131_tl
+
+   (131_tl indicates that I want all patches up to 131_tl to be applied)
+
+   if there is no dependency with any other patch, you can use:
+       dpatch-edit-patch 314_lastlog_usage_249611
+
+ * A new temporary directory should have been created, and a new shell
+   is invoked (by dpatch-edit-patch) in this directory.
+ * You can make you modifications in this directory.
+ * When you have made all you modifications, you just have to exit the
+   new shell created by dpatch-edit-patch, and the patch will be created
+   in the debian/patches directory.
+
+   You can also cancel the operation with an "exit 230".
+ * The last step is to add the patch to debian/patches/00list, at the right
+   place if the patch has some dependancies.
+   If you don't want it to be applied automatically by a "dpatch apply-all",
+   you can comment it.
+   This is used to 
+
+If you have an existing standard patch, you can convert it with dpatch
+(see the dpatch man page).
+
+Editing an existing patch
+-------------------------
+If you want to modify an existing dpatch (and if the modification cannot
+be performed easily by editing the patch), you can use:
+dpatch-edit-patch <name-of-the-existing-patch>
+

@@ -1,0 +1,17 @@
+  * Backported upstream patches:
+    - 011_high-uids.dpatch: Add large file support to lastlog and faillog.
+                            Closes: #280212
+    - 312_usermod-302388.dpatch: 
+         Document -o option in usermod. Closes: #302388
+    - 313_pam_access_with_preauth.dpatch: 
+         Allow PAM account authorization when preauthenticated
+         Closes: #193869
+    - 314_passwd.1_formatting.dpatch
+         Minor formatting fixes to passwd(1)
+         Closes: #304447
+    - 315_chage.1_document_expiration_removal.dpatch
+         Document the removal of expiration in chage(1)
+         Closes: #304542
+    - 316_vipw-race-242407.dpatch
+         Fixes race condition in vipw's handling of .edit files
+         Closes: #242407

@@ -1,0 +1,69 @@
+004_configure.in.dpatch
+005_manpages.dpatch
+# 336_chfn.1
+441_manpages-shadow.5
+440_manpages-login.1
+450_shadowconfig.8
+435_su_addenv_HOME_and_SHELL
+431_su_uid_0_not_root
+437_su_add_GNU_options_1
+437_su_add_GNU_options_2
+437_su_add_GNU_options_3
+437_su_add_GNU_options_4
+437_su_add_GNU_options_5
+437_su_add_GNU_options_6
+437_su_add_GNU_options_7
+008_su_no_sanitize_env
+008_su_get_PAM_username
+439_su_PAM_session
+# 008_login_MAXHOSTNAMELEN # It should probably be dropped.
+428_grpck_add_prune_option
+434_login_stop_checking_args_after--
+433_login_more_LOG_UNKFAIL_ENAB
+008_login_log_failure_in_FTMP
+429_login_FAILLOG_ENAB
+432_login_cancel_timout_after_authentication
+438_su_GNU_origin
+#man pages translations.
+# 200_de-manpages.dpatch
+# 200_de-manpages-2.dpatch
+# 200_de-manpages-passwd.1.dpatch
+# 201_fr-manpages.dpatch
+# 202_ja_manpages.dpatch
+# 203_pl_manpages.dpatch
+# 204_pt_BR-manpages.dpatch
+# 205_it-manpages.dpatch
+# 206_ko-manpages.dpatch
+#
+# 311_high-uids.dpatch       # upstream uses AC_SYS_LARGEFILE in configure.in
+#
+# 319_time_structures.dpatch  # must be checked another time
+333_shadow.5-typo_312430
+401_cppw_src.dpatch
+403_sg_symlink_162339_163652.dpatch
+404_undef_USE_PAM.dpatch
+405_subsystem_remove_*_in_shell.dpatch
+406_good_name.dpatch
+407_32char_grnames.dpatch
+421_login.1_pishing
+010_more-i18ned-messages
+# NOTE: you must use only one of these 423
+# See bug #317264, #276419
+# 423_su_pass_args_without_concatenation # upstream don't suffer from this
+423_su_arguments_are_concatenated
+424_pwck.8_quiet_option
+357_newgrp-stop_cont-proxy
+426_grpck_group-gshadow_members_consistency
+427_chage_expiry_0
+442_useradd-O_option
+449_comment_missplaced
+443_chage_exit_values
+365_PAM_copy_environ_later
+445_su_password_expired
+446_newgrp.1_no_SHADOWPWD
+447_missing_login.defs_variables
+448_enable_man
+#207_id-manpages
+# 999-2 is about using cdbs. It does not patch upstream files
+# so shouldn't be here, but we keep it for the future
+# 999-2_build_using_cdbs

@@ -1,0 +1,120 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 402_missing_debian_man_pages.dpatch by  Nicolas FRANCOIS <nicolas.francois@centraliens.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add the missing add-shell, remove-shell, cppw and cpgr
+## DP: (debian specific) man pages
+
+@DPATCH@
+diff -urNad shadow-4.0.3/debian/passwd.undocumented /tmp/dpep.GcYb3U/shadow-4.0.3/debian/passwd.undocumented
+--- shadow-4.0.3/debian/passwd.undocumented	2005-03-20 15:48:28.000000000 +0100
++++ /tmp/dpep.GcYb3U/shadow-4.0.3/debian/passwd.undocumented	1970-01-01 01:00:00.000000000 +0100
+@@ -1,2 +0,0 @@
+-cppw.8
+-cpgr.8
+diff -urNad shadow-4.0.3/man/add-shell.8 /tmp/dpep.GcYb3U/shadow-4.0.3/man/add-shell.8
+--- shadow-4.0.3/man/add-shell.8	1970-01-01 01:00:00.000000000 +0100
++++ /tmp/dpep.GcYb3U/shadow-4.0.3/man/add-shell.8	2005-04-07 22:48:34.000000000 +0200
+@@ -0,0 +1,18 @@
++.\" $Id$
++.\" Nicolas FRANCOIS, 7 Apr 2005
++.TH ADD-SHELL 8 "7 Apr 2005"
++.SH NAME
++add-shell \- add shells to the list of valid login shells
++.SH SYNOPSIS
++.B  add-shell
++.I  shellname
++.RI [ shellname ...]
++.SH DESCRIPTION
++.B add-shell
++copy \fI/etc/shells\fR to \fI/etc/shells.tmp\fR, add the given shells to
++this file if they are not already present, and copy this temporary file
++back to \fI/etc/shells\fR.
++
++The shells must be provided by their full pathnames.
++.SH "SEE ALSO"
++.BR shells (5)
+diff -urNad shadow-4.0.3/man/cpgr.8 /tmp/dpep.GcYb3U/shadow-4.0.3/man/cpgr.8
+--- shadow-4.0.3/man/cpgr.8	1970-01-01 01:00:00.000000000 +0100
++++ /tmp/dpep.GcYb3U/shadow-4.0.3/man/cpgr.8	2005-04-07 22:31:56.000000000 +0200
+@@ -0,0 +1 @@
++.so man8/cppw.8
+diff -urNad shadow-4.0.3/man/cppw.8 /tmp/dpep.GcYb3U/shadow-4.0.3/man/cppw.8
+--- shadow-4.0.3/man/cppw.8	1970-01-01 01:00:00.000000000 +0100
++++ /tmp/dpep.GcYb3U/shadow-4.0.3/man/cppw.8	2005-04-07 22:48:34.000000000 +0200
+@@ -0,0 +1,29 @@
++.\" $Id$
++.\" Nicolas FRANCOIS, 7 Apr 2005
++.TH CPPW 8 "7 Apr 2005"
++.SH NAME
++cppw, cpgr \- copy with locking the given file to the password or group file
++.SH SYNOPSIS
++\fBcppw\fR [\fB\-h\fR] [\fB\-s\fR] password_file
++.br
++\fBcpgr\fR [\fB\-h\fR] [\fB\-s\fR] group_file
++
++.SH DESCRIPTION
++.BR cppw " and " cpgr
++will copy, with locking, the given file to
++.IR /etc/passwd " and " /etc/group ", respectively."
++With the \fB\-s\fR flag, they will edit the shadow versions of those files,
++.IR /etc/shadow " and " /etc/gshadow ", respectively."
++
++With the \fB\-h\fR flag, the commands display a short help message and exit
++silently.
++.SH "SEE ALSO"
++.BR vipw (8),
++.BR vigr (8),
++.BR group (5),
++.BR passwd (5),
++.BR shadow (5),
++.BR gshadow (5)
++.SH AUTHOR
++\fBcppw\fR and \fBcpgr\fR were written by Stephen Frost, based on
++\fBvipw\fR and \fBvigr\fR written by Guy Maor.
+diff -urNad shadow-4.0.3/man/Makefile.am /tmp/dpep.GcYb3U/shadow-4.0.3/man/Makefile.am
+--- shadow-4.0.3/man/Makefile.am	2002-03-13 09:35:46.000000000 +0100
++++ /tmp/dpep.GcYb3U/shadow-4.0.3/man/Makefile.am	2005-04-14 17:29:00.419246000 +0200
+@@ -3,11 +3,14 @@
+ SUBDIRS = cs de fr hu id it ja ko pl pt_BR
+ 
+ man_MANS = \
++	add-shell.8 \
+ 	adduser.8 \
+ 	chage.1 \
+ 	chfn.1 \
+ 	chpasswd.8 \
+ 	chsh.1 \
++	cppw.8 \
++	cpgr.8 \
+ 	expiry.1 \
+ 	faillog.5 \
+ 	faillog.8 \
+@@ -34,6 +37,7 @@
+ 	pwck.8 \
+ 	pwconv.8 \
+ 	pwunconv.8 \
++	remove-shell.8 \
+ 	sg.1 \
+ 	shadow.5 \
+ 	su.1 \
+diff -urNad shadow-4.0.3/man/remove-shell.8 /tmp/dpep.GcYb3U/shadow-4.0.3/man/remove-shell.8
+--- shadow-4.0.3/man/remove-shell.8	1970-01-01 01:00:00.000000000 +0100
++++ /tmp/dpep.GcYb3U/shadow-4.0.3/man/remove-shell.8	2005-04-07 22:48:34.000000000 +0200
+@@ -0,0 +1,16 @@
++.\" $Id$
++.\" Nicolas FRANCOIS, 7 Apr 2005
++.TH REMOVE-SHELL 8 "7 Apr 2005"
++.SH NAME
++remove-shell \- remove shells from the list of valid login shells
++.SH SYNOPSIS
++.B  remove-shell
++.I  shellname
++.RI [ shellname ...]
++.SH DESCRIPTION
++.B remove-shell
++operates on the temporary files \fI/etc/shells.tmp\fR and
++\fI/etc/shells.tmp2\fR to remove the given shells from the list of valid
++login shells, and copy the result back to \fI/etc/shells\fR.
++.SH "SEE ALSO"
++.BR shells (5)

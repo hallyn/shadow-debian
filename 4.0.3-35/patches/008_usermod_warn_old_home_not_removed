@@ -1,0 +1,30 @@
+Goal: When relocating a user's home directory, don't fail and remove the new
+      home directory if we can't remove the old home directory for some
+      reason; the results can be spectularly poort if, for instance, only
+      the rmdir() fails.
+Fixes: #166369
+
+Status wrt upstream: It could certainly be submitted to upstream.
+
+Index: shadow-4.0.3/src/usermod.c
+===================================================================
+--- shadow-4.0.3.orig/src/usermod.c	2005-05-22 21:23:35.637167000 +0200
++++ shadow-4.0.3/src/usermod.c	2005-05-22 21:48:12.207167000 +0200
+@@ -1544,9 +1544,14 @@
+ 				if (copy_tree (user_home, user_newhome,
+ 					       uflg ? user_newid : -1,
+ 					       gflg ? user_newgid : -1) ==
+-				    0 && remove_tree (user_home) == 0
+-				    && rmdir (user_home) == 0)
+-					return;
++				    0) {
++				  if (remove_tree (user_home) != 0 ||
++				    rmdir (user_home) != 0)
++				    fprintf (stderr,
++					     _("%s: warning: failed to completely remove old home directory %s"),
++					     Prog, user_home);
++				  return;
++				}
+ 
+ 				(void) remove_tree (user_newhome);
+ 				(void) rmdir (user_newhome);
