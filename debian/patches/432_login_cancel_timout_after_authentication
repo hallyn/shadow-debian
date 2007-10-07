@@ -1,0 +1,19 @@
+Goal: Cancel login timeout after authentication so that patient people
+      timing out on network directory services can log in with local
+      accounts.
+Fixes: #107148
+
+Status wrt upstream: It should be forwarded to upstream.
+
+Index: shadow-4.0.14/src/login.c
+===================================================================
+--- shadow-4.0.14.orig/src/login.c	2006-01-03 08:25:02.607411684 +0100
++++ shadow-4.0.14/src/login.c	2006-01-03 08:25:02.951341857 +0100
+@@ -742,6 +742,7 @@
+ 			}
+ 
+ 			/* We don't get here unless they were authenticated above */
++			alarm (0);
+ 			retcode = pam_acct_mgmt (pamh, 0);
+ 
+ 			if (retcode == PAM_NEW_AUTHTOK_REQD) {

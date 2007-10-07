@@ -1,0 +1,27 @@
+Goal: allow non-unique UID
+
+Fixes: #351281
+
+Status wrt upstream: fixed in 4.0.15
+
+Index: shadow-4.0.14/src/useradd.c
+===================================================================
+--- shadow-4.0.14.orig/src/useradd.c	2006-01-24 01:13:37.000000000 +0100
++++ shadow-4.0.14/src/useradd.c	2006-02-04 13:56:09.000000000 +0100
+@@ -1757,10 +1757,12 @@
+ 	 */
+ 	open_files ();
+ 
+-	/* first, seek for a valid uid to use for this user.
+-	 * We do this because later we can use the uid we found as
+-	 * gid too ... --gafton */
+-	find_new_uid ();
++	if (!oflg){
++		/* first, seek for a valid uid to use for this user.
++		 * We do this because later we can use the uid we found as
++		 * gid too ... --gafton */
++		find_new_uid ();
++	}
+ 
+ 	/* do we have to add a group for that user? This is why we need to
+ 	 * open the group files in the open_files() function  --gafton */
