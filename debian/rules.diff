@@ -1,0 +1,11 @@
+--- rules-4.0.12	2005-10-08 10:45:49.684100902 +0200
++++ rules	2005-10-08 10:46:35.188825854 +0200
+@@ -11,7 +11,7 @@
+ endif
+ export CFLAGS
+ 
+-config_options := --disable-shared --without-libcrack --mandir=/usr/share/man --with-libpam --enable-shadowgrp --enable-man
++config_options := --disable-shared --without-libcrack --mandir=/usr/share/man --with-libpam --enable-shadowgrp --enable-man --without-selinux
+ 
+ DEB_HOST_ARCH_OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ DEB_BUILD_GNU_TYPE = $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)

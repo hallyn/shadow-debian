@@ -1,0 +1,40 @@
+Goal: permit the man pages generation from the XML files.
+
+Status wrt upstream: CLEANFILES is commented. This is Debian specific.
+                     (to avoid problems when debuild is used twice in the
+                     same directory, or debuild then debclean then
+                     debuild)
+
+Note: man pages are better with docbook-xsl 1.69.1
+The current version in Debian is 1.68.1. I noticed these differences:
+  * The extra inforamtion (date and User Commands) are not displayed in
+    the headers and footers.
+
+Index: shadow-4.0.13/configure.in
+===================================================================
+--- shadow-4.0.13.orig/configure.in	2005-10-04 08:07:11.639959261 +0200
++++ shadow-4.0.13/configure.in	2005-10-04 08:07:39.450292761 +0200
+@@ -263,6 +263,23 @@
+ fi
+ AM_CONDITIONAL(ENABLE_REGENERATE_MAN, test x$enable_man != xno)
+ 
++if test "$enable_man" = "yes"; then
++	dnl
++	dnl Check for xsltproc
++	dnl
++	AC_PATH_PROG([XSLTPROC], [xsltproc])
++	if test -z "$XSLTPROC"; then
++		enable_man=no
++	fi
++
++	dnl check for DocBook DTD and stylesheets in the local catalog.
++	JH_CHECK_XML_CATALOG([-//OASIS//DTD DocBook XML V4.1.2//EN],
++		[DocBook XML DTD V4.1.2], [], enable_man=no)
++	JH_CHECK_XML_CATALOG([http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl],
++		[DocBook XSL Stylesheets], [], enable_man=no)
++fi
++AM_CONDITIONAL(ENABLE_REGENERATE_MAN, test x$enable_man != xno)
++
+ AC_SUBST(LIBCRYPT)
+ AC_CHECK_LIB(crypt, crypt, [LIBCRYPT=-lcrypt],
+ 	[AC_MSG_ERROR([crypt() not found])])

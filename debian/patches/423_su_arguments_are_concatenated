@@ -1,0 +1,72 @@
+Goal: document in the source and man pages why the arguments are
+      concatenated and why they are always provided to the shell with the
+      -c option of that shell.
+Fixes: #317264
+       see also #276419
+
+Status wrt upstream: This is a Debian specific patch
+
+Note: the fix of the man page is still missing.
+      (to be taken from the trunk)
+
+Index: shadow-4.0.13/src/su.c
+===================================================================
+--- shadow-4.0.13.orig/src/su.c	2005-10-04 08:07:27.298768690 +0200
++++ shadow-4.0.13/src/su.c	2005-10-04 08:07:34.443312955 +0200
+@@ -213,6 +213,8 @@
+ 	int status;
+ 	int ret;
+ 	int argno = 0;
++	unsigned int cmd_len = 0;
++	char *cmd = NULL;
+ 
+ 	/* There is at most 4 arguments (arg0, '-c', <command>, NULL) + the
+ 	 * number of arguments in the additional_args array. */
+@@ -238,6 +240,16 @@
+ 	if (command) {
+ 		args[argno++] = "-c";
+ 		args[argno++] = command;
++	} else if (additional_args) {
++		/* even if -c was not specified, there are some additional arguments
++		 * and they will be passed to the shell in the command provided
++		 * with the -c shell option.
++		 * This differ from others su implementations (FreeBSD, SUN).
++		 *
++		 * If you want to supply arguments to the shell, you will need to
++		 * put the shell with its arguments in the command.
++		 */
++		args[argno++] = "-c";
+ 	}
+ 
+ 	if (additional_args) {
+@@ -248,6 +260,30 @@
+ 
+ 	args[argno] = NULL;
+ 
++	/* Arguments are concatenated because the shell requires the command to
++	 * be specified in one argument (which must follow -c).
++	 * This differ from others su implementations (FreeBSD, SUN).
++	 *
++	 * If you need to supply separated arguments to the shell, then put
++	 * the shell and its arguments in the command line.
++	 */
++	if (args[1]) {
++		const char **parg;
++		cmd_len = 1; /* final \0 */
++		for (parg = &args[2]; *parg; parg++) {
++			cmd_len += strlen(*parg) + 1;
++		}
++		cmd = (char *) xmalloc(sizeof(char) * cmd_len);
++		cmd[0] = '\0';
++		for (parg = &args[2]; *parg; parg++) {
++			strcat (cmd, " ");
++			strcat (cmd, *parg);
++		}
++		cmd[cmd_len-1] = '\0';
++		args[2] = &cmd[1]; /* do not take first space */
++		args[3] = NULL;
++	}
++
+ #ifndef USE_PAM
+ 	(void) execv (shellstr, args);
+ 	fprintf (stderr, _("No shell\n"));

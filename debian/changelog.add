@@ -1,0 +1,11 @@
+This should be added to the changelog when building the package:
+
+  * New upstream version:
+    Debian bugs fixed by the new upstream version:
+    - faillog: Do not oversimplify the date of the last unsuccessful login
+      Closes: #89902
+    - login.1: also mention securetty(5). Closes: #325773
+    - chfn.1, chsh.1, groupadd.8, newusers.8, pwconv.8
+      useradd.8, userdel.8, usermod.8:
+      Improved crossreferences with other manpages
+      Closes: #300892

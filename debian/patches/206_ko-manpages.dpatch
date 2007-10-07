@@ -1,0 +1,12 @@
+Index: shadow-4.0.3/man/ko/Makefile.am
+===================================================================
+--- shadow-4.0.3.orig/man/ko/Makefile.am	2002-03-13 20:02:02.000000000 +0100
++++ shadow-4.0.3/man/ko/Makefile.am	2005-07-23 13:27:47.000000000 +0200
+@@ -5,7 +5,6 @@
+ 	chfn.1 \
+ 	chsh.1 \
+ 	login.1 \
+-	newgrp.1 \
+ 	passwd.5
+ 
+ EXTRA_DIST = $(man_MANS) \

@@ -1,0 +1,15 @@
+Goal: I'm not sure if the pw_shell can be NULL, but checking can't arm.
+
+Index: shadow-4.0.13/src/su.c
+===================================================================
+--- shadow-4.0.13.orig/src/su.c	2005-10-04 08:07:18.807498832 +0200
++++ shadow-4.0.13/src/su.c	2005-10-04 08:07:19.503357047 +0200
+@@ -610,7 +610,7 @@
+ 	/*
+ 	 * Set the default shell.
+ 	 */
+-	if (pwent.pw_shell[0] == '\0')
++	if (pwent.pw_shell == NULL || pwent.pw_shell[0] == '\0')
+ 		pwent.pw_shell = "/bin/sh";	/* XXX warning: const */
+ 
+ 	/* If the user do not want to change the environment,
