@@ -1,3 +1,33 @@
+shadow (1:4.1.1-2) UNRELEASED; urgency=low
+
+  * The "Brie de Meaux" and "Brie de Melun" double cheese release.
+  * Backported patches from upstream
+    - debian/patches/300_SHA_crypt_method:
+      This fixes bugs in the SHA encryption method that force the salt to have
+      8 bytes (instead of a random length between 8 and 16 bytes), and force
+      the number of SHA rounds to be equal to the lowest limit (at least 1000
+      SHA rounds).
+    - debian/patches/301_manpages_missing_options:
+      This add the missing documentation of options in useradd, groupadd, and
+      newusers.
+  * Tag patches already applied upstream
+    - debian/patches/487_passwd_chauthtok_failed_message
+    - debian/patches/406_vipw_resume_properly
+    - debian/patches/008_su_get_PAM_username
+    - debian/patches/491_configure.in_friendly_selinux_detection
+    - debian/patches/434_login_stop_checking_args_after--
+    - debian/patches/414_remove-unwise-advices
+  * Added description of new variables in /etc/login.defs:
+    - SYS_UID_MIN, SYS_UID_MAX, SYS_GID_MIN, SYS_GID_MAX
+    - ENCRYPT_METHOD
+    - SHA_CRYPT_MIN_ROUNDS, SHA_CRYPT_MAX_ROUNDS
+  * New Debian Policy:
+    - debian/control: Bump Standards-Version to 3.8.0 (no changes needed).
+    - debian/README.source: Document how to patch the upstream source, how to
+      use quilt, how to package a new upstream and how to use the testsuite.
+
+ -- Nicolas FRANCOIS (Nekral) <nicolas.francois@centraliens.net>  Fri, 13 Jun 2008 00:16:18 +0200
+
 shadow (1:4.1.1-1) unstable; urgency=low
 
   * New upstream release. This closes the following bugs:

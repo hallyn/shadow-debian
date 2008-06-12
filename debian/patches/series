@@ -28,3 +28,5 @@
 406_vipw_resume_properly
 414_remove-unwise-advices
 415_login_put-echoctl-back
+300_SHA_crypt_method
+301_manpages_missing_options
