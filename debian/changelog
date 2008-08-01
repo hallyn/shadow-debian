@@ -1,3 +1,28 @@
+shadow (1:4.1.1-3) unstable; urgency=low
+
+  * The "Morbier" release.
+  * debian/patches/302_vim_selinux_support: Add SE Linux support to vipw/vigr.
+    Thanks to Russell Coker. Closes: #491907
+  * debian/patches/494_passwd_lock-no_account_lock: Restore the previous
+    behavior of passwd -l (which changed in #389183): only lock the user's
+    password, not the user's account. Also explicitly document the
+    differences. This restores a behavior common with the previous versions of
+    passwd and with other implementations. Closes: #492307
+  * debian/patches/494_passwd_lock-no_account_lock: Add a reference to
+    usermod(8) in passwd(1). Closes: #412234
+  * debian/login.pam: Enforce a fail delay to avoid login brute-force.
+    Closes: #443322
+  * debian/login.pam: Indicate why the pam_securetty module is used as a
+    requisite module and mentions the possible drawbacks. Closes: #482352
+  * debian/login.defs: Do not mention the libpam-umask package (the module is
+    now provided by libpam-modules). Closes: #492410
+  * debian/patches/200_Czech_binary_translation: Updated Czech translation.
+    Thanks to Miroslav Kure. Closes: #482823
+  * debian/securetty.linux: Add the PA-RISC mux ports (ttyB0, ttyB1).
+    Closes: #488515
+
+ -- Nicolas FRANCOIS (Nekral) <nicolas.francois@centraliens.net>  Sat, 26 Jul 2008 10:12:46 +0200
+
 shadow (1:4.1.1-2) unstable; urgency=low
 
   * The "Brie de Meaux" and "Brie de Melun" double cheese release.

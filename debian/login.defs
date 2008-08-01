@@ -140,8 +140,8 @@ TTYPERM		0600
 # non-shell executables in place of login shell, like /usr/sbin/pppd for "ppp"
 # user and alike.
 #
-# Therefore the use of pam_umask is recommended (Debian package libpam-umask)
-# as the solution which catches all these cases on PAM-enabled systems.
+# Therefore the use of pam_umask is recommended as the solution which
+# catches all these cases on PAM-enabled systems.
 # 
 # This avoids the confusion created by having the umask set
 # in two different places -- in login.defs and shell rc files (i.e.
