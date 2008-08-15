@@ -33,3 +33,4 @@
 302_vim_selinux_support
 200_Czech_binary_translation
 494_passwd_lock-no_account_lock
+302_remove_non_translated_polish_manpages

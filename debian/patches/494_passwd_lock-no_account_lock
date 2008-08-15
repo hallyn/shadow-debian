@@ -19,7 +19,7 @@ Index: shadow-4.1.1/man/passwd.1.xml
 -	    and by setting the account expiry field to 1.
 +	    Lock the password of the named account. This option disables a password by changing
 +	    it to a value which matches no possible encrypted value
-+	    (it adds a '!' at the beginning of the password.
++	    (it adds a '!' at the beginning of the password).
 +	  </para>
 +	  <para>
 +	    Note that this does not disable the account. The user may
