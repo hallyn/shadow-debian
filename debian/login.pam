@@ -81,7 +81,7 @@ session    optional   pam_mail.so standard
 # SELinux needs to intervene at login time to ensure that the process
 # starts in the proper default security context.
 # Uncomment the following line to enable SELinux
-# session required pam_selinux.so multiple
+# session required pam_selinux.so select_context
 
 # Standard Un*x account and session
 @include common-account
