@@ -1,7 +1,7 @@
 Goal: Relaxed usernames/groupnames checking patch.
 
 Status wrt upstream: Debian specific. Not to be used upstream
-                     The documentation of the usernam length restriction
+                     The documentation of the username length restriction
                      was added upstream
 
 Details:
