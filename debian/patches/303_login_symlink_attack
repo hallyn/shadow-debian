@@ -1,0 +1,23 @@
+Goal: Fix a symlink attack
+
+Fixes: 505271
+
+Status wrt upstream: Fixed upstream
+
+--- a/libmisc/chowntty.c
++++ b/libmisc/chowntty.c
+@@ -119,8 +119,12 @@
+ 		exit (1);
+ 	}
+ 
+-	if (chown (tty, info->pw_uid, gid) ||
+-	    chmod (tty, getdef_num ("TTYPERM", 0600))) {
++	/* is_my_tty above ensure that tty is the same device as stdin.
++	 * there could be a race condition between the above check, and
++	 * changing the ownership/mode.
++	 */
++	if (fchown (STDIN_FILENO, info->pw_uid, gid) ||
++	    fchmod (STDIN_FILENO, getdef_num ("TTYPERM", 0600))) {
+ 		int err = errno;
+ 
+ 		snprintf (buf, sizeof buf, _("Unable to change tty %s"), tty);

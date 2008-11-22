@@ -1,3 +1,16 @@
+shadow (1:4.1.1-6) unstable; urgency=medium
+
+  * The "Rollot" release.
+  * debian/patches/303_login_symlink_attack: Fix a race condition that could
+    lead to gaining ownership or changing mode of arbitrary files.
+    Closes: #505271 
+  * debian/patches/304_su.1_synopsis: Fix the su synopsis. username is
+    referenced in the manpage, not LOGIN. Closes: #501353
+  * debian/patches/305_login.1_japanese: Fix the path of the utmp and wtmp
+    files. Closes: #501353
+
+ -- Nicolas FRANCOIS (Nekral) <nicolas.francois@centraliens.net>  Fri, 14 Nov 2008 21:52:42 +0100
+
 shadow (1:4.1.1-5) unstable; urgency=low
 
   * The "Bergues" release.

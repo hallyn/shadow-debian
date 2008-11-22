@@ -34,3 +34,6 @@
 200_Czech_binary_translation
 494_passwd_lock-no_account_lock
 302_remove_non_translated_polish_manpages
+303_login_symlink_attack
+304_su.1_synopsis
+305_login.1_japanese
