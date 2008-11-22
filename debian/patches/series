@@ -48,3 +48,4 @@
 104_man-sv
 405_su_no_pam_end_before_exec
 200_regenerate_manpages
+303_login_symlink_attack

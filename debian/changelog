@@ -1,8 +1,11 @@
-shadow (1:4.0.18.1-7etch1) UNRELEASED; urgency=low
+shadow (1:4.0.18.1-7etch1) stable-security; urgency=low
 
-  * 
+  * The "Curé nantais" release
+  * debian/patches/303_login_symlink_attack: Fix a race condition that could
+    lead to gaining ownership or changing mode of arbitrary files.
+    Closes: #505271
 
- -- Christian Perrier <bubulle@debian.org>  Wed, 11 Apr 2007 10:04:04 +0200
+ -- Nicolas FRANCOIS (Nekral) <nicolas.francois@centraliens.net>  Sat, 22 Nov 2008 16:04:04 +0000
 
 shadow (1:4.0.18.1-7) unstable; urgency=low
 
