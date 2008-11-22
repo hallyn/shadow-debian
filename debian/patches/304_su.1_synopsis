@@ -1,7 +1,7 @@
 Goal: Fix the su synopsis. username is referenced in the manpage, not
       LOGIN
 
-Fixes: 501353
+Fixes: 501830
 
 Status wrt upstream: Will be fixed in 4.1.3
 

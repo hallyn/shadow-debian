@@ -5,7 +5,7 @@ shadow (1:4.1.1-6) unstable; urgency=medium
     lead to gaining ownership or changing mode of arbitrary files.
     Closes: #505271 
   * debian/patches/304_su.1_synopsis: Fix the su synopsis. username is
-    referenced in the manpage, not LOGIN. Closes: #501353
+    referenced in the manpage, not LOGIN. Closes: #501830
   * debian/patches/305_login.1_japanese: Fix the path of the utmp and wtmp
     files. Closes: #501353
 
