@@ -1,0 +1,24 @@
+# These patches are only for the testsuite:
+#900_testsuite_groupmems
+#901_testsuite_gcov
+
+503_shadowconfig.8
+008_su_no_sanitize_env
+008_su_get_PAM_username
+428_grpck_add_prune_option
+008_login_log_failure_in_FTMP
+429_login_FAILLOG_ENAB
+401_cppw_src.dpatch
+506_relaxed_usernames
+542_useradd-O_option
+501_commonio_group_shadow
+463_login_delay_obeys_to_PAM
+523_su_arguments_are_concatenated
+523_su_arguments_are_no_more_concatenated_by_default
+483_su_fakelogin_wrong_arg0
+403_fix_PATH-MAX_hurd
+508_nologin_in_usr_sbin
+505_useradd_recommend_adduser
+302_vim_selinux_support
+402_cppw_selinux
+200_bin_nb
