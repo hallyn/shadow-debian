@@ -1,3 +1,11 @@
+shadow (1:4.1.4.2+svn3283-2+squeeze1) stable-security; urgency=high
+
+  * The "Tomanoix" release.
+  * debian/patches/300_CVE-2011-0721: Fix insufficient input sanitation
+    leading to possible user or group creation in NIS environments.
+
+ -- Nicolas FRANCOIS (Nekral) <nicolas.francois@centraliens.net>  Sun, 13 Feb 2011 22:02:28 +0100
+
 shadow (1:4.1.4.2+svn3283-2) unstable; urgency=low
 
   * The "Bleu du Vercors-Sassenage" release.
