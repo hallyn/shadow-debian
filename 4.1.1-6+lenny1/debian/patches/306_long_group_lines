@@ -1,0 +1,84 @@
+Goal: Fix handling of long user or group file lines.
+
+Closes: #552006
+
+Status wrt upstream: This patch comes from upstream
+
+--- a/libmisc/xgetXXbyYY.c
++++ b/libmisc/xgetXXbyYY.c
+@@ -50,7 +50,7 @@
+ 		exit (13);
+ 	}
+ 
+-	do {
++	while (1) {
+ 		int status;
+ 		LOOKUP_TYPE *resbuf = NULL;
+ 		buffer = (char *)realloc (buffer, length);
+@@ -77,8 +77,14 @@
+ 			return NULL;
+ 		}
+ 
+-		length *= 4;
+-	} while (length < MAX_LENGTH);
++		if (length <= ((size_t)-1 / 4)) {
++			length *= 4;
++		} else if (length == (size_t) -1) {
++			break;
++		} else {
++			length = (size_t) -1;
++		}
++	}
+ 
+ 	free(buffer);
+ 	free(result);
+--- a/libmisc/xgetpwnam.c
++++ b/libmisc/xgetpwnam.c
+@@ -27,7 +27,6 @@
+ #define ARG_TYPE	const char *
+ #define ARG_NAME	name
+ #define DUP_FUNCTION	__pw_dup
+-#define MAX_LENGTH	0x8000
+ #define HAVE_FUNCTION_R (defined HAVE_GETPWNAM_R)
+ 
+ #include "xgetXXbyYY.c"
+--- a/libmisc/xgetgrnam.c
++++ b/libmisc/xgetgrnam.c
+@@ -27,7 +27,6 @@
+ #define ARG_TYPE	const char *
+ #define ARG_NAME	name
+ #define DUP_FUNCTION	__gr_dup
+-#define MAX_LENGTH	0x8000
+ #define HAVE_FUNCTION_R (defined HAVE_GETGRNAM_R)
+ 
+ #include "xgetXXbyYY.c"
+--- a/libmisc/xgetpwuid.c
++++ b/libmisc/xgetpwuid.c
+@@ -27,7 +27,6 @@
+ #define ARG_TYPE	uid_t
+ #define ARG_NAME	uid
+ #define DUP_FUNCTION	__pw_dup
+-#define MAX_LENGTH	0x8000
+ #define HAVE_FUNCTION_R (defined HAVE_GETPWUID_R)
+ 
+ #include "xgetXXbyYY.c"
+--- a/libmisc/xgetgrgid.c
++++ b/libmisc/xgetgrgid.c
+@@ -27,7 +27,6 @@
+ #define ARG_TYPE	gid_t
+ #define ARG_NAME	gid
+ #define DUP_FUNCTION	__gr_dup
+-#define MAX_LENGTH	0x8000
+ #define HAVE_FUNCTION_R (defined HAVE_GETGRGID_R)
+ 
+ #include "xgetXXbyYY.c"
+--- a/libmisc/xgetspnam.c
++++ b/libmisc/xgetspnam.c
+@@ -27,7 +27,6 @@
+ #define ARG_TYPE	const char *
+ #define ARG_NAME	name
+ #define DUP_FUNCTION	__spw_dup
+-#define MAX_LENGTH	0x8000
+ #define HAVE_FUNCTION_R (defined HAVE_GETSPNAM_R)
+ 
+ #include "xgetXXbyYY.c"
