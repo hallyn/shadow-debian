@@ -1,3 +1,11 @@
+shadow (1:4.1.1-6+lenny1) stable-proposed-updates; urgency=low
+
+  * The "Soumaintrain" release.
+  * debian/patches/306_long_group_lines: Fix handling of long lines in the
+    user or group files. Closes: #552006
+
+ -- Nicolas FRANCOIS (Nekral) <nicolas.francois@centraliens.net>  Fri, 13 Nov 2009 22:13:39 +0100
+
 shadow (1:4.1.1-6) unstable; urgency=medium
 
   * The "Rollot" release.
